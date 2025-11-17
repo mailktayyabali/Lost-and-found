@@ -66,3 +66,14 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* DEBUG: temporary overrides to help diagnose a black/blank screen */
+/* Remove these after troubleshooting */
+html, body, #root {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.hero, .about, .team, .navbar, .footer {
+  opacity: 1 !important;
+}
