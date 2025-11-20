@@ -4,7 +4,7 @@ function SocialButtons() {
       <button className="google">
         <i className="fa-brands fa-google"></i> <span>Google</span>
       </button>
-      <button className="facebook">
+      <button onClick={()=>{alert("hi")}} className="facebook">
         <i className="fa-brands fa-facebook-f"></i> <span>Facebook</span>
       </button>
     </div>

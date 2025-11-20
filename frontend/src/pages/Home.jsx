@@ -1,4 +1,4 @@
-import heroImg from "../assets/9276436.jpg";
+
 import { Link } from "react-router-dom";
 
 function Home() {
@@ -12,7 +12,7 @@ function Home() {
           <Link to="/auth" className="btn outline">Create Account</Link>
         </div>
       </div>
-      <img src={heroImg} alt="Lost and Found Illustration" className="hero-img" />
+      <img src="/assets/homepic.jpg" alt="Lost and Found Illustration" className="hero-img" />
     </section>
   );
 }
