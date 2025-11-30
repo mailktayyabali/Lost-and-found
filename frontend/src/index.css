@@ -1,4 +1,5 @@
 /* ===== GENERAL ===== */
+
 body {
   margin: 0;
   font-family: "Inter", sans-serif;
@@ -12,6 +13,7 @@ body {
 
 /* ===== NAVBAR ===== */
 /* ===== NAVBAR (Refined Professional Look) ===== */
+
 .navbar {
   width: 100%;
   padding: 1rem 2rem;
@@ -28,6 +30,7 @@ body {
 }
 
 /* ===== Logo Section ===== */
+
 .logo-section {
   display: flex;
   align-items: center;
@@ -51,6 +54,7 @@ body {
 }
 
 /* ===== Back to Home Link ===== */
+
 .back-home {
   text-decoration: none;
   color: #e7f9ff;
@@ -69,7 +73,6 @@ body {
   color: #ffffff;
   transform: translateX(-2px);
 }
-
 
 .page-header {
   text-align: center;
@@ -94,6 +97,7 @@ body {
 }
 
 /* ===== MAIN CONTAINER ===== */
+
 main {
   flex: 1;
   display: flex;
@@ -122,6 +126,7 @@ main {
 }
 
 /* ===== PAGE HEADER (keep readable on dark bg) ===== */
+
 .page-header h1 {
   color: #f9fafb; /* light text for dark background */
 }
@@ -140,6 +145,7 @@ h1 {
 }
 
 /* ===== TAB SWITCHER ===== */
+
 .tab {
   display: flex;
   background: #f3f4f6;
@@ -165,6 +171,7 @@ h1 {
 }
 
 /* ===== FORMS ===== */
+
 form {
   display: none;
   animation: slideIn 0.4s ease;
@@ -182,8 +189,8 @@ label {
   color: #111827;   /* deep dark gray for better contrast */
 }
 
-
 /* ===== INPUT BOX WITH ICONS ===== */
+
 .input-box {
   position: relative;
   display: flex;
@@ -210,6 +217,7 @@ label {
 }
 
 /* ===== EYE ICON (SHOW/HIDE PASSWORD) ===== */
+
 .input-box .toggle-password {
   position: absolute;
   right: 12px;
@@ -224,11 +232,13 @@ label {
 }
 
 /* Optional: make eye icon appear darker when active */
+
 .input-box .toggle-password.active {
   color: #2563eb;
 }
 
 /* ===== PASSWORD + FORGOT ROW ===== */
+
 .password-row {
   display: flex;
   justify-content: space-between;
@@ -256,6 +266,7 @@ label {
 }
 
 /* ===== REMEMBER ME ===== */
+
 .remember {
   display: flex;
   align-items: center;
@@ -289,6 +300,7 @@ label {
 }
 
 /* ===== BUTTONS ===== */
+
 button.submit {
   width: 100%;
   background: #111827;
@@ -308,6 +320,7 @@ button.submit:hover {
 }
 
 /* ===== SOCIAL BUTTONS ===== */
+
 .divider {
   text-align: center;
   margin: 1.2rem 0;
@@ -350,6 +363,7 @@ button.submit:hover {
 }
 
 /* Hover animation */
+
 .social-buttons button:hover {
   background: #f3f4f6;
   transform: translateY(-2px);
@@ -357,18 +371,21 @@ button.submit:hover {
 }
 
 /* Google Icon */
+
 .social-buttons .google i {
   color: #ea4335;
   font-size: 1rem;
 }
 
 /* Facebook Icon */
+
 .social-buttons .facebook i {
   color: #1877f2;
   font-size: 1rem;
 }
 
 /* Responsive Fix */
+
 @media (max-width: 480px) {
   .social-buttons {
     flex-direction: column;
@@ -376,6 +393,7 @@ button.submit:hover {
 }
 
 /* ===== TERMS (Checkbox + Text in One Line) ===== */
+
 .terms {
   display: flex;
   align-items: center;
@@ -412,6 +430,7 @@ button.submit:hover {
 }
 
 /* ===== FOOTER TEXT ===== */
+
 .bottom-text {
   text-align: center;
   font-size: 0.75rem;
@@ -422,6 +441,7 @@ button.submit:hover {
 }
 
 /* ===== ANIMATIONS ===== */
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -445,6 +465,7 @@ button.submit:hover {
 }
 
 /* ===== RESPONSIVE ===== */
+
 @media (max-width: 480px) {
   .navbar {
     flex-direction: column;
@@ -469,6 +490,7 @@ button.submit:hover {
 }
 
 /* Home Responsive */
+
 .nav-links a {
   text-decoration: none;
   color: #fff;
@@ -701,6 +723,7 @@ button.submit:hover {
 }
 
 /* ===== REPORT ITEM PAGE ===== */
+
 .report-item {
   text-align: center;
   padding: 4rem 10%;
@@ -725,6 +748,7 @@ button.submit:hover {
 }
 
 /* Responsive adjustments */
+
 @media (max-width: 768px) {
   .report-item {
     padding: 3rem 5%;
@@ -747,7 +771,7 @@ button.submit:hover {
 }
 
 /* ===== TEAM SECTION ===== */
-/* ===== TEAM SECTION ===== */
+
 .team {
   text-align: center;
   padding: 60px 20px;
@@ -797,6 +821,7 @@ button.submit:hover {
 }
 
 /* Front Side */
+
 .card-front {
   background: #fff;
   display: flex;
@@ -824,6 +849,7 @@ button.submit:hover {
 }
 
 /* Back Side */
+
 .card-back {
   background: linear-gradient(135deg, #0077ff, #00d4ff);
   color: white;
@@ -846,18 +872,22 @@ button.submit:hover {
 }
 
 /* ===== RESPONSIVE ===== */
+
 @media (max-width: 900px) {
   .about {
     flex-direction: column;
     text-align: center;
   }
+
   .about-content {
     max-width: 100%;
   }
+
   .about-img {
     width: 80%;
     margin-top: 2rem;
   }
+
   .mission-vision {
     flex-direction: column;
   }
