@@ -75,7 +75,7 @@ function Auth() {
             <i className="icon fa-solid fa-lock"></i>
             <input type={showPassword ? "text" : "password"} placeholder="Create password" required />
             <i 
-              className={`toggle-password fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"}`}
+              className={`toggle-password fa-solid ${showPassword ? "fa-eye" : "fa-eye-slash"}`}
               onClick={togglePassword}
             ></i>
           </div>

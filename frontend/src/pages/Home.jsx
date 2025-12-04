@@ -8,7 +8,8 @@ function Home() {
           <h1>Find What's Lost, Return What's Found</h1>
           <p>Connecting people to their lost belongings securely and easily.</p>
           <div className="hero-buttons">
-            <Link to="/auth" className="btn primary">Sign In</Link>
+            <Link to="/auth" clas
+            sName="btn primary">Sign In</Link>
             <Link to="/auth" className="btn outline">Create Account</Link>
           </div>
         </div>

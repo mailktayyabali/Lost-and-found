@@ -4,7 +4,7 @@ function Navbar() {
 	return (
 		<nav className="navbar">
 			<div className="logo-section">
-				<img src="/assets/images/icon.jpg" alt="logo" className="logo"/>
+				<Link to="/" className="logo">F</Link>
 				<span className="brand-name">FindIt</span>
 			</div>
 			<div className="nav-links">
