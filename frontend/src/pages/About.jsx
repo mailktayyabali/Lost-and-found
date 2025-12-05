@@ -1,95 +1,164 @@
 function About() {
   const teamMembers = [
-    { 
-      img: "/assets/images/team1.jpg", 
-      name: "Alishba Khan", 
+    {
+      img: "/assets/images/team1.jpg",
+      name: "Alishba Khan",
       role: "Founder",
-      bio: "Passionate about connecting people and their belongings. Started FindIt after losing her own backpack."
+      bio: "Passionate about connecting people and their belongings. Started FindIt after losing her own backpack.",
     },
-    { 
-      img: "/assets/images/team2.jpg", 
-      name: "Ahmed Raza", 
+    {
+      img: "/assets/images/team2.jpg",
+      name: "Ahmed Raza",
       role: "UI/UX Designer",
-      bio: "Creates beautiful and intuitive experiences. Believes design should be accessible to everyone."
+      bio: "Creates beautiful and intuitive experiences. Believes design should be accessible to everyone.",
     },
-    { 
-      img: "/assets/images/team3.jpg", 
-      name: "Sara Malik", 
+    {
+      img: "/assets/images/team3.jpg",
+      name: "Sara Malik",
       role: "Marketing Lead",
-      bio: "Spreads the word about FindIt and helps build our community of helpful individuals."
-    }
+      bio: "Spreads the word about FindIt and helps build our community of helpful individuals.",
+    },
   ];
 
   return (
     <>
       {/* HERO SECTION */}
-      <section className="hero">
-        <div className="hero-content">
-          <h1>
-            About <span style={{ color: '#ffdc73' }}>FindIt</span>
+      <section className="flex flex-col md:flex-row items-center justify-between px-6 md:px-16 py-16 bg-gradient-to-r from-blue-100 to-blue-50">
+        <div className="md:w-1/2 mb-8 md:mb-0">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            About <span className="text-yellow-400">FindIt</span>
           </h1>
-          <p>
-            At FindIt, we believe in the power of community and technology to bring people together — and their lost items back home. Every day, people lose valuable belongings, and honest individuals find them but have no way to return them.
+          <p className="mb-4 text-lg md:text-xl">
+            At FindIt, we believe in the power of community and technology to
+            bring people together — and their lost items back home. Every day,
+            people lose valuable belongings, and honest individuals find them
+            but have no way to return them.
           </p>
-          <p>
-            That's where FindIt comes in. We provide a simple, secure platform that connects finders and owners, building trust and promoting kindness in our digital world.
+          <p className="text-lg md:text-xl">
+            That's where FindIt comes in. We provide a simple, secure platform
+            that connects finders and owners, building trust and promoting
+            kindness in our digital world.
           </p>
         </div>
-        <img src="/assets/images/team1.jpg" alt="About FindIt" className="hero-img" />
+        <img
+          src="/assets/images/team1.jpg"
+          alt="About FindIt"
+          className="md:w-1/2 rounded-xl shadow-lg"
+        />
       </section>
 
       {/* OUR STORY SECTION */}
-      <section className="how-it-works" style={{ background: 'linear-gradient(135deg, #346B7D, #6EAAB8)', color: '#fff' }}>
-        <h2 style={{ color: '#fff' }}>Our Story</h2>
-        <p style={{ maxWidth: '800px', margin: '0 auto', fontSize: '1.1rem', lineHeight: '1.8', color: '#f0f0f0' }}>
-          It all started with a missing backpack. One day, our founder lost her backpack with important documents and personal items. Despite searching everywhere, it seemed gone forever. A week later, a kind stranger found it and wanted to return it, but had no way to contact the owner.
+      <section className="w-full py-16 px-8 bg-white text-gray-800 text-center">
+        <h2 className="text-3xl font-bold mb-6">Our Story</h2>
+        <p className="max-w-3xl mx-auto text-lg leading-relaxed opacity-90">
+          It all started with a missing backpack. One day, our founder lost her
+          backpack with important documents and personal items. Despite
+          searching everywhere, it seemed gone forever. A week later, a kind
+          stranger found it and wanted to return it, but had no way to contact
+          the owner.
         </p>
-        <p style={{ maxWidth: '800px', margin: '1rem auto 0', fontSize: '1.1rem', lineHeight: '1.8', color: '#f0f0f0' }}>
-          This experience sparked an idea: What if there was a simple, secure platform where people could report lost items and connect with finders? That's how FindIt was born. Today, we've helped reunite hundreds of people with their lost belongings, and we're just getting started.
+        <p className="max-w-3xl mx-auto text-lg leading-relaxed opacity-90 mt-6">
+          This experience sparked an idea: What if there was a simple, secure
+          platform where people could report lost items and connect with
+          finders? That's how FindIt was born.
         </p>
       </section>
 
       {/* MISSION & VISION */}
-      <section className="how-it-works">
-        <h2>Our Mission & Vision</h2>
-        <div className="steps">
-          <div className="step">
-            <i className="fa-solid fa-bullseye"></i>
-            <h3>Our Mission</h3>
-            <p>To create a trusted platform that makes it easy for people to report lost items and connect with finders, fostering a community built on kindness and trust.</p>
+      <section className="w-full py-16 px-8 text-center bg-gray-100">
+        <h2 className="text-3xl font-bold mb-4">Our Mission & Vision</h2>
+
+        {/* Paragraph below heading */}
+        <p className="max-w-3xl mx-auto text-lg text-gray-700 mb-10">
+          At FindIt, we aim to build a community where lost items find their way
+          back to their owners. Through innovation, trust, and kindness, we
+          ensure that every lost and found item creates a positive connection
+          between people.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+          <div className="p-8 bg-[#A0B0C0] rounded-2xl shadow-lg hover:shadow-xl transition text-black">
+            <i
+              className="fa-solid fa-bullseye text-4xl mb-4"
+              style={{ color: "#333333" }}
+            ></i>
+            <h3 className="text-2xl font-semibold mt-2">Our Mission</h3>
+            <p className="mt-2">
+              To create a trusted platform connecting finders and owners. We
+              focus on making reporting and finding lost items easy, secure, and
+              fast, ensuring a seamless experience for everyone.
+            </p>
           </div>
-          <div className="step">
-            <i className="fa-solid fa-eye"></i>
-            <h3>Our Vision</h3>
-            <p>To become the go-to platform for lost and found items worldwide, where every lost item has a chance to be reunited with its owner.</p>
+
+          <div className="p-8 bg-[#A0B0C0] rounded-2xl shadow-lg hover:shadow-xl transition text-black">
+            <i
+              className="fa-solid fa-eye text-4xl mb-4"
+              style={{ color: "#333333" }}
+            ></i>
+            <h3 className="text-2xl font-semibold mt-2">Our Vision</h3>
+            <p className="mt-2">
+              To become the go-to global platform for lost and found. We
+              envision a world where no valuable item remains lost, and every
+              community becomes more connected through trust and kindness.
+            </p>
           </div>
-          <div className="step">
-            <i className="fa-solid fa-heart"></i>
-            <h3>Our Values</h3>
-            <p>Trust, community, kindness, and security are at the heart of everything we do. We believe in making the world a better place, one found item at a time.</p>
+
+          <div className="p-8 bg-[#A0B0C0] rounded-2xl shadow-lg hover:shadow-xl transition text-black">
+            <i
+              className="fa-solid fa-heart text-4xl mb-4"
+              style={{ color: "#333333" }}
+            ></i>
+            <h3 className="text-2xl font-semibold mt-2">Our Values</h3>
+            <p className="mt-2">
+              Trust, community, kindness, and security are at the heart of
+              everything we do. We strive to create a culture of helpfulness,
+              integrity, and compassion, making the world a better place, one
+              found item at a time.
+            </p>
           </div>
         </div>
       </section>
 
       {/* TEAM SECTION */}
-      <section className="team">
-        <h2>Meet Our Team</h2>
-        <div className="team-container">
+      <section className="w-full py-16 px-8 text-center bg-gray-50">
+        <h2 className="text-3xl font-bold mb-12">Meet Our Team</h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
           {teamMembers.map((member) => (
-            <div className="team-card" key={member.name}>
-              <div className="card-inner">
-                <div className="card-front">
-                  <img src={member.img} alt={member.name} />
-                  <h3>{member.name}</h3>
-                  <p>{member.role}</p>
+            <div key={member.name} className="group perspective">
+              <div className="relative h-96 w-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180 rounded-2xl shadow-lg">
+                {/* FRONT SIDE */}
+                <div className="absolute inset-0 backface-hidden rounded-2xl overflow-hidden">
+                  <img
+                    src={member.img}
+                    alt={member.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4 flex flex-col items-center">
+                    <h3 className="text-xl font-semibold">{member.name}</h3>
+                    <p className="text-sm">{member.role}</p>
+                  </div>
                 </div>
-                <div className="card-back">
-                  <h3>{member.name}</h3>
-                  <p>{member.bio}</p>
+
+                {/* BACK SIDE */}
+                <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl p-6 flex flex-col items-center justify-center bg-gradient-to-br from-[#346B7D] to-[#6EAAB8] text-white shadow-lg">
+                  <h3 className="text-xl font-semibold mb-2">{member.name}</h3>
+                  <p className="text-center text-sm opacity-90">{member.bio}</p>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+
+        {/* GET IN TOUCH SECTION */}
+        <div className="mt-16 py-12 px-8 bg-gray-100 max-w-3xl mx-auto text-center rounded-2xl">
+          <h2 className="text-3xl font-bold mb-4">Get in Touch</h2>
+          <p className="text-gray-700 text-lg leading-relaxed">
+            We love hearing from our community! Whether you have questions,
+            suggestions, or want to collaborate, feel free to reach out. Connect
+            with us and be part of our journey to make lost items find their way
+            home.
+          </p>
         </div>
       </section>
     </>
