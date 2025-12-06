@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Auth from "./pages/Auth";
 import About from "./pages/About";
 import Feed from "./pages/Feed";
+import ReportItem from "./pages/ReportItem";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 
@@ -15,6 +16,7 @@ function App() {
         <Route path="/feed" element={<Feed />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/about" element={<About />} />
+        <Route path="/report" element={<ReportItem />} />
       </Routes>
       <Footer />
     </div>
