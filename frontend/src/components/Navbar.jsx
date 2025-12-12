@@ -9,7 +9,7 @@ function Navbar() {
   };
 
   return (
-    <nav className="w-full px-8 py-4 flex items-center justify-between bg-gradient-to-br from-[#2E5C6B] to-[#3D7A8C] shadow-lg border-b border-white/10 fixed top-0 left-0 z-50">
+<nav className="w-full px-8 py-4 flex items-center justify-between bg-gradient-to-br from-[#2E5C6B] to-[#3D7A8C] shadow-lg border-b border-white/10 sticky top-0 z-50">
       {/* Logo + Brand */}
       <div className="flex items-center gap-3">
         <img
