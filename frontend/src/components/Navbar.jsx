@@ -43,6 +43,9 @@ function Navbar() {
         <Link className="text-white text-lg hover:text-gray-200 transition font-medium" to="/feed">
           Feed
         </Link>
+        <Link className="text-white text-lg hover:text-gray-200 transition font-medium" to="/contact">
+          Contact
+        </Link>
 
         {/* NEW Dashboard Button */}
         <Link
@@ -79,6 +82,9 @@ function Navbar() {
           </Link>
           <Link className="text-white text-lg hover:text-gray-200 transition font-medium" to="/feed" onClick={() => setIsOpen(false)}>
             Feed
+          </Link>
+          <Link className="text-white text-lg hover:text-gray-200 transition font-medium" to="/contact" onClick={() => setIsOpen(false)}>
+            Contact
           </Link>
 
           {/* NEW Dashboard Button (Mobile) */}
