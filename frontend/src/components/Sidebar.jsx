@@ -22,18 +22,30 @@ export default function Sidebar() {
       </div>
 
       {/* MENU */}
-      <nav className="flex flex-col gap-4 flex-1">
+      <nav className="flex flex-col gap-2 flex-1">
 
-        <Link className="flex items-center gap-3 p-3 rounded-xl bg-white/10" to="#">
-          <LayoutDashboard size={20} /> Dashboard Overview
+        <Link 
+          className="flex items-center gap-3 p-3 rounded-xl bg-white/10 transition-colors" 
+          to="/dashboard"
+        >
+          <LayoutDashboard size={20} /> 
+          <span className="font-medium">Dashboard Overview</span>
         </Link>
 
-        <Link className="flex items-center gap-3 p-3 hover:bg-white/10 rounded-xl" to="#">
-          <FileText size={20} /> My Reports
+        <Link 
+          className="flex items-center gap-3 p-3 hover:bg-white/10 rounded-xl transition-colors" 
+          to="/feed"
+        >
+          <FileText size={20} /> 
+          <span>My Reports</span>
         </Link>
 
-        <Link className="flex items-center gap-3 p-3 hover:bg-white/10 rounded-xl" to="#">
-          <User size={20} /> Edit Profile
+        <Link 
+          className="flex items-center gap-3 p-3 hover:bg-white/10 rounded-xl transition-colors" 
+          to="/dashboard"
+        >
+          <User size={20} /> 
+          <span>Edit Profile</span>
         </Link>
       </nav>
 

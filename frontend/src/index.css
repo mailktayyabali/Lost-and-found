@@ -1,1 +1,133 @@
 @import "tailwindcss";
+
+/* Custom scrollbar hiding */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom CSS variables for colors */
+:root {
+  --color-primary: #f2b90d;
+  --color-background-light: #f8f8f5;
+  --color-background-dark: #221e10;
+  --color-royal-blue: #243DB3;
+  --color-emerald-green: #4CAF50;
+  --color-coral-red: #F44336;
+  --color-deep-charcoal: #212121;
+  --color-cool-gray: #F4F6FA;
+}
+
+/* Apply display font */
+body {
+  font-family: "Inter", sans-serif;
+}
+
+/* Utility classes for custom colors */
+.bg-primary {
+  background-color: var(--color-primary);
+}
+
+.bg-background-light {
+  background-color: var(--color-background-light);
+}
+
+.bg-background-dark {
+  background-color: var(--color-background-dark);
+}
+
+.bg-royal-blue {
+  background-color: var(--color-royal-blue);
+}
+
+.bg-emerald-green {
+  background-color: var(--color-emerald-green);
+}
+
+.bg-coral-red {
+  background-color: var(--color-coral-red);
+}
+
+.bg-deep-charcoal {
+  background-color: var(--color-deep-charcoal);
+}
+
+.bg-cool-gray {
+  background-color: var(--color-cool-gray);
+}
+
+.text-primary {
+  color: var(--color-primary);
+}
+
+.text-royal-blue {
+  color: var(--color-royal-blue);
+}
+
+.text-emerald-green {
+  color: var(--color-emerald-green);
+}
+
+.text-coral-red {
+  color: var(--color-coral-red);
+}
+
+.text-deep-charcoal {
+  color: var(--color-deep-charcoal);
+}
+
+.border-primary {
+  border-color: var(--color-primary);
+}
+
+.border-emerald-green {
+  border-color: var(--color-emerald-green);
+}
+
+.border-coral-red {
+  border-color: var(--color-coral-red);
+}
+
+.font-heading {
+  font-family: "Poppins", sans-serif;
+}
+
+.font-display {
+  font-family: "Inter", sans-serif;
+}
+
+/* Flip Card Animation Styles */
+.flip-card-container {
+  perspective: 1000px;
+  height: 384px; /* h-96 equivalent */
+  width: 100%;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.flip-card-container:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+}

@@ -1,5 +1,12 @@
+import { useNavigate } from "react-router-dom";
+
 function FeedPostCard({ post }) {
+  const navigate = useNavigate();
   const isFound = post.status === "FOUND";
+
+  const handleViewDetails = () => {
+    navigate(`/item/${post.id}`);
+  };
 
   return (
     <article className="bg-white rounded-2xl overflow-hidden shadow hover:shadow-lg transition cursor-pointer">
@@ -42,6 +49,7 @@ function FeedPostCard({ post }) {
         {/* BUTTON */}
         <button
           type="button"
+          onClick={handleViewDetails}
           className="mt-3 w-full bg-gray-800 text-white py-2 rounded-xl text-sm font-medium hover:bg-gray-900 transition"
         >
           View Details

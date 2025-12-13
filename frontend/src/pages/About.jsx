@@ -125,10 +125,10 @@ function About() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
           {teamMembers.map((member) => (
-            <div key={member.name} className="group perspective">
-              <div className="relative h-96 w-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180 rounded-2xl shadow-lg">
+            <div key={member.name} className="flip-card-container">
+              <div className="flip-card-inner">
                 {/* FRONT SIDE */}
-                <div className="absolute inset-0 backface-hidden rounded-2xl overflow-hidden">
+                <div className="flip-card-front rounded-2xl overflow-hidden shadow-lg relative">
                   <img
                     src={member.img}
                     alt={member.name}
@@ -141,9 +141,10 @@ function About() {
                 </div>
 
                 {/* BACK SIDE */}
-                <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl p-6 flex flex-col items-center justify-center bg-gradient-to-br from-[#346B7D] to-[#6EAAB8] text-white shadow-lg">
-                  <h3 className="text-xl font-semibold mb-2">{member.name}</h3>
-                  <p className="text-center text-sm opacity-90">{member.bio}</p>
+                <div className="flip-card-back rounded-2xl p-6 flex flex-col items-center justify-center bg-gradient-to-br from-[#346B7D] to-[#6EAAB8] text-white shadow-lg">
+                  <h3 className="text-xl font-semibold mb-3">{member.name}</h3>
+                  <p className="text-sm font-medium mb-2 opacity-80">{member.role}</p>
+                  <p className="text-center text-sm leading-relaxed opacity-90">{member.bio}</p>
                 </div>
               </div>
             </div>

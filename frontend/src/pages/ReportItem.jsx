@@ -91,15 +91,11 @@ export default function ReportItem() {
             <label className="mb-1 font-medium text-gray-600">
               Upload Photos
             </label>
-            <div className="border border-dashed p-8 rounded-lg text-center mt-2 bg-gray-50">
-              <img
-                src="/upload-icon.png"
-                alt="upload"
-                className="mx-auto opacity-50 w-10 mb-2"
-              />
+            <div className="border border-dashed p-8 rounded-lg text-center mt-2 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
+              <i className="fa-solid fa-cloud-arrow-up text-4xl text-gray-400 mb-3"></i>
               <p className="text-gray-600">
                 Drag & drop files here or{" "}
-                <span className="text-blue-600 cursor-pointer">browse</span>
+                <span className="text-blue-600 font-medium hover:underline">browse</span>
               </p>
               <p className="text-xs text-gray-400 mt-1">
                 PNG, JPG, GIF up to 10MB
@@ -204,11 +200,17 @@ export default function ReportItem() {
 
         {/* SUBMIT BUTTONS */}
         <div className="flex flex-col sm:flex-row justify-end gap-4 pt-4">
-          <button className="px-6 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition">
+          <button 
+            type="button"
+            className="px-6 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition"
+          >
             Cancel
           </button>
 
-          <button className="px-6 py-2 rounded-lg bg-black text-white hover:bg-gray-800 transition">
+          <button 
+            type="submit"
+            className="px-6 py-2 rounded-lg bg-black text-white hover:bg-gray-800 transition"
+          >
             Submit Report
           </button>
         </div>

@@ -13,7 +13,7 @@ function Navbar() {
       {/* Logo + Brand */}
       <div className="flex items-center gap-3">
         <img
-          src="assets/images/icon.jpg"
+          src="/assets/images/icon.jpg"
           alt="logo"
           className="w-12 h-12 rounded-[10px] object-cover shadow-md"
         />
