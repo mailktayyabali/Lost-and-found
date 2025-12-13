@@ -41,7 +41,7 @@ function About() {
           </p>
         </div>
         <img
-          src="/assets/images/team1.jpg"
+          src="/assets/images/abouthero.jpg"
           alt="About FindIt"
           className="md:w-1/2 rounded-xl shadow-lg"
         />
@@ -143,8 +143,12 @@ function About() {
                 {/* BACK SIDE */}
                 <div className="flip-card-back rounded-2xl p-6 flex flex-col items-center justify-center bg-gradient-to-br from-[#346B7D] to-[#6EAAB8] text-white shadow-lg">
                   <h3 className="text-xl font-semibold mb-3">{member.name}</h3>
-                  <p className="text-sm font-medium mb-2 opacity-80">{member.role}</p>
-                  <p className="text-center text-sm leading-relaxed opacity-90">{member.bio}</p>
+                  <p className="text-sm font-medium mb-2 opacity-80">
+                    {member.role}
+                  </p>
+                  <p className="text-center text-sm leading-relaxed opacity-90">
+                    {member.bio}
+                  </p>
                 </div>
               </div>
             </div>

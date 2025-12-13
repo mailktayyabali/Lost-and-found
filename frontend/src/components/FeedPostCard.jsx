@@ -55,7 +55,7 @@ function FeedPostCard({ post }) {
         <button
           type="button"
           onClick={handleViewDetails}
-          className="mt-3 w-full bg-gray-800 text-white py-2 rounded-xl text-sm font-medium hover:bg-gray-900 transition"
+          className="mt-3 w-full bg-[#2E5C6B] text-white py-2 rounded-xl text-sm font-medium hover:bg-[#1f3d47] transition"
         >
           View Details
         </button>
@@ -65,4 +65,3 @@ function FeedPostCard({ post }) {
 }
 
 export default FeedPostCard;
-
