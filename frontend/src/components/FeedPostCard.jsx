@@ -3,9 +3,15 @@ import { useNavigate } from "react-router-dom";
 function FeedPostCard({ post }) {
   const navigate = useNavigate();
   const isFound = post.status === "FOUND";
+  const isResolved = post.status === "RESOLVED";
 
   const handleViewDetails = () => {
     navigate(`/item/${post.id}`);
+  };
+
+  const getStatusColor = () => {
+    if (isResolved) return "bg-blue-600";
+    return isFound ? "bg-green-600" : "bg-red-600";
   };
 
   return (
@@ -20,8 +26,7 @@ function FeedPostCard({ post }) {
 
         {/* STATUS BADGE */}
         <span
-          className={`absolute top-3 left-3 px-3 py-1 text-sm font-semibold rounded-lg text-white
-            ${isFound ? "bg-green-600" : "bg-red-600"}`}
+          className={`absolute top-3 left-3 px-3 py-1 text-sm font-semibold rounded-lg text-white ${getStatusColor()}`}
         >
           {post.status}
         </span>

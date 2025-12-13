@@ -5,10 +5,10 @@ import ActivityTable from "../components/ActivityTable";
 
 export default function UserDashboard() {
   return (
-    <div className="flex bg-gray-100 min-h-screen">
+    <div className="flex bg-gray-200 min-h-screen">
       <Sidebar />
 
-      <main className="flex-1 p-4 md:p-6 lg:p-10 overflow-x-hidden">
+      <main className="flex-1 p-4 md:p-6 lg:p-10 overflow-x-hidden lg:ml-0">
         <DashboardHeader />
 
         {/* Stats */}

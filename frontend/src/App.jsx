@@ -5,6 +5,7 @@ import About from "./pages/About";
 import Feed from "./pages/Feed";
 import ReportItem from "./pages/ReportItem";
 import UserDashboard from "./pages/UserDashboard";
+import MyReports from "./pages/MyReports";
 import ItemDetail from "./pages/ItemDetail";
 import Contact from "./pages/Contact";
 import Navbar from "./components/Navbar.jsx";
@@ -23,6 +24,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/report" element={<ReportItem />} />
         <Route path="/dashboard" element={<UserDashboard />} />
+        <Route path="/my-reports" element={<MyReports />} />
         <Route path="/item/:id" element={<ItemDetail />} />
       </Routes>
 
