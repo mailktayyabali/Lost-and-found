@@ -10,42 +10,40 @@ function FeedPostCard({ post }) {
   };
 
   const getStatusColor = () => {
-    if (isResolved) return "bg-blue-600";
-    return isFound ? "bg-green-600" : "bg-red-600";
+    if (isResolved) return "badge-info";
+    return isFound ? "badge-success" : "badge-error";
   };
 
   return (
-    <article className="bg-white rounded-2xl overflow-hidden shadow hover:shadow-lg transition cursor-pointer">
+    <article className="card-minimal overflow-hidden group cursor-pointer">
       {/* IMAGE WRAPPER */}
-      <div className="relative w-full h-56 overflow-hidden">
+      <div className="relative w-full h-56 overflow-hidden bg-gray-100">
         <img
           src={post.imageUrl}
           alt={post.title}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
 
         {/* STATUS BADGE */}
-        <span
-          className={`absolute top-3 left-3 px-3 py-1 text-sm font-semibold rounded-lg text-white ${getStatusColor()}`}
-        >
+        <span className={`absolute top-3 left-3 badge ${getStatusColor()}`}>
           {post.status}
         </span>
       </div>
 
       {/* BODY */}
-      <div className="p-4 flex flex-col gap-3">
-        <h3 className="text-xl font-semibold text-gray-800">{post.title}</h3>
+      <div className="p-5 flex flex-col gap-3">
+        <h3 className="text-xl font-semibold text-navy group-hover:text-teal transition">{post.title}</h3>
 
-        <p className="text-gray-600 text-sm">{post.description}</p>
+        <p className="text-slate text-sm line-clamp-2">{post.description}</p>
 
         {/* META DATA */}
-        <div className="mt-1 space-y-2">
-          <div className="flex items-center gap-2 text-gray-500 text-sm">
+        <div className="mt-2 space-y-2">
+          <div className="flex items-center gap-2 text-slate text-sm">
             <i className="fa-regular fa-calendar" />
             <span>{post.date}</span>
           </div>
 
-          <div className="flex items-center gap-2 text-gray-500 text-sm">
+          <div className="flex items-center gap-2 text-slate text-sm">
             <i className="fa-solid fa-location-dot" />
             <span>{post.location}</span>
           </div>
@@ -55,7 +53,7 @@ function FeedPostCard({ post }) {
         <button
           type="button"
           onClick={handleViewDetails}
-          className="mt-3 w-full bg-[#2E5C6B] text-white py-2 rounded-xl text-sm font-medium hover:bg-[#1f3d47] transition"
+          className="mt-3 w-full bg-navy text-white py-2.5 rounded-lg text-sm font-medium hover:bg-teal transition shadow-sm hover:shadow-md"
         >
           View Details
         </button>

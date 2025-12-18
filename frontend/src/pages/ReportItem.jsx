@@ -1,61 +1,116 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function ReportItem() {
   const location = useLocation();
+  const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
   const typeFromURL = params.get("type");
   const [type, setType] = useState(typeFromURL || "lost");
 
+  const [formData, setFormData] = useState({
+    itemName: "",
+    category: "Electronics",
+    color: "",
+    description: "",
+    location: "",
+    date: "",
+    time: "",
+    contactName: "",
+    contactEmail: "",
+    contactPhone: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    alert(`${type === "lost" ? "Lost" : "Found"} item report submitted! (Demo only)`);
+    console.log("Report Data:", { type, ...formData });
+    // Reset form
+    setFormData({
+      itemName: "",
+      category: "Electronics",
+      color: "",
+      description: "",
+      location: "",
+      date: "",
+      time: "",
+      contactName: "",
+      contactEmail: "",
+      contactPhone: "",
+    });
+  };
+
+  const handleCancel = () => {
+    navigate(-1); // Go back to previous page
+  };
+
   return (
-    <div className="w-full min-h-screen bg-gray-100 flex flex-col items-center">
+    <div className="w-full min-h-screen bg-gray-50 flex flex-col items-center px-4 py-10">
       {/* PAGE HEADER */}
-      <h1 className="text-4xl font-bold text-gray-800 mt-10">Report an Item</h1>
+      <h1 className="text-4xl font-bold text-navy mb-2">Report an Item</h1>
+      <p className="text-slate mb-8">Help reunite lost items with their owners</p>
 
       {/* LOST / FOUND TOGGLE */}
-      <div className="mt-6 bg-gray-200 rounded-full p-1 flex w-full max-w-[320px]">
+      <div className="bg-gray-200 rounded-full p-1 flex w-full max-w-[320px] mb-8">
         <button
+          type="button"
           onClick={() => setType("lost")}
-          className={`flex-1 py-2 text-sm rounded-full transition ${
-            type === "lost" ? "bg-white shadow font-semibold" : "text-gray-600"
-          }`}
+          className={`flex-1 py-2.5 text-sm rounded-full transition-all font-medium ${type === "lost" ? "bg-white text-navy shadow-md" : "text-gray-600 hover:text-navy"
+            }`}
         >
           I Lost Something
         </button>
 
         <button
+          type="button"
           onClick={() => setType("found")}
-          className={`flex-1 py-2 text-sm rounded-full transition ${
-            type === "found" ? "bg-white shadow font-semibold" : "text-gray-600"
-          }`}
+          className={`flex-1 py-2.5 text-sm rounded-full transition-all font-medium ${type === "found" ? "bg-white text-navy shadow-md" : "text-gray-600 hover:text-navy"
+            }`}
         >
           I Found Something
         </button>
       </div>
 
       {/* FORM CONTAINER */}
-      <form className="w-full max-w-3xl bg-white mt-10 p-6 sm:p-10 rounded-2xl shadow-sm space-y-10 mb-20">
+      <form onSubmit={handleSubmit} className="w-full max-w-3xl card-minimal p-8 space-y-10 mb-20">
         {/* ABOUT THE ITEM */}
         <section>
-          <h2 className="text-lg font-bold text-gray-700 border-b pb-2">
+          <h2 className="text-lg font-bold text-navy border-b border-gray-200 pb-3 mb-6">
             About the Item
           </h2>
 
-          {/* Row 1: Item Name */}
-          <div className="mt-6">
-            <label className="mb-1 font-medium text-gray-600">Item Name</label>
+          {/* Item Name */}
+          <div className="mb-5">
+            <label className="block mb-2 font-medium text-navy text-sm">Item Name</label>
             <input
               type="text"
+              name="itemName"
               placeholder="e.g., Black Leather Wallet"
-              className="border p-3 rounded-lg w-full focus:ring-2 ring-blue-300"
+              value={formData.itemName}
+              onChange={handleChange}
+              required
+              className="input-minimal w-full"
             />
           </div>
 
-          {/* Row 2: Category + Color */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-            <div className="flex flex-col">
-              <label className="mb-1 font-medium text-gray-600">Category</label>
-              <select className="border p-3 rounded-lg w-full focus:ring-2 ring-blue-300">
+          {/* Category + Color */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            <div>
+              <label className="block mb-2 font-medium text-navy text-sm">Category</label>
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                required
+                className="input-minimal w-full"
+              >
                 <option>Electronics</option>
                 <option>Accessories</option>
                 <option>Clothing</option>
@@ -64,40 +119,47 @@ export default function ReportItem() {
               </select>
             </div>
 
-            <div className="flex flex-col">
-              <label className="mb-1 font-medium text-gray-600">Color</label>
+            <div>
+              <label className="block mb-2 font-medium text-navy text-sm">Color</label>
               <input
                 type="text"
+                name="color"
                 placeholder="e.g., Red"
-                className="border p-3 rounded-lg w-full focus:ring-2 ring-blue-300"
+                value={formData.color}
+                onChange={handleChange}
+                className="input-minimal w-full"
               />
             </div>
           </div>
 
-          {/* Row 3: Detailed Description */}
-          <div className="flex flex-col mt-6">
-            <label className="mb-1 font-medium text-gray-600">
+          {/* Detailed Description */}
+          <div className="mb-5">
+            <label className="block mb-2 font-medium text-navy text-sm">
               Detailed Description
             </label>
             <textarea
+              name="description"
               rows="4"
-              placeholder="Describe any distinctive features, brand, condition, or contents…"
-              className="border p-3 rounded-lg w-full focus:ring-2 ring-blue-300"
+              placeholder="Describe any distinctive features, brand, condition, or contents..."
+              value={formData.description}
+              onChange={handleChange}
+              required
+              className="input-minimal w-full custom-scrollbar"
             ></textarea>
           </div>
 
-          {/* Row 4: Upload Photos */}
-          <div className="flex flex-col mt-6">
-            <label className="mb-1 font-medium text-gray-600">
+          {/* Upload Photos */}
+          <div>
+            <label className="block mb-2 font-medium text-navy text-sm">
               Upload Photos
             </label>
-            <div className="border border-dashed p-8 rounded-lg text-center mt-2 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50 hover:bg-gray-100 hover:border-teal transition-all cursor-pointer">
               <i className="fa-solid fa-cloud-arrow-up text-4xl text-gray-400 mb-3"></i>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-sm">
                 Drag & drop files here or{" "}
-                <span className="text-blue-600 font-medium hover:underline">browse</span>
+                <span className="text-teal font-medium hover:underline">browse</span>
               </p>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-gray-400 mt-2">
                 PNG, JPG, GIF up to 10MB
               </p>
             </div>
@@ -106,39 +168,50 @@ export default function ReportItem() {
 
         {/* WHERE & WHEN */}
         <section>
-          <h2 className="text-lg font-bold text-gray-700 border-b pb-2">
+          <h2 className="text-lg font-bold text-navy border-b border-gray-200 pb-3 mb-6">
             Where & When
           </h2>
 
           {/* Location */}
-          <div className="mt-6">
-            <label className="mb-1 font-medium text-gray-600">Location</label>
+          <div className="mb-5">
+            <label className="block mb-2 font-medium text-navy text-sm">Location</label>
             <input
               type="text"
+              name="location"
               placeholder="e.g., Central Park, near the fountain"
-              className="border p-3 rounded-lg w-full focus:ring-2 ring-blue-300"
+              value={formData.location}
+              onChange={handleChange}
+              required
+              className="input-minimal w-full"
             />
           </div>
 
-          {/* Date Lost/Found and Time */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-            <div className="flex flex-col">
-              <label className="mb-1 font-medium text-gray-600">
+          {/* Date and Time */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label className="block mb-2 font-medium text-navy text-sm">
                 Date {type === "lost" ? "Lost" : "Found"}
               </label>
               <input
                 type="date"
-                className="border p-3 rounded-lg w-full focus:ring-2 ring-blue-300"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                required
+                className="input-minimal w-full"
               />
             </div>
 
-            <div className="flex flex-col">
-              <label className="mb-1 font-medium text-gray-600">
+            <div>
+              <label className="block mb-2 font-medium text-navy text-sm">
                 Approximate Time
               </label>
               <input
                 type="time"
-                className="border p-3 rounded-lg w-full focus:ring-2 ring-blue-300"
+                name="time"
+                value={formData.time}
+                onChange={handleChange}
+                className="input-minimal w-full"
               />
             </div>
           </div>
@@ -146,52 +219,62 @@ export default function ReportItem() {
 
         {/* CONTACT DETAILS */}
         <section>
-          <h2 className="text-lg font-bold text-gray-700 border-b pb-2">
+          <h2 className="text-lg font-bold text-navy border-b border-gray-200 pb-3 mb-6">
             Your Contact Details
           </h2>
 
           {/* Name and Email */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-            <div className="flex flex-col">
-              <label className="mb-1 font-medium text-gray-600">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            <div>
+              <label className="block mb-2 font-medium text-navy text-sm">
                 Your Name
               </label>
               <input
                 type="text"
+                name="contactName"
                 placeholder="John Doe"
-                className="border p-3 rounded-lg w-full focus:ring-2 ring-blue-300"
+                value={formData.contactName}
+                onChange={handleChange}
+                required
+                className="input-minimal w-full"
               />
             </div>
 
-            <div className="flex flex-col">
-              <label className="mb-1 font-medium text-gray-600">
+            <div>
+              <label className="block mb-2 font-medium text-navy text-sm">
                 Email Address
               </label>
               <input
                 type="email"
+                name="contactEmail"
                 placeholder="you@example.com"
-                className="border p-3 rounded-lg w-full focus:ring-2 ring-blue-300"
+                value={formData.contactEmail}
+                onChange={handleChange}
+                required
+                className="input-minimal w-full"
               />
             </div>
           </div>
 
           {/* Phone Number */}
-          <div className="mt-6 flex flex-col">
-            <label className="mb-1 font-medium text-gray-600">
-              Phone Number{" "}
-              <span className="text-gray-400 text-sm">(optional)</span>
+          <div className="mb-5">
+            <label className="block mb-2 font-medium text-navy text-sm">
+              Phone Number <span className="text-gray-400 text-sm">(optional)</span>
             </label>
             <input
               type="text"
+              name="contactPhone"
               placeholder="e.g., +1 234 567 890"
-              className="border p-3 rounded-lg w-full focus:ring-2 ring-blue-300"
+              value={formData.contactPhone}
+              onChange={handleChange}
+              className="input-minimal w-full"
             />
           </div>
 
           {/* Security / Info Message */}
-          <div className="mt-4 flex gap-3 items-start p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <span className="text-blue-500 text-xl flex-shrink-0">🔒</span>
-            <p className="text-blue-700 text-sm">
+          <div className="flex gap-3 items-start p-4 bg-teal/10 border border-teal/30 rounded-lg">
+            <span className="text-teal text-xl flex-shrink-0">🔒</span>
+            <p className="text-navy text-sm">
               Your contact information will be kept private and shared only with
               a user who has a confirmed match for your item.
             </p>
@@ -200,16 +283,17 @@ export default function ReportItem() {
 
         {/* SUBMIT BUTTONS */}
         <div className="flex flex-col sm:flex-row justify-end gap-4 pt-4">
-          <button 
+          <button
             type="button"
-            className="px-6 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition"
+            onClick={handleCancel}
+            className="btn-secondary px-6 py-2.5"
           >
             Cancel
           </button>
 
-          <button 
+          <button
             type="submit"
-            className="px-6 py-2 rounded-lg bg-black text-white hover:bg-gray-800 transition"
+            className="btn-primary px-6 py-2.5"
           >
             Submit Report
           </button>

@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* ===========================================
+   MINIMALISTIC PROFESSIONAL DESIGN SYSTEM
+   =========================================== */
+
 /* Custom scrollbar hiding */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -10,100 +14,277 @@
   scrollbar-width: none;
 }
 
-/* Custom CSS variables for colors */
+/* Color System Variables */
 :root {
-  --color-primary: #f2b90d;
-  --color-background-light: #f8f8f5;
-  --color-background-dark: #221e10;
-  --color-royal-blue: #243DB3;
-  --color-emerald-green: #4CAF50;
-  --color-coral-red: #F44336;
-  --color-deep-charcoal: #212121;
-  --color-cool-gray: #F4F6FA;
+  /* Primary Colors */
+  --color-navy: #1e293b;
+  --color-slate: #64748b;
+  --color-light: #f8fafc;
+  --color-white: #ffffff;
+  
+  /* Accent Colors */
+  --color-teal: #0d9488;
+  --color-teal-dark: #0f766e;
+  --color-amber: #f59e0b;
+  --color-amber-dark: #d97706;
+  
+  /* Semantic Colors */
+  --color-success: #10b981;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+  --color-info: #3b82f6;
+  
+  /* Neutral Grays */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
 }
 
-/* Apply display font */
+/* Typography */
 body {
-  font-family: "Inter", sans-serif;
-}
-
-/* Utility classes for custom colors */
-.bg-primary {
-  background-color: var(--color-primary);
-}
-
-.bg-background-light {
-  background-color: var(--color-background-light);
-}
-
-.bg-background-dark {
-  background-color: var(--color-background-dark);
-}
-
-.bg-royal-blue {
-  background-color: var(--color-royal-blue);
-}
-
-.bg-emerald-green {
-  background-color: var(--color-emerald-green);
-}
-
-.bg-coral-red {
-  background-color: var(--color-coral-red);
-}
-
-.bg-deep-charcoal {
-  background-color: var(--color-deep-charcoal);
-}
-
-.bg-cool-gray {
-  background-color: var(--color-cool-gray);
-}
-
-.text-primary {
-  color: var(--color-primary);
-}
-
-.text-royal-blue {
-  color: var(--color-royal-blue);
-}
-
-.text-emerald-green {
-  color: var(--color-emerald-green);
-}
-
-.text-coral-red {
-  color: var(--color-coral-red);
-}
-
-.text-deep-charcoal {
-  color: var(--color-deep-charcoal);
-}
-
-.border-primary {
-  border-color: var(--color-primary);
-}
-
-.border-emerald-green {
-  border-color: var(--color-emerald-green);
-}
-
-.border-coral-red {
-  border-color: var(--color-coral-red);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--color-gray-800);
+  line-height: 1.6;
 }
 
 .font-heading {
-  font-family: "Poppins", sans-serif;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.025em;
 }
 
 .font-display {
   font-family: "Inter", sans-serif;
 }
 
-/* Flip Card Animation Styles */
+/* Utility Classes for Theme Colors */
+.bg-navy {
+  background-color: var(--color-navy);
+}
+
+.bg-slate {
+  background-color: var(--color-slate);
+}
+
+.bg-teal {
+  background-color: var(--color-teal);
+}
+
+.bg-teal-dark {
+  background-color: var(--color-teal-dark);
+}
+
+.bg-amber {
+  background-color: var(--color-amber);
+}
+
+.text-navy {
+  color: var(--color-navy);
+}
+
+.text-slate {
+  color: var(--color-slate);
+}
+
+.text-teal {
+  color: var(--color-teal);
+}
+
+.text-amber {
+  color: var(--color-amber);
+}
+
+.border-teal {
+  border-color: var(--color-teal);
+}
+
+.border-navy {
+  border-color: var(--color-navy);
+}
+
+/* Custom Scrollbar (Minimalistic) */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--color-gray-100);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: 3px;
+  transition: background 0.2s;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-slate);
+}
+
+/* Smooth Transitions */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card Styles */
+.card-minimal {
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.card-minimal:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Button Base Styles */
+.btn-primary {
+  background: var(--color-teal);
+  color: var(--color-white);
+  padding: 0.625rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: var(--color-teal-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(13, 148, 136, 0.2);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-navy);
+  padding: 0.625rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: 1px solid var(--color-gray-300);
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: var(--color-gray-50);
+  border-color: var(--color-gray-400);
+}
+
+/* Input Styles */
+.input-minimal {
+  border: 1px solid var(--color-gray-300);
+  background: var(--color-white);
+  padding: 0.625rem 1rem;
+  border-radius: 0.5rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.input-minimal:focus {
+  border-color: var(--color-teal);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+/* Underline Hover Effect for Links */
+.link-underline {
+  position: relative;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--color-teal);
+  transition: width 0.3s ease;
+}
+
+.link-underline:hover::after {
+  width: 100%;
+}
+
+/* Fade In Animation */
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slide In Animation */
+.slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Backdrop Blur */
+.backdrop-blur-minimal {
+  backdrop-filter: blur(8px);
+  background: rgba(30, 41, 59, 0.8);
+}
+
+/* Status Badge */
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.badge-success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge-error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-info {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+/* Flip Card Animation (Simplified) */
 .flip-card-container {
   perspective: 1000px;
-  height: 384px; /* h-96 equivalent */
+  height: 384px;
   width: 100%;
 }
 
@@ -126,52 +307,9 @@ body {
   height: 100%;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  border-radius: 0.75rem;
 }
 
 .flip-card-back {
   transform: rotateY(180deg);
-}
-
-/* Custom scrollbar for textarea */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #cfd3e7;
-  border-radius: 4px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #243DB3;
-}
-
-/* Fade in slide in animation */
-.fade-in-slide-in {
-  animation: fade-in-slide-in 0.6s ease-out forwards;
-}
-
-@keyframes fade-in-slide-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Card rise animation */
-.card-rise {
-  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
-}
-
-.card-rise:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 10px 20px rgba(36, 61, 179, 0.1), 0 3px 6px rgba(0, 0, 0, 0.05);
 }

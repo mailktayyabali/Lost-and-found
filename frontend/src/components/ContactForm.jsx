@@ -15,19 +15,18 @@ function ContactForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission here
     console.log("Form submitted:", formData);
     alert("Thank you for your message! We'll get back to you soon.");
     setFormData({ name: "", email: "", subject: "", message: "" });
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 sm:p-8 lg:p-10 shadow-md border border-gray-100">
+    <div className="card-minimal p-8 lg:p-10">
       <div className="flex items-center gap-3 mb-8">
-        <div className="p-2 bg-[#243DB3]/10 rounded-lg text-[#243DB3]">
-          <span className="material-symbols-outlined">mail</span>
+        <div className="p-2 bg-teal/10 rounded-lg text-teal">
+          <span className="material-symbols-outlined">email</span>
         </div>
-        <h2 className="text-xl font-heading font-bold text-[#212121]">
+        <h2 className="text-xl font-bold text-navy">
           Send us a message
         </h2>
       </div>
@@ -37,13 +36,13 @@ function ContactForm() {
           {/* Name Field */}
           <div className="flex flex-col gap-2">
             <label
-              className="text-sm font-semibold text-gray-700"
+              className="text-sm font-semibold text-navy"
               htmlFor="name"
             >
               Full Name
             </label>
             <input
-              className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 h-12 text-gray-900 placeholder:text-gray-400 focus:border-[#243DB3] focus:ring-2 focus:ring-[#243DB3]/20 transition-all outline-none"
+              className="input-minimal"
               id="name"
               name="name"
               placeholder="John Doe"
@@ -57,13 +56,13 @@ function ContactForm() {
           {/* Email Field */}
           <div className="flex flex-col gap-2">
             <label
-              className="text-sm font-semibold text-gray-700"
+              className="text-sm font-semibold text-navy"
               htmlFor="email"
             >
               Email Address
             </label>
             <input
-              className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 h-12 text-gray-900 placeholder:text-gray-400 focus:border-[#243DB3] focus:ring-2 focus:ring-[#243DB3]/20 transition-all outline-none"
+              className="input-minimal"
               id="email"
               name="email"
               placeholder="john@example.com"
@@ -78,14 +77,14 @@ function ContactForm() {
         {/* Subject Dropdown */}
         <div className="flex flex-col gap-2">
           <label
-            className="text-sm font-semibold text-gray-700"
+            className="text-sm font-semibold text-navy"
             htmlFor="subject"
           >
             Subject
           </label>
           <div className="relative">
             <select
-              className="w-full appearance-none rounded-xl border border-gray-200 bg-gray-50 px-4 h-12 text-gray-900 focus:border-[#243DB3] focus:ring-2 focus:ring-[#243DB3]/20 transition-all outline-none pr-10"
+              className="input-minimal w-full appearance-none pr-10"
               id="subject"
               name="subject"
               value={formData.subject}
@@ -109,13 +108,13 @@ function ContactForm() {
         {/* Message Textarea */}
         <div className="flex flex-col gap-2">
           <label
-            className="text-sm font-semibold text-gray-700"
+            className="text-sm font-semibold text-navy"
             htmlFor="message"
           >
             Message
           </label>
           <textarea
-            className="w-full rounded-xl border border-gray-200 bg-gray-50 p-4 text-gray-900 placeholder:text-gray-400 focus:border-[#243DB3] focus:ring-2 focus:ring-[#243DB3]/20 transition-all outline-none resize-y min-h-[140px] custom-scrollbar"
+            className="input-minimal resize-y min-h-[140px] custom-scrollbar"
             id="message"
             name="message"
             placeholder="Please describe your issue or question in detail..."
@@ -129,7 +128,7 @@ function ContactForm() {
         {/* Submit Button */}
         <div className="pt-2">
           <button
-            className="group relative w-full sm:w-auto min-w-[160px] h-12 flex items-center justify-center gap-2 bg-gradient-to-r from-[#243DB3] to-[#3D7A8C] hover:from-[#3D7A8C] hover:to-[#243DB3] text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg shadow-md"
+            className="btn-primary group flex items-center gap-2 px-6 py-3 w-full sm:w-auto"
             type="submit"
           >
             <span>Send Message</span>
@@ -144,4 +143,3 @@ function ContactForm() {
 }
 
 export default ContactForm;
-
