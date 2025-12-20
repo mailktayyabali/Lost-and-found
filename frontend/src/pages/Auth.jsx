@@ -1,11 +1,14 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import SocialButtons from "../components/SocialButtons";
+import { useAuth } from "../context/AuthContext";
 
 function Auth() {
   const [isSignIn, setIsSignIn] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -26,19 +29,22 @@ function Auth() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (isSignIn) {
-      alert("Sign in submitted! (Demo only)");
-      console.log("Sign In:", { email: formData.email, password: formData.password });
-    } else {
-      if (formData.password !== formData.confirmPassword) {
+    
+    // Simple validation for sign up
+    if (!isSignIn && formData.password !== formData.confirmPassword) {
         alert("Passwords do not match!");
         return;
-      }
-      alert("Account created! (Demo only)");
-      console.log("Sign Up:", formData);
     }
-    // Reset form
-    setFormData({ fullName: "", email: "", password: "", confirmPassword: "" });
+
+    // Call login from context (works for both sign in and sign up for this mock)
+    const user = login(formData.email, formData.password);
+    
+    // Redirect based on role
+    if (user.role === "admin") {
+      navigate("/admin");
+    } else {
+      navigate("/dashboard");
+    }
   };
 
   return (
@@ -111,6 +117,7 @@ function Auth() {
                 className="input-minimal w-full pl-10 pr-3 py-2.5 text-sm"
               />
             </div>
+             <p className="text-xs text-gray-400 mt-1">Tip: Use 'admin@findit.com' for Admin role</p>
           </div>
 
           {/* Password */}
