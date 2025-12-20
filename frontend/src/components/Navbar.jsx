@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { User, LogOut, LayoutDashboard } from "lucide-react";
+import { User, LogOut, LayoutDashboard, Search, CheckCircle } from "lucide-react";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -63,7 +63,19 @@ function Navbar() {
           <div className="hidden md:flex items-center gap-1">
             <NavLink to="/">Home</NavLink>
             <NavLink to="/about">About</NavLink>
-            <NavLink to="/feed">Feed</NavLink>
+            
+            {/* Split Feeds */}
+            <NavLink to="/lost-items">
+                <span className="flex items-center gap-1.5">
+                    <Search size={14} className="opacity-70" /> Lost Items
+                </span>
+            </NavLink>
+            <NavLink to="/found-items">
+                <span className="flex items-center gap-1.5">
+                    <CheckCircle size={14} className="opacity-70" /> Found Items
+                </span>
+            </NavLink>
+            
             <NavLink to="/contact">Contact</NavLink>
 
             {/* Separator */}
@@ -132,11 +144,11 @@ function Navbar() {
               </div>
             ) : (
               <Link
-                className="ml-4 px-6 py-2.5 bg-gradient-to-r from-teal to-emerald-500 text-white rounded-full hover:shadow-[0_0_20px_rgba(45,212,191,0.3)] hover:-translate-y-0.5 transition-all text-sm font-semibold shadow-md border border-white/10 flex items-center gap-2 group"
+                className="ml-4 px-6 py-2.5 bg-white text-slate-900 rounded-lg hover:bg-slate-100 transition-all text-sm font-bold shadow-md hover:shadow-lg flex items-center gap-2 group border-2 border-transparent hover:border-white/50"
                 to="/auth"
               >
                 Sign In
-                <i className="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                <i className="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform text-teal"></i>
               </Link>
             )}
           </div>
@@ -178,7 +190,12 @@ function Navbar() {
             <div className="flex flex-col gap-2 p-6 pt-24 flex-1">
               <MobileNavLink to="/" onClick={() => setIsOpen(false)}>Home</MobileNavLink>
               <MobileNavLink to="/about" onClick={() => setIsOpen(false)}>About</MobileNavLink>
-              <MobileNavLink to="/feed" onClick={() => setIsOpen(false)}>Feed</MobileNavLink>
+              <MobileNavLink to="/lost-items" onClick={() => setIsOpen(false)}>
+                 <i className="fa-solid fa-magnifying-glass mr-2 text-teal"></i> Lost Items
+              </MobileNavLink>
+              <MobileNavLink to="/found-items" onClick={() => setIsOpen(false)}>
+                 <i className="fa-solid fa-check-circle mr-2 text-teal"></i> Found Items
+              </MobileNavLink>
               <MobileNavLink to="/contact" onClick={() => setIsOpen(false)}>Contact</MobileNavLink>
 
               <div className="h-px bg-white/10 my-4"></div>
@@ -208,7 +225,7 @@ function Navbar() {
                 </>
               ) : (
                 <Link
-                  className="mt-4 px-5 py-4 bg-gradient-to-r from-teal to-emerald-500 text-white rounded-xl hover:shadow-lg transition-all text-base font-bold text-center shadow-md w-full"
+                  className="mt-4 px-5 py-4 bg-white text-slate-900 rounded-xl hover:shadow-lg transition-all text-base font-bold text-center shadow-md w-full"
                   to="/auth"
                   onClick={() => setIsOpen(false)}
                 >
@@ -230,7 +247,7 @@ function Navbar() {
 const NavLink = ({ to, children }) => (
   <Link
     to={to}
-    className="px-4 py-2 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-all text-sm font-medium relative group"
+    className="px-4 py-2 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-all text-xs font-bold uppercase tracking-wider relative group"
   >
     {children}
   </Link>

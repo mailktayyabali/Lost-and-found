@@ -23,6 +23,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/feed" element={<Feed />} />
+          <Route path="/lost-items" element={<Feed type="lost" />} />
+          <Route path="/found-items" element={<Feed type="found" />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/report" element={<ReportItem />} />
