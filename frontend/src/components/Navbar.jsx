@@ -1,11 +1,20 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+    setIsOpen(false);
   };
 
   return (
@@ -26,56 +35,109 @@ function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <Link 
-              className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group" 
+            <Link
+              className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group"
               to="/"
             >
               Home
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
             </Link>
-            <Link 
-              className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group" 
-              to="/about"
-            >
-              About
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            <Link 
-              className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group" 
-              to="/feed"
-            >
-              Feed
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            <Link 
-              className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group" 
-              to="/contact"
-            >
-              Contact
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            <Link 
-              className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group" 
-              to="/dashboard"
-            >
-              Dashboard
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            <Link 
-              className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group" 
-              to="/report"
-            >
-              Report Item
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            
-            {/* CTA Button */}
-            <Link
-              className="px-5 py-2 bg-teal text-white rounded-lg hover:bg-teal-dark transition-all text-sm font-medium shadow-sm hover:shadow-md hover:-translate-y-0.5"
-              to="/auth"
-            >
-              Sign In
-            </Link>
+
+            {/* Guest - Public Links */}
+            {!user && (
+              <>
+                <Link
+                  className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group"
+                  to="/about"
+                >
+                  About
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
+                </Link>
+                <Link
+                  className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group"
+                  to="/feed"
+                >
+                  Feed
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
+                </Link>
+                <Link
+                  className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group"
+                  to="/contact"
+                >
+                  Contact
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
+                </Link>
+              </>
+            )}
+
+            {/* User Links */}
+            {user && user.role === "user" && (
+              <>
+                <Link
+                  className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group"
+                  to="/feed"
+                >
+                  Feed
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
+                </Link>
+                <Link
+                  className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group"
+                  to="/report"
+                >
+                  Report Item
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
+                </Link>
+                <Link
+                  className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group"
+                  to="/dashboard"
+                >
+                  Dashboard
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
+                </Link>
+              </>
+            )}
+
+            {/* Admin Links */}
+            {user && user.role === "admin" && (
+              <>
+                <Link
+                  className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group"
+                  to="/admin"
+                >
+                  Admin Dashboard
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
+                </Link>
+                <Link
+                  className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group"
+                  to="/feed"
+                >
+                  Items Feed
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
+                </Link>
+              </>
+            )}
+
+            {/* Auth Button */}
+            {user ? (
+              <div className="flex items-center gap-4">
+                 <span className="text-white/60 text-xs uppercase tracking-wider font-semibold border border-white/20 px-2 py-1 rounded">
+                  {user.role}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="px-5 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all text-sm font-medium shadow-sm"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link
+                className="px-5 py-2 bg-teal text-white rounded-lg hover:bg-teal-dark transition-all text-sm font-medium shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                to="/auth"
+              >
+                Sign In
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -84,9 +146,21 @@ function Navbar() {
             className="flex md:hidden flex-col gap-1.5 cursor-pointer z-50 relative"
             aria-label="Toggle menu"
           >
-            <span className={`w-6 h-0.5 bg-white transition-all duration-300 ${isOpen ? "rotate-45 translate-y-2" : ""}`}></span>
-            <span className={`w-6 h-0.5 bg-white transition-all duration-300 ${isOpen ? "opacity-0" : ""}`}></span>
-            <span className={`w-6 h-0.5 bg-white transition-all duration-300 ${isOpen ? "-rotate-45 -translate-y-2" : ""}`}></span>
+            <span
+              className={`w-6 h-0.5 bg-white transition-all duration-300 ${
+                isOpen ? "rotate-45 translate-y-2" : ""
+              }`}
+            ></span>
+            <span
+              className={`w-6 h-0.5 bg-white transition-all duration-300 ${
+                isOpen ? "opacity-0" : ""
+              }`}
+            ></span>
+            <span
+              className={`w-6 h-0.5 bg-white transition-all duration-300 ${
+                isOpen ? "-rotate-45 -translate-y-2" : ""
+              }`}
+            ></span>
           </button>
         </div>
       </div>
@@ -95,7 +169,7 @@ function Navbar() {
       {isOpen && (
         <>
           {/* Backdrop */}
-          <div 
+          <div
             className="fixed inset-0 bg-navy/80 backdrop-blur-sm md:hidden z-40"
             onClick={() => setIsOpen(false)}
           ></div>
@@ -103,57 +177,80 @@ function Navbar() {
           {/* Mobile Menu */}
           <div className="fixed top-0 right-0 h-full w-64 bg-navy shadow-2xl md:hidden z-50 slide-in-right">
             <div className="flex flex-col gap-2 p-6 pt-20">
-              <Link 
-                className="text-white hover:text-teal transition-colors text-base font-medium py-3 px-4 rounded-lg hover:bg-white/5" 
-                to="/" 
+              <Link
+                className="text-white hover:text-teal transition-colors text-base font-medium py-3 px-4 rounded-lg hover:bg-white/5"
+                to="/"
                 onClick={() => setIsOpen(false)}
               >
                 Home
               </Link>
-              <Link 
-                className="text-white hover:text-teal transition-colors text-base font-medium py-3 px-4 rounded-lg hover:bg-white/5" 
-                to="/about" 
-                onClick={() => setIsOpen(false)}
-              >
-                About
-              </Link>
-              <Link 
-                className="text-white hover:text-teal transition-colors text-base font-medium py-3 px-4 rounded-lg hover:bg-white/5" 
-                to="/feed" 
-                onClick={() => setIsOpen(false)}
-              >
-                Feed
-              </Link>
-              <Link 
-                className="text-white hover:text-teal transition-colors text-base font-medium py-3 px-4 rounded-lg hover:bg-white/5" 
-                to="/contact" 
-                onClick={() => setIsOpen(false)}
-              >
-                Contact
-              </Link>
-              <Link 
-                className="text-white hover:text-teal transition-colors text-base font-medium py-3 px-4 rounded-lg hover:bg-white/5" 
-                to="/dashboard" 
-                onClick={() => setIsOpen(false)}
-              >
-                Dashboard
-              </Link>
-              <Link 
-                className="text-white hover:text-teal transition-colors text-base font-medium py-3 px-4 rounded-lg hover:bg-white/5" 
-                to="/report" 
-                onClick={() => setIsOpen(false)}
-              >
-                Report Item
-              </Link>
               
+              {!user && (
+                <>
+                  <Link
+                    className="text-white hover:text-teal transition-colors text-base font-medium py-3 px-4 rounded-lg hover:bg-white/5"
+                    to="/about"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    About
+                  </Link>
+                  <Link
+                    className="text-white hover:text-teal transition-colors text-base font-medium py-3 px-4 rounded-lg hover:bg-white/5"
+                    to="/feed"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Feed
+                  </Link>
+                </>
+              )}
+
+              {user && user.role === "user" && (
+                 <>
+                  <Link
+                    className="text-white hover:text-teal transition-colors text-base font-medium py-3 px-4 rounded-lg hover:bg-white/5"
+                    to="/dashboard"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    className="text-white hover:text-teal transition-colors text-base font-medium py-3 px-4 rounded-lg hover:bg-white/5"
+                    to="/report"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Report Item
+                  </Link>
+                </>
+              )}
+
+              {user && user.role === "admin" && (
+                <Link
+                  className="text-white hover:text-teal transition-colors text-base font-medium py-3 px-4 rounded-lg hover:bg-white/5"
+                  to="/admin"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Admin Dashboard
+                </Link>
+              )}
+
+
               {/* Mobile CTA */}
-              <Link 
-                className="mt-4 px-5 py-3 bg-teal text-white rounded-lg hover:bg-teal-dark transition-all text-base font-medium text-center shadow-md" 
-                to="/auth" 
-                onClick={() => setIsOpen(false)}
-              >
-                Sign In
-              </Link>
+              {user ? (
+                 <button
+                  onClick={handleLogout}
+                  className="mt-4 px-5 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all text-base font-medium text-center shadow-md w-full"
+                >
+                  Logout
+                </button>
+              ) : (
+                <Link
+                  className="mt-4 px-5 py-3 bg-teal text-white rounded-lg hover:bg-teal-dark transition-all text-base font-medium text-center shadow-md"
+                  to="/auth"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Sign In
+                </Link>
+              )}
             </div>
           </div>
         </>
