@@ -1,109 +1,136 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { ArrowRight, Search, CheckCircle, PlusCircle } from "lucide-react";
 
 function Home() {
-  const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
-    <>
-      {/* HERO SECTION */}
-      <section className="w-full flex flex-col md:flex-row items-center justify-between px-10 py-20 bg-gradient-to-br from-[#1e293b] to-[#64748b] text-white overflow-hidden relative">
-        {/* Text Content */}
-        <div className="max-w-xl space-y-6 z-10">
-          <h1 className="text-4xl md:text-5xl font-bold leading-tight text-white">
-            Find What's Lost, Return What's Found
-          </h1>
-          <p className="text-lg text-white opacity-90">
-            Connecting people to their lost belongings securely and easily.
-          </p>
+    <main className="flex-1">
+      {/* Hero Section */}
+      <section className="relative bg-[#0f172a] overflow-hidden min-h-[600px] flex items-center">
+        {/* Background Gradients */}
+        <div className="absolute top-0 -left-4 w-96 h-96 bg-teal/20 rounded-full blur-[100px] opacity-50 animate-pulse"></div>
+        <div className="absolute bottom-0 -right-4 w-96 h-96 bg-purple-500/20 rounded-full blur-[100px] opacity-50"></div>
 
-          {/* Buttons */}
-          <div className="flex gap-4 mt-6">
-            <Link
-              to="/auth"
-              className="px-6 py-3 bg-[#0d9488] text-white font-semibold rounded-lg shadow-md hover:bg-[#0f766e] transition hover:-translate-y-0.5"
-            >
-              Sign In
-            </Link>
-
-            <button
-              onClick={() => navigate("/auth", { state: { signUp: true } })}
-              className="px-6 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-white/10 transition backdrop-blur"
-            >
-              Create Account
-            </button>
-          </div>
-        </div>
-
-        {/* Hero Image with Floating Effect */}
-        <div className="relative mt-10 md:mt-0 z-10">
-          <div className="relative w-[320px] md:w-[450px] h-auto">
-            {/* Decorative background circles */}
-            <div className="absolute -top-10 -right-10 w-full h-full bg-[#0d9488]/10 rounded-full blur-3xl"></div>
-            <div className="absolute -bottom-10 -left-10 w-3/4 h-3/4 bg-[#0d9488]/5 rounded-full blur-2xl"></div>
-
-            {/* Image */}
-            <div className="relative bg-transparent rounded-2xl overflow-visible">
-              <img
-                src="/assets/home.jpg"
-                alt="Lost and Found"
-                className="w-full h-auto rounded-2xl object-contain drop-shadow-2xl transform hover:scale-105 transition-transform duration-500"
-                style={{
-                  filter: 'drop-shadow(0 25px 50px rgba(0, 0, 0, 0.3))',
-                }}
-              />
-              {/* Subtle glow effect */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS SECTION */}
-      <section className="px-10 py-20 text-center bg-gray-50">
-        <h2 className="text-3xl font-bold text-[#1e293b] mb-4">
-          How It Works
-        </h2>
-        <p className="text-[#64748b] mb-12 max-w-2xl mx-auto">
-          Simple, secure, and effective way to reunite lost items with their owners
-        </p>
-
-        {/* Steps */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl mx-auto">
-          {/* Step 1 */}
-          <div className="card-minimal p-8 text-center group">
-            <div className="w-16 h-16 bg-[#0d9488]/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-[#0d9488]/20 transition">
-              <i className="fa-solid fa-magnifying-glass text-3xl text-[#0d9488]"></i>
-            </div>
-            <h3 className="text-xl font-semibold mb-3 text-[#1e293b]">Search</h3>
-            <p className="text-[#64748b]">
-              Browse reports to find your lost items quickly and easily.
-            </p>
+        <div className="relative max-w-7xl mx-auto px-6 py-24 lg:py-32 flex flex-col md:flex-row items-center gap-12">
+          
+          {/* Text Content */}
+          <div className="flex-1 text-center md:text-left z-10">
+            {user ? (
+               // LOGGED IN VIEW
+               <>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal/10 border border-teal/20 text-teal text-xs font-bold uppercase tracking-widest mb-6">
+                    <span className="w-2 h-2 rounded-full bg-teal animate-pulse"></span>
+                    Welcome back, {user.name}
+                </div>
+                <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-6">
+                  Manage your <br/>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal to-emerald-400">Lost & Found</span> items.
+                </h1>
+                <p className="text-lg text-slate-400 mb-8 max-w-xl mx-auto md:mx-0 leading-relaxed">
+                  Jump straight into your dashboard or check the latest items reported in your area.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                   <Link
+                    to="/dashboard"
+                    className="px-8 py-4 bg-teal hover:bg-teal-dark text-white rounded-xl text-base font-bold shadow-lg shadow-teal/20 hover:shadow-teal/40 transition-all hover:-translate-y-1 flex items-center justify-center gap-2"
+                  >
+                    Go to Dashboard <ArrowRight size={18} />
+                  </Link>
+                  <Link
+                    to="/report"
+                    className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl text-base font-bold transition-all hover:-translate-y-1 flex items-center justify-center gap-2"
+                  >
+                    <PlusCircle size={18} className="text-teal"/> Report New Item
+                  </Link>
+                </div>
+               </>
+            ) : (
+                // GUEST VIEW
+                <>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300 text-xs font-bold uppercase tracking-widest mb-6">
+                    Community Driven Platform
+                </div>
+                <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-6">
+                  Lost something? <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal to-emerald-400">Let's find it.</span>
+                </h1>
+                <p className="text-lg text-slate-400 mb-8 max-w-xl mx-auto md:mx-0 leading-relaxed">
+                  FindIt connects you with people around you to help recover lost items. 
+                  Simple, fast, and community-powered.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                  <Link
+                    to="/lost-items"
+                    className="px-8 py-4 bg-teal hover:bg-teal-dark text-white rounded-xl text-base font-bold shadow-lg shadow-teal/20 hover:shadow-teal/40 transition-all hover:-translate-y-1 flex items-center justify-center gap-2"
+                  >
+                    I Lost Something <Search size={18} />
+                  </Link>
+                  <Link
+                    to="/found-items"
+                    className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl text-base font-bold transition-all hover:-translate-y-1 flex items-center justify-center gap-2"
+                  >
+                    I Found Something <CheckCircle size={18} className="text-teal"/>
+                  </Link>
+                </div>
+                </>
+            )}
           </div>
 
-          {/* Step 2 */}
-          <div className="card-minimal p-8 text-center group">
-            <div className="w-16 h-16 bg-[#0d9488]/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-[#0d9488]/20 transition">
-              <i className="fa-solid fa-bullhorn text-3xl text-[#0d9488]"></i>
-            </div>
-            <h3 className="text-xl font-semibold mb-3 text-[#1e293b]">Report</h3>
-            <p className="text-[#64748b]">
-              Report a lost or found item within seconds.
-            </p>
-          </div>
-
-          {/* Step 3 */}
-          <div className="card-minimal p-8 text-center group">
-            <div className="w-16 h-16 bg-[#0d9488]/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-[#0d9488]/20 transition">
-              <i className="fa-solid fa-handshake text-3xl text-[#0d9488]"></i>
-            </div>
-            <h3 className="text-xl font-semibold mb-3 text-[#1e293b]">Reconnect</h3>
-            <p className="text-[#64748b]">
-              Safely connect with the rightful owner and return belongings.
-            </p>
-          </div>
+          {/* Hero Image/Illustration would go here */}
+           <div className="flex-1 relative hidden md:block">
+               {/* Abstract decorative elements simulating items */}
+               <div className="relative z-10 grid grid-cols-2 gap-4 animate-float-slow">
+                   <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-4 rounded-2xl shadow-2xl transform translate-y-8">
+                       <div className="h-40 bg-slate-800/50 rounded-xl mb-3 flex items-center justify-center">
+                           <Search size={48} className="text-teal/20" />
+                       </div>
+                       <div className="h-4 w-3/4 bg-white/10 rounded mb-2"></div>
+                       <div className="h-3 w-1/2 bg-white/5 rounded"></div>
+                   </div>
+                   <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-4 rounded-2xl shadow-2xl transform -translate-y-8">
+                        <div className="h-40 bg-slate-800/50 rounded-xl mb-3 flex items-center justify-center">
+                             <CheckCircle size={48} className="text-purple-500/20" />
+                        </div>
+                       <div className="h-4 w-3/4 bg-white/10 rounded mb-2"></div>
+                       <div className="h-3 w-1/2 bg-white/5 rounded"></div>
+                   </div>
+               </div>
+           </div>
         </div>
       </section>
-    </>
+
+      {/* Feature Section (Placeholder for guest/user context) */}
+      <section className="py-20 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
+              <h2 className="text-3xl font-bold text-navy mb-12">How it works</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                      <div className="w-14 h-14 bg-teal/10 rounded-xl flex items-center justify-center text-teal mx-auto mb-6">
+                          <i className="fa-solid fa-pen-to-square text-2xl"></i>
+                      </div>
+                      <h3 className="text-xl font-bold text-navy mb-3">1. Report</h3>
+                      <p className="text-slate leading-relaxed">Details about what you lost or found helping others identify it.</p>
+                  </div>
+                  <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                      <div className="w-14 h-14 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-600 mx-auto mb-6">
+                           <i className="fa-solid fa-bell text-2xl"></i>
+                      </div>
+                      <h3 className="text-xl font-bold text-navy mb-3">2. Notify</h3>
+                      <p className="text-slate leading-relaxed">Our system matches keywords and locations to alert relevant users.</p>
+                  </div>
+                  <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                      <div className="w-14 h-14 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-600 mx-auto mb-6">
+                           <i className="fa-solid fa-handshake text-2xl"></i>
+                      </div>
+                      <h3 className="text-xl font-bold text-navy mb-3">3. Recover</h3>
+                      <p className="text-slate leading-relaxed">Connect securely and arrange the return of the item.</p>
+                  </div>
+              </div>
+          </div>
+      </section>
+    </main>
   );
 }
 

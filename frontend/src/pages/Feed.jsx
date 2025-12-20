@@ -1,141 +1,117 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FeedPostCard from "../components/FeedPostCard";
-import { posts } from "../data/posts";
 
-function Feed() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All Categories");
-  const [selectedDate, setSelectedDate] = useState("");
-  const [displayedPosts, setDisplayedPosts] = useState(posts.slice(0, 6));
-  const [showAll, setShowAll] = useState(false);
+function Feed({ type }) {
+  const [items, setItems] = useState([
+    {
+      id: 1,
+      title: "Lost iPhone 13 Pro",
+      description: "Left it on a bench in Central Park near the fountain...",
+      location: "Central Park, NY",
+      date: "2023-10-25",
+      type: "lost",
+      image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      id: 2,
+      title: "Found Golden Retriever",
+      description: "Found wandering near 5th Ave. Very friendly, has a red collar...",
+      location: "5th Ave, NY",
+      date: "2023-10-26",
+      type: "found",
+      image: "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      id: 3,
+      title: "Lost Leather Wallet",
+      description: "Brown leather wallet lost in the subway. Contains ID and cards...",
+      location: "Subway Station, Brooklyn",
+      date: "2023-10-24",
+      type: "lost",
+      image: "https://images.unsplash.com/photo-1627123424574-181ce5171c98?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    },
+    {
+      id: 4,
+      title: "Found Blue Backpack",
+      description: "Found a blue Nike backpack at the library entrance...",
+      location: "Public Library",
+      date: "2023-10-27",
+      type: "found",
+      image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    },
+  ]);
 
-  // Filter posts based on search query, category, and date
-  const filteredPosts = displayedPosts.filter((post) => {
-    const matchesSearch =
-      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.description.toLowerCase().includes(searchQuery.toLowerCase());
+  const [filteredItems, setFilteredItems] = useState(items);
+  const [searchTerm, setSearchTerm] = useState("");
 
-    const matchesCategory =
-      selectedCategory === "All Categories" || post.category === selectedCategory;
-
-    const matchesDate =
-      !selectedDate || post.date.includes(selectedDate);
-
-    return matchesSearch && matchesCategory && matchesDate;
-  });
-
-  const handleLoadMore = () => {
-    if (showAll) {
-      setDisplayedPosts(posts.slice(0, 6));
-      setShowAll(false);
-    } else {
-      setDisplayedPosts(posts);
-      setShowAll(true);
+  useEffect(() => {
+    let result = items;
+    
+    // Filter by type (lost/found) if prop is provided
+    if (type) {
+        result = result.filter(item => item.type === type);
     }
-  };
+
+    // Filter by search term
+    if (searchTerm) {
+        result = result.filter(item => 
+            item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.location.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }
+
+    setFilteredItems(result);
+  }, [type, searchTerm, items]);
+
+
+  const getPageTitle = () => {
+      if (type === 'lost') return 'Lost Items';
+      if (type === 'found') return 'Found Items';
+      return 'All Items';
+  }
 
   return (
-    <main className="w-full min-h-screen bg-gray-50 px-4 py-10">
-      {/* HEADER SECTION */}
-      <section className="text-center mb-10">
-        <h1 className="text-4xl font-bold text-navy tracking-tight mb-2">
-          All Posts Feed
-        </h1>
-        <p className="text-slate text-lg">
-          Browse the latest lost and found items from our community
-        </p>
-      </section>
+    <main className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-navy">{getPageTitle()}</h1>
+            <p className="text-slate text-sm mt-1">
+              Browsing {filteredItems.length} {type ? type : ''} items in your area
+            </p>
+          </div>
 
-      {/* FILTERS */}
-      <section className="max-w-5xl mx-auto mb-10 flex flex-col gap-5">
-        {/* SEARCH BAR */}
-        <div className="flex items-center gap-3 bg-white px-4 py-3.5 rounded-lg shadow-sm border border-gray-200 focus-within:border-teal focus-within:shadow-md transition">
-          <i className="fa-solid fa-magnifying-glass text-gray-400" />
-          <input
-            type="search"
-            placeholder="Search by item, description..."
-            aria-label="Search posts"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full outline-none text-gray-700 placeholder-gray-400"
-          />
+          {/* Search Bar */}
+          <div className="w-full md:w-96 relative">
+            <i className="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-400"></i>
+            <input
+              type="text"
+              placeholder="Search by keyword or location..."
+              className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all shadow-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
 
-        {/* FILTER ROW */}
-        <div className="flex flex-wrap gap-4">
-          <select
-            className="input-minimal w-full sm:w-auto px-4 py-3"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            <option>All Categories</option>
-            <option>Electronics</option>
-            <option>Keys & Wallets</option>
-            <option>Bags</option>
-            <option>Apparel</option>
-            <option>Pets</option>
-            <option>Other</option>
-          </select>
-
-          <input
-            type="date"
-            className="input-minimal w-full sm:w-auto px-4 py-3"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-          />
-
-          <button
-            type="button"
-            className="btn-secondary flex items-center gap-2 w-full sm:w-auto"
-            onClick={() => {
-              setSearchQuery("");
-              setSelectedCategory("All Categories");
-              setSelectedDate("");
-            }}
-          >
-            <i className="fa-solid fa-rotate-right" />
-            <span>Reset Filters</span>
-          </button>
-        </div>
-      </section>
-
-      {/* GRID */}
-      <section className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredPosts.length > 0 ? (
-          filteredPosts.map((post) => (
-            <FeedPostCard key={post.id} post={post} />
-          ))
+        {/* Grid */}
+        {filteredItems.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {filteredItems.map((item) => (
+              <FeedPostCard key={item.id} item={item} />
+            ))}
+          </div>
         ) : (
-          <div className="col-span-full text-center py-20">
-            <i className="fa-solid fa-search text-5xl text-gray-300 mb-4"></i>
-            <p className="text-gray-500 text-lg">No posts found matching your filters</p>
-            <button
-              onClick={() => {
-                setSearchQuery("");
-                setSelectedCategory("All Categories");
-                setSelectedDate("");
-              }}
-              className="mt-4 text-teal hover:underline"
-            >
-              Reset filters
-            </button>
+          <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                <i className="fa-solid fa-box-open text-2xl"></i>
+            </div>
+            <h3 className="text-lg font-bold text-navy mb-2">No items found</h3>
+            <p className="text-slate">Try adjusting your search terms or filters.</p>
           </div>
         )}
-      </section>
-
-      {/* LOAD MORE */}
-      {filteredPosts.length > 0 && posts.length > 6 && (
-        <div className="flex justify-center mt-10">
-          <button
-            type="button"
-            onClick={handleLoadMore}
-            className="btn-primary flex items-center gap-2 px-6 py-3"
-          >
-            <i className={`fa-solid ${showAll ? "fa-minus" : "fa-plus"}`} />
-            <span>{showAll ? "Show Less" : "Load More"}</span>
-          </button>
-        </div>
-      )}
+      </div>
     </main>
   );
 }
