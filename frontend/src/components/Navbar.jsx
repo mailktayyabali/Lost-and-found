@@ -1,11 +1,14 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { User, LogOut, LayoutDashboard } from "lucide-react";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const profileRef = useRef(null);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -15,127 +18,125 @@ function Navbar() {
     logout();
     navigate("/");
     setIsOpen(false);
+    setIsProfileOpen(false);
   };
 
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <nav className="w-full bg-navy shadow-sm border-b border-white/10 sticky top-0 z-50">
+    <nav className="w-full bg-slate-900/95 backdrop-blur-md shadow-lg border-b border-white/5 sticky top-0 z-50 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           {/* Logo + Brand */}
           <Link to="/" className="flex items-center gap-3 group">
-            <img
-              src="/assets/images/icon.jpg"
-              alt="FindIt logo"
-              className="w-10 h-10 rounded-lg object-cover shadow-md transition-transform group-hover:scale-105"
-            />
-            <span className="text-xl font-semibold tracking-tight text-white">
-              FindIt
-            </span>
+             <div className="relative">
+                <img
+                src="/assets/images/icon.jpg"
+                alt="FindIt logo"
+                className="w-12 h-12 rounded-xl object-cover shadow-lg ring-2 ring-teal/20 transition-transform group-hover:scale-105 group-hover:ring-teal/50"
+                />
+                <span className="absolute -bottom-1 -right-1 flex h-4 w-4">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-4 w-4 bg-teal"></span>
+                </span>
+             </div>
+            <div className="flex flex-col">
+              <span className="text-2xl font-bold tracking-tight text-white group-hover:text-teal transition-colors">
+                FindIt
+              </span>
+              <span className="text-[10px] uppercase tracking-widest text-slate-400 font-medium">Lost & Found</span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            <Link
-              className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group"
-              to="/"
-            >
-              Home
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
-            </Link>
+          <div className="hidden md:flex items-center gap-1">
+            <NavLink to="/">Home</NavLink>
+            <NavLink to="/about">About</NavLink>
+            <NavLink to="/feed">Feed</NavLink>
+            <NavLink to="/contact">Contact</NavLink>
 
-            {/* Guest - Public Links */}
-            {!user && (
-              <>
-                <Link
-                  className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group"
-                  to="/about"
-                >
-                  About
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
-                </Link>
-                <Link
-                  className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group"
-                  to="/feed"
-                >
-                  Feed
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
-                </Link>
-                <Link
-                  className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group"
-                  to="/contact"
-                >
-                  Contact
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
-                </Link>
-              </>
-            )}
+            {/* Separator */}
+            <div className="h-6 w-px bg-white/10 mx-4"></div>
 
-            {/* User Links */}
-            {user && user.role === "user" && (
-              <>
-                <Link
-                  className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group"
-                  to="/feed"
-                >
-                  Feed
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
-                </Link>
-                <Link
-                  className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group"
-                  to="/report"
-                >
-                  Report Item
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
-                </Link>
-                <Link
-                  className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group"
-                  to="/dashboard"
-                >
-                  Dashboard
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
-                </Link>
-              </>
-            )}
-
-            {/* Admin Links */}
-            {user && user.role === "admin" && (
-              <>
-                <Link
-                  className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group"
-                  to="/admin"
-                >
-                  Admin Dashboard
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
-                </Link>
-                <Link
-                  className="text-white/80 hover:text-white transition-colors text-sm font-medium relative group"
-                  to="/feed"
-                >
-                  Items Feed
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-teal group-hover:w-full transition-all duration-300"></span>
-                </Link>
-              </>
-            )}
-
-            {/* Auth Button */}
+            {/* Auth Button or Profile Dropdown */}
             {user ? (
-              <div className="flex items-center gap-4">
-                 <span className="text-white/60 text-xs uppercase tracking-wider font-semibold border border-white/20 px-2 py-1 rounded">
-                  {user.role}
-                </span>
+              <div className="relative ml-2" ref={profileRef}>
                 <button
-                  onClick={handleLogout}
-                  className="px-5 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all text-sm font-medium shadow-sm"
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="flex items-center gap-3 pl-2 pr-1 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 transition-all group focus:outline-none focus:ring-2 focus:ring-teal/50"
                 >
-                  Logout
+                  <img
+                    src={`https://ui-avatars.com/api/?name=${user.name}&background=random`}
+                    alt={user.name}
+                    className="w-8 h-8 rounded-full ring-2 ring-white/10 group-hover:ring-teal/50 transition-all"
+                  />
+                  <div className="text-left hidden lg:block mr-2">
+                    <p className="text-xs font-semibold text-white leading-tight">{user.name}</p>
+                    <p className="text-[10px] text-teal uppercase tracking-wider font-bold">{user.role}</p>
+                  </div>
+                  <i className={`fa-solid fa-chevron-down text-white/50 text-xs transition-transform duration-200 mr-2 ${isProfileOpen ? 'rotate-180' : ''}`}></i>
                 </button>
+
+                {/* Dropdown Menu */}
+                {isProfileOpen && (
+                  <div className="absolute right-0 mt-3 w-56 origin-top-right rounded-xl bg-[#1e293b] shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none animate-scale-in overflow-hidden z-50 border border-white/10">
+                    <div className="p-4 border-b border-white/5 bg-slate-900/50">
+                        <p className="text-sm font-medium text-white">Signed in as</p>
+                        <p className="text-xs text-slate-400 truncate">{user.email}</p>
+                    </div>
+                    
+                    <div className="p-2">
+                        <Link
+                        to={user.role === 'admin' ? '/admin' : '/dashboard'}
+                        className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-200 hover:bg-white/5 hover:text-white rounded-lg transition-colors group"
+                        onClick={() => setIsProfileOpen(false)}
+                        >
+                        <LayoutDashboard size={16} className="text-teal group-hover:scale-110 transition-transform" />
+                        Dashboard
+                        </Link>
+                        
+                        {user.role === 'user' && (
+                             <Link
+                            to="/dashboard"
+                            className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-200 hover:bg-white/5 hover:text-white rounded-lg transition-colors group"
+                            onClick={() => setIsProfileOpen(false)}
+                            >
+                            <User size={16} className="text-indigo-400 group-hover:scale-110 transition-transform" />
+                            My Profile
+                            </Link>
+                        )}
+                    </div>
+                    
+                    <div className="border-t border-white/5 p-2">
+                        <button
+                        onClick={handleLogout}
+                        className="flex w-full items-center gap-3 px-3 py-2.5 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-lg transition-all group"
+                        >
+                        <LogOut size={16} className="group-hover:translate-x-1 transition-transform" />
+                        Sign out
+                        </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <Link
-                className="px-5 py-2 bg-teal text-white rounded-lg hover:bg-teal-dark transition-all text-sm font-medium shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                className="ml-4 px-6 py-2.5 bg-gradient-to-r from-teal to-emerald-500 text-white rounded-full hover:shadow-[0_0_20px_rgba(45,212,191,0.3)] hover:-translate-y-0.5 transition-all text-sm font-semibold shadow-md border border-white/10 flex items-center gap-2 group"
                 to="/auth"
               >
                 Sign In
+                <i className="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
               </Link>
             )}
           </div>
@@ -143,22 +144,22 @@ function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={toggleMenu}
-            className="flex md:hidden flex-col gap-1.5 cursor-pointer z-50 relative"
+            className="flex md:hidden flex-col gap-1.5 cursor-pointer z-50 relative p-2"
             aria-label="Toggle menu"
           >
             <span
-              className={`w-6 h-0.5 bg-white transition-all duration-300 ${
-                isOpen ? "rotate-45 translate-y-2" : ""
+              className={`w-6 h-0.5 bg-white transition-all duration-300 rounded-full ${
+                isOpen ? "rotate-45 translate-y-2 bg-red-400" : "bg-teal"
               }`}
             ></span>
             <span
-              className={`w-6 h-0.5 bg-white transition-all duration-300 ${
-                isOpen ? "opacity-0" : ""
+              className={`w-4 h-0.5 bg-white transition-all duration-300 rounded-full ml-auto ${
+                isOpen ? "opacity-0" : "bg-teal/80"
               }`}
             ></span>
             <span
-              className={`w-6 h-0.5 bg-white transition-all duration-300 ${
-                isOpen ? "-rotate-45 -translate-y-2" : ""
+              className={`w-6 h-0.5 bg-white transition-all duration-300 rounded-full ${
+                isOpen ? "-rotate-45 -translate-y-2 bg-red-400" : "bg-teal"
               }`}
             ></span>
           </button>
@@ -168,95 +169,85 @@ function Navbar() {
       {/* Mobile Menu Overlay */}
       {isOpen && (
         <>
-          {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-navy/80 backdrop-blur-sm md:hidden z-40"
+            className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm md:hidden z-40 transition-opacity duration-300"
             onClick={() => setIsOpen(false)}
           ></div>
 
-          {/* Mobile Menu */}
-          <div className="fixed top-0 right-0 h-full w-64 bg-navy shadow-2xl md:hidden z-50 slide-in-right">
-            <div className="flex flex-col gap-2 p-6 pt-20">
-              <Link
-                className="text-white hover:text-teal transition-colors text-base font-medium py-3 px-4 rounded-lg hover:bg-white/5"
-                to="/"
-                onClick={() => setIsOpen(false)}
-              >
-                Home
-              </Link>
-              
-              {!user && (
-                <>
-                  <Link
-                    className="text-white hover:text-teal transition-colors text-base font-medium py-3 px-4 rounded-lg hover:bg-white/5"
-                    to="/about"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    About
-                  </Link>
-                  <Link
-                    className="text-white hover:text-teal transition-colors text-base font-medium py-3 px-4 rounded-lg hover:bg-white/5"
-                    to="/feed"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Feed
-                  </Link>
-                </>
-              )}
+          <div className="fixed top-0 right-0 h-full w-[80%] max-w-sm bg-[#0f172a] shadow-2xl md:hidden z-50 slide-in-right flex flex-col border-l border-white/10">
+            <div className="flex flex-col gap-2 p-6 pt-24 flex-1">
+              <MobileNavLink to="/" onClick={() => setIsOpen(false)}>Home</MobileNavLink>
+              <MobileNavLink to="/about" onClick={() => setIsOpen(false)}>About</MobileNavLink>
+              <MobileNavLink to="/feed" onClick={() => setIsOpen(false)}>Feed</MobileNavLink>
+              <MobileNavLink to="/contact" onClick={() => setIsOpen(false)}>Contact</MobileNavLink>
 
-              {user && user.role === "user" && (
-                 <>
-                  <Link
-                    className="text-white hover:text-teal transition-colors text-base font-medium py-3 px-4 rounded-lg hover:bg-white/5"
-                    to="/dashboard"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    className="text-white hover:text-teal transition-colors text-base font-medium py-3 px-4 rounded-lg hover:bg-white/5"
-                    to="/report"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Report Item
-                  </Link>
-                </>
-              )}
+              <div className="h-px bg-white/10 my-4"></div>
 
-              {user && user.role === "admin" && (
-                <Link
-                  className="text-white hover:text-teal transition-colors text-base font-medium py-3 px-4 rounded-lg hover:bg-white/5"
-                  to="/admin"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Admin Dashboard
-                </Link>
-              )}
-
-
-              {/* Mobile CTA */}
               {user ? (
-                 <button
-                  onClick={handleLogout}
-                  className="mt-4 px-5 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all text-base font-medium text-center shadow-md w-full"
-                >
-                  Logout
-                </button>
+                <>
+                  <div className="flex items-center gap-3 p-4 bg-white/5 rounded-xl border border-white/5 mb-2">
+                    <img
+                        src={`https://ui-avatars.com/api/?name=${user.name}&background=random`}
+                        alt={user.name}
+                        className="w-10 h-10 rounded-full"
+                    />
+                    <div>
+                        <p className="text-white font-medium">{user.name}</p>
+                        <p className="text-xs text-slate-400">{user.email}</p>
+                    </div>
+                  </div>
+                  <MobileNavLink to={user.role === 'admin' ? '/admin' : '/dashboard'} onClick={() => setIsOpen(false)} highlighted>
+                    <i className="fa-solid fa-gauge mr-2"></i> Dashboard
+                  </MobileNavLink>
+                   <button
+                    onClick={handleLogout}
+                    className="mt-auto px-5 py-4 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-xl transition-all text-base font-medium text-center w-full flex items-center justify-center gap-2 border border-red-500/20"
+                  >
+                    <LogOut size={18} /> Logout
+                  </button>
+                </>
               ) : (
                 <Link
-                  className="mt-4 px-5 py-3 bg-teal text-white rounded-lg hover:bg-teal-dark transition-all text-base font-medium text-center shadow-md"
+                  className="mt-4 px-5 py-4 bg-gradient-to-r from-teal to-emerald-500 text-white rounded-xl hover:shadow-lg transition-all text-base font-bold text-center shadow-md w-full"
                   to="/auth"
                   onClick={() => setIsOpen(false)}
                 >
-                  Sign In
+                  Sign In / Register
                 </Link>
               )}
             </div>
+             <div className="p-6 border-t border-white/5 text-center">
+                 <p className="text-xs text-slate-500">© 2025 FindIt Inc.</p>
+             </div>
           </div>
         </>
       )}
     </nav>
   );
 }
+
+// Helper components for clean code
+const NavLink = ({ to, children }) => (
+  <Link
+    to={to}
+    className="px-4 py-2 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-all text-sm font-medium relative group"
+  >
+    {children}
+  </Link>
+);
+
+const MobileNavLink = ({ to, children, onClick, highlighted }) => (
+  <Link
+    to={to}
+    onClick={onClick}
+    className={`text-base font-medium py-3 px-4 rounded-xl transition-all ${
+        highlighted 
+        ? "bg-teal/10 text-teal border border-teal/20" 
+        : "text-slate-300 hover:text-white hover:bg-white/5"
+    }`}
+  >
+    {children}
+  </Link>
+);
 
 export default Navbar;
