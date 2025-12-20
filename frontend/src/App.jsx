@@ -11,7 +11,7 @@ import ItemDetail from "./pages/ItemDetail";
 import Contact from "./pages/Contact";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
-// import AdminDashboard from "./pages/AdminDashboard"; // Will implement next
+import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
   return (
@@ -27,7 +27,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/report" element={<ReportItem />} />
           <Route path="/dashboard" element={<UserDashboard />} />
-          {/* <Route path="/admin-dashboard" element={<AdminDashboard />} /> */}
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/my-reports" element={<MyReports />} />
           <Route path="/item/:id" element={<ItemDetail />} />
         </Routes>
