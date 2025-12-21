@@ -72,7 +72,7 @@ function ItemDetail() {
             />
 
             {/* Action Buttons */}
-            <ItemActions status={post.status} />
+            <ItemActions status={post.status} itemId={post.id} postedBy={post.postedBy} />
           </div>
 
           {/* Safety Notice */}

@@ -1,7 +1,13 @@
 import { useNavigate } from "react-router-dom";
+import FavoriteButton from "./FavoriteButton";
 
 function FeedPostCard({ post }) {
   const navigate = useNavigate();
+  
+  if (!post) {
+    return null;
+  }
+  
   const isFound = post.status === "FOUND";
   const isResolved = post.status === "RESOLVED";
 
@@ -28,6 +34,11 @@ function FeedPostCard({ post }) {
         <span className={`absolute top-3 left-3 badge ${getStatusColor()}`}>
           {post.status}
         </span>
+
+        {/* FAVORITE BUTTON */}
+        <div className="absolute top-3 right-3">
+          <FavoriteButton itemId={post.id} size="small" />
+        </div>
       </div>
 
       {/* BODY */}

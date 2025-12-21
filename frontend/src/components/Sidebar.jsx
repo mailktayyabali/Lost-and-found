@@ -1,6 +1,8 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useMessaging } from "../context/MessagingContext";
+import { useSearchAlerts } from "../context/SearchAlertsContext";
 import {
   LayoutDashboard,
   FileText,
@@ -11,16 +13,29 @@ import {
   Globe,
   Settings,
   Users,
-  ChevronLeft,
-  ChevronRight
+  Heart,
+  MessageSquare,
+  Bell,
+  Search,
+  Plus,
+  CheckCircle,
+  HelpCircle,
+  BarChart3,
+  History,
+  Shield,
+  TrendingUp
 } from "lucide-react";
 
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { getUnreadCount: getMessageUnreadCount } = useMessaging();
+  const { getUnreadCount: getAlertUnreadCount } = useSearchAlerts();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const isCollapsed = false; // Always expanded, no toggle button
+  const messageUnreadCount = getMessageUnreadCount();
+  const alertUnreadCount = getAlertUnreadCount();
 
   const isActive = (path) => {
     return location.pathname === path;
@@ -29,10 +44,6 @@ export default function Sidebar() {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
-
-  const toggleCollapse = () => {
-      setIsCollapsed(!isCollapsed);
-  }
 
   const handleLogout = () => {
       logout();
@@ -55,8 +66,8 @@ export default function Sidebar() {
           isMobileMenuOpen ? "translate-x-0 w-72" : "-translate-x-full lg:translate-x-0"
         } ${isCollapsed ? "lg:w-20" : "lg:w-72"}`}
       >
-        {/* HEADER / TOGGLE */}
-        <div className={`flex items-center ${isCollapsed ? "justify-center" : "justify-between"} gap-3 p-2 mb-8 mt-2 transition-all`}>
+        {/* HEADER */}
+        <div className={`flex items-center ${isCollapsed ? "justify-center" : "justify-start"} gap-3 p-2 mb-8 mt-2 transition-all`}>
            {!isCollapsed && (
              <div className="flex items-center gap-3 animate-fade-in">
                 <img 
@@ -74,13 +85,6 @@ export default function Sidebar() {
                alt="Logo"
                />
            )}
-           
-           <button 
-            onClick={toggleCollapse}
-            className="hidden lg:flex p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
-           >
-               {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-           </button>
         </div>
 
         {/* USER PROFILE SUMMARY */}
@@ -101,8 +105,8 @@ export default function Sidebar() {
         )}
 
         {/* NAVIGATION LINKS */}
-        <nav className="flex flex-col gap-1.5 flex-1 overflow-y-auto overflow-x-hidden">
-            {!isCollapsed && <p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 mt-2 animate-fade-in">Menu</p>}
+        <nav className="flex flex-col gap-1.5 flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
+            {!isCollapsed && <p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 mt-2 animate-fade-in">Main Menu</p>}
             {isCollapsed && <div className="h-4"></div>}
           
           {/* USER SPECIFIC LINKS */}
@@ -125,10 +129,116 @@ export default function Sidebar() {
                     onClick={() => setIsMobileMenuOpen(false)}
                 />
                  <SidebarLink 
-                    to="/dashboard" 
+                    to="/report" 
+                    icon={<Plus size={20} />} 
+                    label="Report Item" 
+                    isActive={isActive("/report")}
+                    isCollapsed={isCollapsed}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+
+                 {/* Separator */}
+                 {!isCollapsed && <div className="h-px bg-white/5 my-2"></div>}
+                 {isCollapsed && <div className="h-2"></div>}
+                 {!isCollapsed && <p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 animate-fade-in">Browse</p>}
+
+                 <SidebarLink 
+                    to="/feed" 
+                    icon={<Search size={20} />} 
+                    label="All Items" 
+                    isActive={isActive("/feed")}
+                    isCollapsed={isCollapsed}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+                 <SidebarLink 
+                    to="/lost-items" 
+                    icon={<Search size={20} />} 
+                    label="Lost Items" 
+                    isActive={isActive("/lost-items")}
+                    isCollapsed={isCollapsed}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+                 <SidebarLink 
+                    to="/found-items" 
+                    icon={<CheckCircle size={20} />} 
+                    label="Found Items" 
+                    isActive={isActive("/found-items")}
+                    isCollapsed={isCollapsed}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+
+                 {/* Separator */}
+                 {!isCollapsed && <div className="h-px bg-white/5 my-2"></div>}
+                 {isCollapsed && <div className="h-2"></div>}
+                 {!isCollapsed && <p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 animate-fade-in">My Activity</p>}
+
+                 <SidebarLink 
+                    to="/favorites" 
+                    icon={<Heart size={20} />} 
+                    label="Favorites" 
+                    isActive={isActive("/favorites")}
+                    isCollapsed={isCollapsed}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+                 <SidebarLink 
+                    to="/messages" 
+                    icon={<MessageSquare size={20} />} 
+                    label="Messages" 
+                    isActive={isActive("/messages") || location.pathname.startsWith("/chat")}
+                    isCollapsed={isCollapsed}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    badge={messageUnreadCount > 0 ? messageUnreadCount : null}
+                />
+                 <SidebarLink 
+                    to="/search-alerts" 
+                    icon={<Bell size={20} />} 
+                    label="Search Alerts" 
+                    isActive={isActive("/search-alerts")}
+                    isCollapsed={isCollapsed}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    badge={alertUnreadCount > 0 ? alertUnreadCount : null}
+                />
+
+                 {/* Separator */}
+                 {!isCollapsed && <div className="h-px bg-white/5 my-2"></div>}
+                 {isCollapsed && <div className="h-2"></div>}
+                 {!isCollapsed && <p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 animate-fade-in">Account</p>}
+
+                 <SidebarLink 
+                    to={user ? `/profile/${user.email}` : "/dashboard"} 
                     icon={<UserIcon size={20} />} 
-                    label="Profile" 
-                    isActive={false} // Placeholder
+                    label="My Profile" 
+                    isActive={location.pathname.startsWith("/profile")}
+                    isCollapsed={isCollapsed}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+                 <SidebarLink 
+                    to="/dashboard" 
+                    icon={<BarChart3 size={20} />} 
+                    label="Statistics" 
+                    isActive={false}
+                    isCollapsed={isCollapsed}
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      navigate("/dashboard");
+                    }}
+                />
+                 <SidebarLink 
+                    to="/dashboard" 
+                    icon={<History size={20} />} 
+                    label="Activity History" 
+                    isActive={false}
+                    isCollapsed={isCollapsed}
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      navigate("/dashboard");
+                    }}
+                />
+                 <SidebarLink 
+                    to="/dashboard" 
+                    icon={<Settings size={20} />} 
+                    label="Settings" 
+                    isActive={false}
                     isCollapsed={isCollapsed}
                     onClick={() => setIsMobileMenuOpen(false)}
                 />
@@ -146,6 +256,12 @@ export default function Sidebar() {
                     isCollapsed={isCollapsed}
                     onClick={() => setIsMobileMenuOpen(false)}
                 />
+                 
+                 {/* Separator */}
+                 {!isCollapsed && <div className="h-px bg-white/5 my-2"></div>}
+                 {isCollapsed && <div className="h-2"></div>}
+                 {!isCollapsed && <p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 animate-fade-in">Management</p>}
+
                  <SidebarLink 
                     to="/admin" 
                     icon={<Users size={20} />} 
@@ -156,8 +272,54 @@ export default function Sidebar() {
                 />
                  <SidebarLink 
                     to="/admin" 
+                    icon={<FileText size={20} />} 
+                    label="All Reports" 
+                    isActive={false}
+                    isCollapsed={isCollapsed}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+                 <SidebarLink 
+                    to="/admin" 
+                    icon={<BarChart3 size={20} />} 
+                    label="Analytics" 
+                    isActive={false}
+                    isCollapsed={isCollapsed}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+                 <SidebarLink 
+                    to="/admin" 
+                    icon={<TrendingUp size={20} />} 
+                    label="Reports" 
+                    isActive={false}
+                    isCollapsed={isCollapsed}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+
+                 {/* Separator */}
+                 {!isCollapsed && <div className="h-px bg-white/5 my-2"></div>}
+                 {isCollapsed && <div className="h-2"></div>}
+                 {!isCollapsed && <p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 animate-fade-in">System</p>}
+
+                 <SidebarLink 
+                    to="/admin" 
                     icon={<Settings size={20} />} 
                     label="Settings" 
+                    isActive={false}
+                    isCollapsed={isCollapsed}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+                 <SidebarLink 
+                    to="/admin" 
+                    icon={<Shield size={20} />} 
+                    label="Security" 
+                    isActive={false}
+                    isCollapsed={isCollapsed}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                />
+                 <SidebarLink 
+                    to="/admin" 
+                    icon={<HelpCircle size={20} />} 
+                    label="Help & Support" 
                     isActive={false}
                     isCollapsed={isCollapsed}
                     onClick={() => setIsMobileMenuOpen(false)}
@@ -172,7 +334,15 @@ export default function Sidebar() {
            <SidebarLink 
                 to="/" 
                 icon={<Globe size={20} />} 
-                label="Website" 
+                label="Visit Website" 
+                isCollapsed={isCollapsed}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-slate-400 hover:text-white"
+            />
+           <SidebarLink 
+                to="/contact" 
+                icon={<HelpCircle size={20} />} 
+                label="Help & Support" 
                 isCollapsed={isCollapsed}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="text-slate-400 hover:text-white"
@@ -199,11 +369,11 @@ export default function Sidebar() {
   );
 }
 
-const SidebarLink = ({ to, icon, label, isActive, isCollapsed, onClick, className = "" }) => (
+const SidebarLink = ({ to, icon, label, isActive, isCollapsed, onClick, className = "", badge = null }) => (
     <Link 
         to={to}
         onClick={onClick}
-        className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group ${
+        className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group relative ${
             isActive 
             ? "bg-teal text-white shadow-lg shadow-teal/20 font-medium" 
             : "hover:bg-white/5 hover:text-white text-slate-400"
@@ -212,6 +382,11 @@ const SidebarLink = ({ to, icon, label, isActive, isCollapsed, onClick, classNam
     >
         <span className={isActive ? "" : "group-hover:scale-110 transition-transform duration-200"}>{icon}</span>
         {!isCollapsed && <span className="whitespace-nowrap animate-fade-in">{label}</span>}
-        {isActive && !isCollapsed && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>}
+        {badge !== null && badge > 0 && (
+          <span className={`${isCollapsed ? "absolute top-1 right-1" : "ml-auto"} bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center`}>
+            {badge}
+          </span>
+        )}
+        {isActive && !isCollapsed && badge === null && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>}
     </Link>
 )

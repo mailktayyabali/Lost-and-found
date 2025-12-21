@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function About() {
   const teamMembers = [
     {
@@ -160,12 +162,12 @@ function About() {
             with us and be part of our journey to make lost items find their way
             home.
           </p>
-          <a
-            href="/contact"
+          <Link
+            to="/contact"
             className="inline-block px-6 py-3 bg-[#0d9488] text-white rounded-lg hover:bg-[#0f766e] transition shadow-md font-medium"
           >
             Contact Us
-          </a>
+          </Link>
         </div>
       </section>
     </>

@@ -1,5 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { FavoritesProvider } from "./context/FavoritesContext";
+import { UserProfileProvider } from "./context/UserProfileContext";
+import { MessagingProvider } from "./context/MessagingContext";
+import { SearchAlertsProvider } from "./context/SearchAlertsContext";
 import MainLayout from "./layouts/MainLayout";
 import DashboardLayout from "./layouts/DashboardLayout";
 
@@ -13,11 +17,20 @@ import MyReports from "./pages/MyReports";
 import ItemDetail from "./pages/ItemDetail";
 import Contact from "./pages/Contact";
 import AdminDashboard from "./pages/AdminDashboard";
+import Favorites from "./pages/Favorites";
+import UserProfile from "./pages/UserProfile";
+import Messages from "./pages/Messages";
+import Chat from "./pages/Chat";
+import SearchAlerts from "./pages/SearchAlerts";
 
 function App() {
   return (
     <AuthProvider>
-      <Routes>
+      <FavoritesProvider>
+        <UserProfileProvider>
+          <MessagingProvider>
+            <SearchAlertsProvider>
+              <Routes>
         {/* Public / Website Layout */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
@@ -29,6 +42,7 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/report" element={<ReportItem />} />
           <Route path="/item/:id" element={<ItemDetail />} />
+          <Route path="/profile/:userId" element={<UserProfile />} />
         </Route>
 
         {/* Dashboard Layout (Authenticated) */}
@@ -36,8 +50,16 @@ function App() {
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/my-reports" element={<MyReports />} />
+          <Route path="/favorites" element={<Favorites />} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/chat/:itemId/:userId" element={<Chat />} />
+          <Route path="/search-alerts" element={<SearchAlerts />} />
         </Route>
       </Routes>
+            </SearchAlertsProvider>
+          </MessagingProvider>
+        </UserProfileProvider>
+      </FavoritesProvider>
     </AuthProvider>
   );
 }

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Sidebar from "../components/Sidebar";
 import FeedPostCard from "../components/FeedPostCard";
 import { posts } from "../data/posts";
 
@@ -17,10 +16,7 @@ function MyReports() {
         );
 
   return (
-    <div className="flex bg-gray-200 min-h-screen">
-      <Sidebar />
-
-      <main className="flex-1 p-4 md:p-6 lg:p-10 overflow-x-hidden">
+    <div className="flex-1 p-4 md:p-6 lg:p-10 overflow-x-hidden">
         <div className="fade-in-slide-in">
           {/* Header Section */}
           <div className="mb-10 text-center">
@@ -66,7 +62,6 @@ function MyReports() {
             )}
           </div>
         </div>
-      </main>
     </div>
   );
 }

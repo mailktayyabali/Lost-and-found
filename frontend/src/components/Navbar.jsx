@@ -1,14 +1,20 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { User, LogOut, LayoutDashboard, Search, CheckCircle } from "lucide-react";
+import { useMessaging } from "../context/MessagingContext";
+import { useSearchAlerts } from "../context/SearchAlertsContext";
+import { User, LogOut, LayoutDashboard, Search, CheckCircle, MessageSquare, Bell } from "lucide-react";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { getUnreadCount: getMessageUnreadCount } = useMessaging();
+  const { getUnreadCount: getAlertUnreadCount } = useSearchAlerts();
   const navigate = useNavigate();
   const profileRef = useRef(null);
+  const messageUnreadCount = getMessageUnreadCount();
+  const alertUnreadCount = getAlertUnreadCount();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -77,6 +83,36 @@ function Navbar() {
             </NavLink>
             
             <NavLink to="/contact">Contact</NavLink>
+
+            {/* Messages & Alerts Links (if logged in) */}
+            {user && (
+              <>
+                <Link
+                  to="/messages"
+                  className="relative px-4 py-2 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-all text-xs font-bold uppercase tracking-wider"
+                >
+                  <MessageSquare size={14} className="inline mr-1.5" />
+                  Messages
+                  {messageUnreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                      {messageUnreadCount}
+                    </span>
+                  )}
+                </Link>
+                <Link
+                  to="/search-alerts"
+                  className="relative px-4 py-2 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-all text-xs font-bold uppercase tracking-wider"
+                >
+                  <Bell size={14} className="inline mr-1.5" />
+                  Alerts
+                  {alertUnreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-teal text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                      {alertUnreadCount}
+                    </span>
+                  )}
+                </Link>
+              </>
+            )}
 
             {/* Separator */}
             <div className="h-6 w-px bg-white/10 mx-4"></div>

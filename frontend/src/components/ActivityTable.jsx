@@ -1,32 +1,51 @@
 import { Pencil, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { posts } from "../data/posts";
+import { useMemo } from "react";
 
 export default function ActivityTable() {
-  const data = [
-    {
-      item: "Blue North Face Backpack",
-      desc: "Lost near Central Library",
-      category: "Bags & Luggage",
-      posted: "Oct 24, 2023",
-      status: "Pending",
-      badge: "bg-red-100 text-red-600",
-    },
-    {
-      item: "iPhone 13 Pro Max",
-      desc: "Found in Cafeteria",
-      category: "Electronics",
-      posted: "Oct 22, 2023",
-      status: "Found",
-      badge: "bg-green-100 text-green-600",
-    },
-    {
-      item: "Golden Retriever (Max)",
-      desc: "Lost in City Park",
-      category: "Pets",
-      posted: "Oct 15, 2023",
-      status: "Claimed",
-      badge: "bg-blue-100 text-blue-600",
-    },
-  ];
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const userPosts = useMemo(() => {
+    if (!user) return [];
+    return posts
+      .filter(
+        (post) =>
+          post.postedBy?.email === user.email ||
+          post.postedBy?.username === user.email?.split("@")[0]
+      )
+      .slice(0, 5)
+      .map((post) => ({
+        id: post.id,
+        item: post.title,
+        desc: post.description,
+        category: post.category || "Other",
+        posted: post.date,
+        status: post.status,
+        badge:
+          post.status === "LOST"
+            ? "bg-red-100 text-red-600"
+            : post.status === "FOUND"
+            ? "bg-green-100 text-green-600"
+            : "bg-blue-100 text-blue-600",
+      }));
+  }, [user]);
+
+  const data = userPosts.length > 0 
+    ? userPosts 
+    : [
+        {
+          id: 1,
+          item: "No items reported yet",
+          desc: "Start by reporting a lost or found item",
+          category: "-",
+          posted: "-",
+          status: "Empty",
+          badge: "bg-gray-100 text-gray-600",
+        },
+      ];
 
   return (
     <div className="bg-white p-4 md:p-6 rounded-xl shadow-md border border-gray-100 mt-6">
@@ -63,12 +82,24 @@ export default function ActivityTable() {
                 </td>
                 <td className="py-4">
                   <div className="flex gap-3">
-                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                      <Pencil size={18} className="text-gray-600" />
-                    </button>
-                    <button className="p-2 hover:bg-red-50 rounded-lg transition-colors">
-                      <Trash2 size={18} className="text-red-600" />
-                    </button>
+                    {item.id && (
+                      <>
+                        <button
+                          onClick={() => navigate(`/item/${item.id}`)}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          title="View Details"
+                        >
+                          <i className="fa-solid fa-eye text-gray-600"></i>
+                        </button>
+                        <button
+                          onClick={() => navigate("/my-reports")}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                          title="Edit"
+                        >
+                          <Pencil size={18} className="text-gray-600" />
+                        </button>
+                      </>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -100,16 +131,24 @@ export default function ActivityTable() {
                 {item.posted}
               </div>
             </div>
-            <div className="flex gap-3 pt-3 border-t border-gray-200">
-              <button className="flex-1 flex items-center justify-center gap-2 p-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
-                <Pencil size={16} className="text-gray-600" />
-                <span className="text-sm text-gray-700">Edit</span>
-              </button>
-              <button className="flex-1 flex items-center justify-center gap-2 p-2 border border-red-300 rounded-lg hover:bg-red-50 transition-colors">
-                <Trash2 size={16} className="text-red-600" />
-                <span className="text-sm text-red-600">Delete</span>
-              </button>
-            </div>
+            {item.id && (
+              <div className="flex gap-3 pt-3 border-t border-gray-200">
+                <button
+                  onClick={() => navigate(`/item/${item.id}`)}
+                  className="flex-1 flex items-center justify-center gap-2 p-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <i className="fa-solid fa-eye text-gray-600"></i>
+                  <span className="text-sm text-gray-700">View</span>
+                </button>
+                <button
+                  onClick={() => navigate("/my-reports")}
+                  className="flex-1 flex items-center justify-center gap-2 p-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <Pencil size={16} className="text-gray-600" />
+                  <span className="text-sm text-gray-700">Edit</span>
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>

@@ -1,5 +1,24 @@
-function ItemActions({ status }) {
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+
+function ItemActions({ status, itemId, postedBy }) {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const isFound = status === "FOUND";
+
+  const handleMessage = () => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+
+    if (!postedBy || !postedBy.email) {
+      alert("Unable to start conversation. User information not available.");
+      return;
+    }
+
+    navigate(`/chat/${itemId}/${postedBy.email}`);
+  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -9,7 +28,10 @@ function ItemActions({ status }) {
       </button>
 
       <div className="flex gap-3">
-        <button className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-[#212121] font-semibold transition-colors hover:bg-gray-50 hover:border-gray-300">
+        <button
+          onClick={handleMessage}
+          className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-[#212121] font-semibold transition-colors hover:bg-gray-50 hover:border-gray-300"
+        >
           <span className="material-symbols-outlined text-gray-500">chat</span>
           Message
         </button>

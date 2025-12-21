@@ -1,3 +1,5 @@
+import FavoriteButton from "./FavoriteButton";
+
 function ItemHeader({ status, title, itemId, postedTime }) {
   const isFound = status === "FOUND";
 
@@ -20,12 +22,15 @@ function ItemHeader({ status, title, itemId, postedTime }) {
           {title}
         </h1>
       </div>
-      <button
-        className="text-gray-400 hover:text-[#243DB3] transition-colors p-1"
-        title="Share Item"
-      >
-        <span className="material-symbols-outlined">share</span>
-      </button>
+      <div className="flex items-center gap-2">
+        <FavoriteButton itemId={itemId} size="default" />
+        <button
+          className="text-gray-400 hover:text-[#243DB3] transition-colors p-1"
+          title="Share Item"
+        >
+          <span className="material-symbols-outlined">share</span>
+        </button>
+      </div>
     </div>
   );
 }

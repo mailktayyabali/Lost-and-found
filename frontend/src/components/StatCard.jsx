@@ -12,7 +12,11 @@ export default function StatCard({ title, value, subtitle, icon, type, trend }) 
   } else if (type === "claim") {
     sideColor = "border-blue-500";
     iconBgColor = "bg-blue-100 text-blue-600";
+  } else if (type === "info") {
+    sideColor = "border-teal";
+    iconBgColor = "bg-teal/10 text-teal";
   } else {
+    sideColor = "border-gray-300";
     iconBgColor = "bg-gray-100 text-gray-600";
   }
 
