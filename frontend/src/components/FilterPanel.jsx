@@ -56,17 +56,16 @@ function FilterPanel({ filters, onFilterChange, onClearFilters, isOpen, onToggle
 
       {/* Filter Panel */}
       <div
-        className={`fixed lg:static inset-0 lg:inset-auto bg-white lg:bg-transparent z-50 lg:z-auto transform transition-transform duration-300 ${
-          isOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"
-        } lg:block`}
+        className={`fixed lg:static inset-0 lg:inset-auto bg-[#1e293b] lg:bg-transparent z-50 lg:z-auto transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"
+          } lg:block`}
       >
         <div className="h-full lg:h-auto overflow-y-auto lg:overflow-visible p-6 lg:p-0">
           {/* Mobile Header */}
           <div className="flex items-center justify-between mb-6 lg:hidden">
-            <h2 className="text-xl font-bold text-navy">Filters</h2>
+            <h2 className="text-xl font-bold text-white">Filters</h2>
             <button
               onClick={onToggle}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white"
             >
               <X size={24} />
             </button>
@@ -78,7 +77,7 @@ function FilterPanel({ filters, onFilterChange, onClearFilters, isOpen, onToggle
             <div>
               <button
                 onClick={() => toggleSection("category")}
-                className="w-full flex items-center justify-between text-left font-semibold text-navy mb-3"
+                className="w-full flex items-center justify-between text-left font-semibold text-white mb-3"
               >
                 <span>Category</span>
                 <i
@@ -90,7 +89,7 @@ function FilterPanel({ filters, onFilterChange, onClearFilters, isOpen, onToggle
                   {CATEGORIES.map((category) => (
                     <label
                       key={category}
-                      className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                      className="flex items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-lg transition-colors"
                     >
                       <input
                         type="radio"
@@ -108,7 +107,7 @@ function FilterPanel({ filters, onFilterChange, onClearFilters, isOpen, onToggle
                         }
                         className="accent-teal"
                       />
-                      <span className="text-sm text-slate">{category}</span>
+                      <span className="text-sm text-slate-300">{category}</span>
                     </label>
                   ))}
                 </div>
@@ -119,7 +118,7 @@ function FilterPanel({ filters, onFilterChange, onClearFilters, isOpen, onToggle
             <div>
               <button
                 onClick={() => toggleSection("date")}
-                className="w-full flex items-center justify-between text-left font-semibold text-navy mb-3"
+                className="w-full flex items-center justify-between text-left font-semibold text-white mb-3"
               >
                 <span>Date Range</span>
                 <i
@@ -129,7 +128,7 @@ function FilterPanel({ filters, onFilterChange, onClearFilters, isOpen, onToggle
               {isExpanded.date && (
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm text-slate mb-1">From</label>
+                    <label className="block text-sm text-slate-300 mb-1">From</label>
                     <input
                       type="date"
                       value={filters.dateFrom || ""}
@@ -140,7 +139,7 @@ function FilterPanel({ filters, onFilterChange, onClearFilters, isOpen, onToggle
                     />
                   </div>
                   <div>
-                    <label className="block text-sm text-slate mb-1">To</label>
+                    <label className="block text-sm text-slate-300 mb-1">To</label>
                     <input
                       type="date"
                       value={filters.dateTo || ""}
@@ -158,7 +157,7 @@ function FilterPanel({ filters, onFilterChange, onClearFilters, isOpen, onToggle
             <div>
               <button
                 onClick={() => toggleSection("location")}
-                className="w-full flex items-center justify-between text-left font-semibold text-navy mb-3"
+                className="w-full flex items-center justify-between text-left font-semibold text-white mb-3"
               >
                 <span>Location</span>
                 <i
@@ -184,7 +183,7 @@ function FilterPanel({ filters, onFilterChange, onClearFilters, isOpen, onToggle
             <div>
               <button
                 onClick={() => toggleSection("sort")}
-                className="w-full flex items-center justify-between text-left font-semibold text-navy mb-3"
+                className="w-full flex items-center justify-between text-left font-semibold text-white mb-3"
               >
                 <span>Sort By</span>
                 <i
@@ -196,7 +195,7 @@ function FilterPanel({ filters, onFilterChange, onClearFilters, isOpen, onToggle
                   {SORT_OPTIONS.map((option) => (
                     <label
                       key={option.value}
-                      className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                      className="flex items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-lg transition-colors"
                     >
                       <input
                         type="radio"
@@ -208,7 +207,7 @@ function FilterPanel({ filters, onFilterChange, onClearFilters, isOpen, onToggle
                         }
                         className="accent-teal"
                       />
-                      <span className="text-sm text-slate">{option.label}</span>
+                      <span className="text-sm text-slate-300">{option.label}</span>
                     </label>
                   ))}
                 </div>
@@ -219,7 +218,7 @@ function FilterPanel({ filters, onFilterChange, onClearFilters, isOpen, onToggle
             {activeFilterCount > 0 && (
               <button
                 onClick={onClearFilters}
-                className="w-full px-4 py-2 bg-gray-100 text-navy rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                className="w-full px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors text-sm font-medium"
               >
                 Clear All Filters
               </button>

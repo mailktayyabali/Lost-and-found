@@ -175,9 +175,9 @@ function Feed({ type }) {
 
 
   const getPageTitle = () => {
-      if (type === 'lost') return 'Lost Items';
-      if (type === 'found') return 'Found Items';
-      return 'All Items';
+    if (type === 'lost') return 'Lost Items';
+    if (type === 'found') return 'Found Items';
+    return 'All Items';
   }
 
   return (
@@ -197,112 +197,113 @@ function Feed({ type }) {
 
           {/* Main Content */}
           <div className="flex-1">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-navy">{getPageTitle()}</h1>
-            <p className="text-slate text-sm mt-1">
-              Browsing {filteredItems.length} {type ? type : ''} items in your area
-            </p>
-          </div>
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+              <div>
+                <h1 className="text-3xl font-bold text-navy">{getPageTitle()}</h1>
+                <p className="text-slate text-sm mt-1">
+                  Browsing {filteredItems.length} {type ? type : ''} items in your area
+                </p>
+              </div>
 
-          {/* Filters and Search */}
-          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-            {user && (
-              <button
-                onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-                className={`px-4 py-3 rounded-xl border transition-all text-sm font-medium ${
-                  showFavoritesOnly
-                    ? "bg-teal text-white border-teal"
-                    : "bg-white text-navy border-gray-200 hover:border-teal"
-                }`}
-              >
-                <i className={`fa-solid fa-heart mr-2 ${showFavoritesOnly ? "text-white" : "text-red-500"}`}></i>
-                My Favorites
-              </button>
-            )}
-            
-            {/* Search Bar */}
-            <div className="w-full md:w-96 relative">
-            <i className="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-400"></i>
-            <input
-              type="text"
-              placeholder="Search by keyword or location..."
-              className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all shadow-sm"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+              {/* Filters and Search */}
+              <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                {user && (
+                  <button
+                    onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                    className={`px-4 py-3 rounded-xl border transition-all text-sm font-medium ${showFavoritesOnly
+                        ? "bg-teal text-white border-teal"
+                        : "bg-white text-navy border-gray-200 hover:border-teal"
+                      }`}
+                  >
+                    <i className={`fa-solid fa-heart mr-2 ${showFavoritesOnly ? "text-white" : "text-red-500"}`}></i>
+                    My Favorites
+                  </button>
+                )}
+
+                {/* Search Bar */}
+                <div className="w-full md:w-96 relative">
+                  <i className="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-400"></i>
+                  <input
+                    type="text"
+                    placeholder="Search by keyword or location..."
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all shadow-sm"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        {/* Active Filters */}
-        {getActiveFilters().length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mb-6">
-            <span className="text-sm text-slate font-medium">Active filters:</span>
-            {getActiveFilters().map((filter) => (
-              <FilterChip
-                key={filter.key}
-                label={filter.label}
-                value={filter.value}
-                onRemove={() => {
-                  if (filter.key === "category") {
-                    handleFilterChange({ category: null });
-                  } else if (filter.key === "date") {
-                    handleFilterChange({ dateFrom: null, dateTo: null });
-                  } else if (filter.key === "location") {
-                    handleFilterChange({ location: null });
-                  } else if (filter.key === "sort") {
-                    handleFilterChange({ sortBy: "newest" });
-                  }
-                }}
-              />
-            ))}
-            {user && hasActiveFilters() && (
-              <button
-                onClick={handleSaveSearch}
-                className="ml-auto px-4 py-1.5 bg-teal/10 text-teal rounded-full text-sm font-medium border border-teal/20 hover:bg-teal/20 transition-colors flex items-center gap-2"
-              >
-                <i className="fa-solid fa-bell text-xs"></i>
-                Save Search
-              </button>
+            {/* Active Filters */}
+            {getActiveFilters().length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 mb-6">
+                <span className="text-sm text-slate font-medium">Active filters:</span>
+                {getActiveFilters().map((filter) => (
+                  <FilterChip
+                    key={filter.key}
+                    label={filter.label}
+                    value={filter.value}
+                    onRemove={() => {
+                      if (filter.key === "category") {
+                        handleFilterChange({ category: null });
+                      } else if (filter.key === "date") {
+                        handleFilterChange({ dateFrom: null, dateTo: null });
+                      } else if (filter.key === "location") {
+                        handleFilterChange({ location: null });
+                      } else if (filter.key === "sort") {
+                        handleFilterChange({ sortBy: "newest" });
+                      }
+                    }}
+                  />
+                ))}
+                {user && hasActiveFilters() && (
+                  <button
+                    onClick={handleSaveSearch}
+                    className="ml-auto px-4 py-1.5 bg-teal/10 text-teal rounded-full text-sm font-medium border border-teal/20 hover:bg-teal/20 transition-colors flex items-center gap-2"
+                  >
+                    <i className="fa-solid fa-bell text-xs"></i>
+                    Save Search
+                  </button>
+                )}
+              </div>
             )}
-          </div>
-        )}
 
-        {/* Grid */}
-        {filteredItems.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredItems.map((item) => {
-              // Transform item to match FeedPostCard expected structure
-              const post = {
-                ...item,
-                status: item.type ? item.type.toUpperCase() : 'LOST',
-                imageUrl: item.image || item.imageUrl,
-              };
-              return <FeedPostCard key={item.id} post={post} />;
-            })}
-          </div>
-        ) : (
-          <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
-                <i className="fa-solid fa-box-open text-2xl"></i>
-            </div>
-            <h3 className="text-lg font-bold text-navy mb-2">No items found</h3>
-            <p className="text-slate">Try adjusting your search terms or filters.</p>
-          </div>
-        )}
+            {/* Grid */}
+            {filteredItems.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {filteredItems.map((item) => {
+                  // Transform item to match FeedPostCard expected structure
+                  const post = {
+                    ...item,
+                    status: item.type ? item.type.toUpperCase() : 'LOST',
+                    imageUrl: item.image || item.imageUrl,
+                  };
+                  return <FeedPostCard key={item.id} post={post} />;
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                  <i className="fa-solid fa-box-open text-2xl"></i>
+                </div>
+                <h3 className="text-lg font-bold text-navy mb-2">No items found</h3>
+                <p className="text-slate">Try adjusting your search terms or filters.</p>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Filter Panel - Mobile */}
-        <FilterPanel
-          filters={filters}
-          onFilterChange={handleFilterChange}
-          onClearFilters={handleClearFilters}
-          isOpen={isFilterOpen}
-          onToggle={() => setIsFilterOpen(!isFilterOpen)}
-        />
+        <div className="lg:hidden">
+          <FilterPanel
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onClearFilters={handleClearFilters}
+            isOpen={isFilterOpen}
+            onToggle={() => setIsFilterOpen(!isFilterOpen)}
+          />
+        </div>
 
         {/* Create Alert Modal */}
         <CreateAlertModal
