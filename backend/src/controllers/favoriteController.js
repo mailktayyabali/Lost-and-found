@@ -3,6 +3,7 @@ const Item = require('../models/Item');
 const { sendSuccess } = require('../utils/response');
 const { NotFoundError } = require('../utils/errors');
 const { getPaginationParams, getPaginationMeta } = require('../utils/pagination');
+const { transformFavorite, transformFavoritesToIds } = require('../utils/transformers');
 
 // Get user's favorites
 const getFavorites = async (req, res, next) => {
@@ -28,7 +29,8 @@ const getFavorites = async (req, res, next) => {
     const validFavorites = favorites.filter((fav) => fav.item !== null);
 
     sendSuccess(res, 'Favorites retrieved successfully', {
-      favorites: validFavorites,
+      favorites: validFavorites.map(transformFavorite),
+      favoriteIds: transformFavoritesToIds(validFavorites), // For frontend compatibility
       pagination: getPaginationMeta(page, limit, total),
     });
   } catch (error) {
@@ -68,7 +70,7 @@ const addFavorite = async (req, res, next) => {
       },
     });
 
-    sendSuccess(res, 'Item added to favorites', { favorite }, 201);
+    sendSuccess(res, 'Item added to favorites', { favorite: transformFavorite(favorite) }, 201);
   } catch (error) {
     next(error);
   }
@@ -98,11 +100,18 @@ const checkFavorite = async (req, res, next) => {
     const { itemId } = req.params;
     const userId = req.user.id;
 
-    const favorite = await Favorite.findOne({ user: userId, item: itemId });
+    const favorite = await Favorite.findOne({ user: userId, item: itemId })
+      .populate({
+        path: 'item',
+        populate: {
+          path: 'postedBy',
+          select: 'name username avatar rating verified',
+        },
+      });
 
     sendSuccess(res, 'Favorite status retrieved', {
       isFavorite: !!favorite,
-      favorite: favorite || null,
+      favorite: favorite ? transformFavorite(favorite) : null,
     });
   } catch (error) {
     next(error);

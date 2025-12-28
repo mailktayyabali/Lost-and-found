@@ -2,6 +2,7 @@ const User = require('../models/User');
 const { sendSuccess, sendError } = require('../utils/response');
 const { AppError, UnauthorizedError, ValidationError } = require('../utils/errors');
 const { sendWelcomeEmail } = require('../services/emailService');
+const { transformUser } = require('../utils/transformers');
 
 // Register new user
 const register = async (req, res, next) => {
@@ -28,13 +29,7 @@ const register = async (req, res, next) => {
     sendWelcomeEmail(user).catch((err) => console.error('Welcome email failed:', err));
 
     sendSuccess(res, 'User registered successfully', {
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        verified: user.verified,
-      },
+      user: transformUser(user),
       token,
     }, 201);
   } catch (error) {
@@ -64,14 +59,7 @@ const login = async (req, res, next) => {
     const token = user.generateAuthToken();
 
     sendSuccess(res, 'Login successful', {
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        verified: user.verified,
-        avatar: user.avatar,
-      },
+      user: transformUser(user),
       token,
     });
   } catch (error) {
@@ -83,7 +71,7 @@ const login = async (req, res, next) => {
 const getMe = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
-    sendSuccess(res, 'User profile retrieved successfully', { user });
+    sendSuccess(res, 'User profile retrieved successfully', { user: transformUser(user) });
   } catch (error) {
     next(error);
   }
@@ -122,7 +110,7 @@ const updateProfile = async (req, res, next) => {
       }
     );
 
-    sendSuccess(res, 'Profile updated successfully', { user });
+    sendSuccess(res, 'Profile updated successfully', { user: transformUser(user) });
   } catch (error) {
     next(error);
   }

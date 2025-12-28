@@ -4,6 +4,7 @@ const Review = require('../models/Review');
 const Favorite = require('../models/Favorite');
 const { sendSuccess } = require('../utils/response');
 const { NotFoundError } = require('../utils/errors');
+const { transformUser, transformItems } = require('../utils/transformers');
 
 // Get user profile
 const getUserProfile = async (req, res, next) => {
@@ -15,7 +16,7 @@ const getUserProfile = async (req, res, next) => {
       throw new NotFoundError('User');
     }
 
-    sendSuccess(res, 'User profile retrieved successfully', { user });
+    sendSuccess(res, 'User profile retrieved successfully', { user: transformUser(user) });
   } catch (error) {
     next(error);
   }
@@ -86,7 +87,7 @@ const getUserItems = async (req, res, next) => {
     const total = await Item.countDocuments(query);
 
     sendSuccess(res, 'User items retrieved successfully', {
-      items,
+      items: transformItems(items),
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),

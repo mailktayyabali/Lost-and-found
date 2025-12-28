@@ -4,6 +4,7 @@ const { NotFoundError, ForbiddenError } = require('../utils/errors');
 const { getPaginationParams, getPaginationMeta } = require('../utils/pagination');
 const { searchItems } = require('../services/searchService');
 const { uploadMultipleImageFiles, deleteMultipleImages } = require('../services/imageService');
+const { transformItem, transformItems } = require('../utils/transformers');
 
 // Get all items with filters and pagination
 const getAllItems = async (req, res, next) => {
@@ -23,7 +24,7 @@ const getAllItems = async (req, res, next) => {
     const result = await searchItems(filters, { page, limit, skip });
 
     sendSuccess(res, 'Items retrieved successfully', {
-      items: result.items,
+      items: transformItems(result.items),
       pagination: getPaginationMeta(page, limit, result.total),
     });
   } catch (error) {
@@ -43,7 +44,7 @@ const getItemById = async (req, res, next) => {
       throw new NotFoundError('Item');
     }
 
-    sendSuccess(res, 'Item retrieved successfully', { item });
+    sendSuccess(res, 'Item retrieved successfully', { item: transformItem(item) });
   } catch (error) {
     next(error);
   }
@@ -70,7 +71,7 @@ const createItem = async (req, res, next) => {
     const item = await Item.create(itemData);
     await item.populate('postedBy', 'name username avatar rating verified');
 
-    sendSuccess(res, 'Item created successfully', { item }, 201);
+    sendSuccess(res, 'Item created successfully', { item: transformItem(item) }, 201);
   } catch (error) {
     next(error);
   }
@@ -106,7 +107,7 @@ const updateItem = async (req, res, next) => {
       runValidators: true,
     }).populate('postedBy', 'name username avatar rating verified');
 
-    sendSuccess(res, 'Item updated successfully', { item: updatedItem });
+    sendSuccess(res, 'Item updated successfully', { item: transformItem(updatedItem) });
   } catch (error) {
     next(error);
   }
@@ -157,8 +158,9 @@ const markAsResolved = async (req, res, next) => {
     item.resolvedAt = new Date();
     item.resolvedBy = req.user.id;
     await item.save();
+    await item.populate('postedBy', 'name username avatar rating verified');
 
-    sendSuccess(res, 'Item marked as resolved', { item });
+    sendSuccess(res, 'Item marked as resolved', { item: transformItem(item) });
   } catch (error) {
     next(error);
   }
@@ -179,7 +181,7 @@ const getUserItems = async (req, res, next) => {
     const total = await Item.countDocuments({ postedBy: userId });
 
     sendSuccess(res, 'User items retrieved successfully', {
-      items,
+      items: transformItems(items),
       pagination: getPaginationMeta(page, limit, total),
     });
   } catch (error) {
@@ -199,7 +201,7 @@ const searchItemsController = async (req, res, next) => {
     const result = await searchItems(filters, { page, limit, skip });
 
     sendSuccess(res, 'Search completed successfully', {
-      items: result.items,
+      items: transformItems(result.items),
       pagination: getPaginationMeta(page, limit, result.total),
     });
   } catch (error) {

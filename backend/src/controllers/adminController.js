@@ -8,6 +8,7 @@ const SearchAlert = require('../models/SearchAlert');
 const { sendSuccess } = require('../utils/response');
 const { NotFoundError } = require('../utils/errors');
 const { getPaginationParams, getPaginationMeta } = require('../utils/pagination');
+const { transformUser, transformItems } = require('../utils/transformers');
 
 // Get dashboard statistics
 const getDashboardStats = async (req, res, next) => {
@@ -116,7 +117,7 @@ const getAllUsers = async (req, res, next) => {
     const total = await User.countDocuments(query);
 
     sendSuccess(res, 'Users retrieved successfully', {
-      users,
+      users: users.map(transformUser),
       pagination: getPaginationMeta(page, limit, total),
     });
   } catch (error) {
@@ -151,7 +152,7 @@ const getAllItems = async (req, res, next) => {
     const total = await Item.countDocuments(query);
 
     sendSuccess(res, 'Items retrieved successfully', {
-      items,
+      items: transformItems(items),
       pagination: getPaginationMeta(page, limit, total),
     });
   } catch (error) {

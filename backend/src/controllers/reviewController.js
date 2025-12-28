@@ -3,6 +3,7 @@ const User = require('../models/User');
 const { sendSuccess } = require('../utils/response');
 const { NotFoundError, ForbiddenError } = require('../utils/errors');
 const { getPaginationParams, getPaginationMeta } = require('../utils/pagination');
+const { transformReview } = require('../utils/transformers');
 
 // Get reviews for a user
 const getReviews = async (req, res, next) => {
@@ -20,7 +21,7 @@ const getReviews = async (req, res, next) => {
     const total = await Review.countDocuments({ reviewee: userId });
 
     sendSuccess(res, 'Reviews retrieved successfully', {
-      reviews,
+      reviews: reviews.map(transformReview),
       pagination: getPaginationMeta(page, limit, total),
     });
   } catch (error) {
@@ -54,13 +55,13 @@ const createReview = async (req, res, next) => {
       item,
     });
 
-    await review.populate('reviewer', 'name username avatar');
+    await review.populate('reviewer', 'name username avatar email');
     await review.populate('item', 'title status');
 
     // Update reviewee's rating
     await updateUserRating(reviewee);
 
-    sendSuccess(res, 'Review created successfully', { review }, 201);
+    sendSuccess(res, 'Review created successfully', { review: transformReview(review) }, 201);
   } catch (error) {
     next(error);
   }
@@ -87,13 +88,13 @@ const updateReview = async (req, res, next) => {
     if (comment !== undefined) review.comment = comment;
 
     await review.save();
-    await review.populate('reviewer', 'name username avatar');
+    await review.populate('reviewer', 'name username avatar email');
     await review.populate('item', 'title status');
 
     // Update reviewee's rating
     await updateUserRating(review.reviewee);
 
-    sendSuccess(res, 'Review updated successfully', { review });
+    sendSuccess(res, 'Review updated successfully', { review: transformReview(review) });
   } catch (error) {
     next(error);
   }

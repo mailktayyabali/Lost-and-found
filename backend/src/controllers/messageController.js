@@ -6,6 +6,7 @@ const { NotFoundError, ForbiddenError } = require('../utils/errors');
 const { getPaginationParams, getPaginationMeta } = require('../utils/pagination');
 const { sendMessageNotification } = require('../services/emailService');
 const User = require('../models/User');
+const { transformMessage, transformConversation, transformItem } = require('../utils/transformers');
 
 // Get all user conversations
 const getConversations = async (req, res, next) => {
@@ -20,21 +21,8 @@ const getConversations = async (req, res, next) => {
       .populate('lastMessage')
       .sort({ lastMessageAt: -1, updatedAt: -1 });
 
-    // Format conversations with other user info
-    const formattedConversations = conversations.map((conv) => {
-      const otherUser = conv.participants.find((p) => p._id.toString() !== userId.toString());
-      return {
-        id: conv._id,
-        item: conv.item,
-        otherUser,
-        lastMessage: conv.lastMessage,
-        lastMessageAt: conv.lastMessageAt,
-        createdAt: conv.createdAt,
-      };
-    });
-
     sendSuccess(res, 'Conversations retrieved successfully', {
-      conversations: formattedConversations,
+      conversations: conversations.map((conv) => transformConversation(conv, userId)),
     });
   } catch (error) {
     next(error);
@@ -66,8 +54,16 @@ const getConversation = async (req, res, next) => {
     // Get messages
     const { page, limit, skip } = getPaginationParams(req.query);
     const messages = await Message.find({ conversation: conversationId })
-      .populate('sender', 'name username avatar')
-      .populate('receiver', 'name username avatar')
+      .populate('sender', 'name username avatar email')
+      .populate('receiver', 'name username avatar email')
+      .populate({
+        path: 'conversation',
+        select: 'item',
+        populate: {
+          path: 'item',
+          select: '_id',
+        },
+      })
       .sort({ createdAt: 1 })
       .skip(skip)
       .limit(limit);
@@ -87,16 +83,10 @@ const getConversation = async (req, res, next) => {
       }
     );
 
-    const otherUser = conversation.participants.find(
-      (p) => p._id.toString() !== userId.toString()
-    );
-
     sendSuccess(res, 'Conversation retrieved successfully', {
       conversation: {
-        id: conversation._id,
-        item: conversation.item,
-        otherUser,
-        messages,
+        ...transformConversation(conversation, userId),
+        messages: messages.map((msg) => transformMessage(msg, req.user.email)),
         pagination: getPaginationMeta(page, limit, total),
       },
     });
@@ -138,9 +128,20 @@ const sendMessage = async (req, res, next) => {
     conversation.lastMessageAt = new Date();
     await conversation.save();
 
-    // Populate message
-    await message.populate('sender', 'name username avatar');
-    await message.populate('receiver', 'name username avatar');
+    // Populate message with itemId for frontend
+    await message.populate('sender', 'name username avatar email');
+    await message.populate('receiver', 'name username avatar email');
+    await message.populate({
+      path: 'conversation',
+      select: 'item',
+      populate: {
+        path: 'item',
+        select: '_id',
+      },
+    });
+    
+    // Add itemId directly to message object for transformer
+    message.itemId = req.body.itemId || conversation.item?.toString();
 
     // Send notification email (non-blocking)
     const receiver = await User.findById(receiverId);
@@ -151,7 +152,9 @@ const sendMessage = async (req, res, next) => {
       );
     }
 
-    sendSuccess(res, 'Message sent successfully', { message }, 201);
+    sendSuccess(res, 'Message sent successfully', { 
+      message: transformMessage(message, req.user.email) 
+    }, 201);
   } catch (error) {
     next(error);
   }
@@ -176,8 +179,12 @@ const markAsRead = async (req, res, next) => {
     message.read = true;
     message.readAt = new Date();
     await message.save();
+    await message.populate('sender', 'name username avatar email');
+    await message.populate('receiver', 'name username avatar email');
 
-    sendSuccess(res, 'Message marked as read', { message });
+    sendSuccess(res, 'Message marked as read', { 
+      message: transformMessage(message, req.user.email) 
+    });
   } catch (error) {
     next(error);
   }

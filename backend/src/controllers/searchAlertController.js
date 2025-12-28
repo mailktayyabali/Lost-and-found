@@ -3,6 +3,7 @@ const { sendSuccess } = require('../utils/response');
 const { NotFoundError } = require('../utils/errors');
 const { getPaginationParams, getPaginationMeta } = require('../utils/pagination');
 const { matchAlerts } = require('../services/searchService');
+const { transformSearchAlert, transformItems } = require('../utils/transformers');
 
 // Get user's search alerts
 const getAlerts = async (req, res, next) => {
@@ -24,7 +25,7 @@ const getAlerts = async (req, res, next) => {
     const total = await SearchAlert.countDocuments(query);
 
     sendSuccess(res, 'Search alerts retrieved successfully', {
-      alerts,
+      alerts: alerts.map(transformSearchAlert),
       pagination: getPaginationMeta(page, limit, total),
     });
   } catch (error) {
@@ -45,7 +46,7 @@ const createAlert = async (req, res, next) => {
       active: true,
     });
 
-    sendSuccess(res, 'Search alert created successfully', { alert }, 201);
+    sendSuccess(res, 'Search alert created successfully', { alert: transformSearchAlert(alert) }, 201);
   } catch (error) {
     next(error);
   }
@@ -69,7 +70,7 @@ const updateAlert = async (req, res, next) => {
 
     await alert.save();
 
-    sendSuccess(res, 'Search alert updated successfully', { alert });
+    sendSuccess(res, 'Search alert updated successfully', { alert: transformSearchAlert(alert) });
   } catch (error) {
     next(error);
   }
@@ -111,8 +112,8 @@ const checkMatches = async (req, res, next) => {
     const matches = await matchAlerts(alert);
 
     sendSuccess(res, 'Matches checked successfully', {
-      alert,
-      matches,
+      alert: transformSearchAlert(alert),
+      matches: transformItems(matches),
       matchCount: matches.length,
     });
   } catch (error) {
