@@ -1,5 +1,5 @@
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getPostById } from "../data/posts";
 import ItemImageGallery from "../components/ItemImageGallery";
 import ItemHeader from "../components/ItemHeader";
 import PosterProfile from "../components/PosterProfile";
@@ -8,17 +8,73 @@ import ItemActions from "../components/ItemActions";
 import SafetyNotice from "../components/SafetyNotice";
 import ItemMap from "../components/ItemMap";
 import ItemDescription from "../components/ItemDescription";
+import { itemsApi } from "../services/itemsApi";
+import { getErrorMessage } from "../utils/errorHandler";
 
 function ItemDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const post = getPostById(id);
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  if (!post) {
+  useEffect(() => {
+    const fetchItem = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const response = await itemsApi.getItemById(id);
+        if (response.success && response.data) {
+          const item = response.data.item || response.data;
+          // Increment views
+          itemsApi.incrementViews(id).catch(() => {
+            // Silently fail if view increment fails
+          });
+          
+          // Transform item to match frontend format
+          const transformedItem = {
+            ...item,
+            id: item.id || item._id,
+            imageUrl: item.imageUrl || (item.images && item.images[0]) || "",
+            additionalImages: item.additionalImages || (item.images && item.images.slice(1)) || [],
+            fullDescription: item.description,
+            date: item.date || new Date(item.createdAt).toLocaleDateString(),
+            postedBy: item.postedBy || item.user,
+          };
+          setPost(transformedItem);
+        } else {
+          setError("Item not found");
+        }
+      } catch (err) {
+        setError(getErrorMessage(err));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchItem();
+    }
+  }, [id]);
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-[#f8f8f5] flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-[#212121] mb-4">Item Not Found</h1>
+          <i className="fa-solid fa-spinner fa-spin text-4xl text-teal mb-4"></i>
+          <p className="text-gray-600">Loading item...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !post) {
+    return (
+      <div className="min-h-screen bg-[#f8f8f5] flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-[#212121] mb-4">
+            {error || "Item Not Found"}
+          </h1>
           <button
             onClick={() => navigate("/feed")}
             className="px-6 py-3 bg-[#f2b90d] text-[#212121] font-bold rounded-xl hover:bg-[#f2b90d]/90 transition"

@@ -7,7 +7,10 @@ function Auth() {
   const [isSignIn, setIsSignIn] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { login } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
+  const { login, register } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -25,25 +28,76 @@ function Auth() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+    // Clear errors when user types
+    if (error) setError("");
+    if (fieldErrors[e.target.name]) {
+      setFieldErrors({ ...fieldErrors, [e.target.name]: "" });
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Simple validation for sign up
-    if (!isSignIn && formData.password !== formData.confirmPassword) {
-        alert("Passwords do not match!");
+    console.log("Auth: Form submitted", { isSignIn, formData });
+
+    setError("");
+    setFieldErrors({});
+
+    // Client-side validation for sign up
+    if (!isSignIn) {
+      if (formData.password !== formData.confirmPassword) {
+        console.log("Auth: Password mismatch");
+        setError("Passwords do not match!");
         return;
+      }
+      if (formData.password.length < 6) {
+        console.log("Auth: Password too short");
+        setError("Password must be at least 6 characters");
+        return;
+      }
     }
 
-    // Call login from context (works for both sign in and sign up for this mock)
-    const user = login(formData.email, formData.password);
-    
-    // Redirect based on role
-    if (user.role === "admin") {
-      navigate("/admin");
-    } else {
-      navigate("/dashboard");
+    setLoading(true);
+
+    try {
+      let result;
+      if (isSignIn) {
+        console.log("Auth: Attempting login...");
+        result = await login(formData.email, formData.password);
+      } else {
+        console.log("Auth: Attempting registration...");
+        result = await register(formData.fullName, formData.email, formData.password);
+      }
+
+      console.log("Auth: Result received", result);
+
+      if (result.success) {
+        console.log("Auth: Success, navigating...");
+        // Redirect based on role
+        if (result.user.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/dashboard");
+        }
+      } else {
+        console.error("Auth: Failed", result);
+        // Handle errors
+        setError(result.error || "An error occurred");
+
+        // Handle field-specific validation errors
+        if (result.errors && Array.isArray(result.errors)) {
+          const errors = {};
+          result.errors.forEach((err) => {
+            const field = err.field || err.param || "general";
+            errors[field] = err.message || err.msg || err;
+          });
+          setFieldErrors(errors);
+        }
+      }
+    } catch (err) {
+      console.error("Auth: Unexpected error in handleSubmit", err);
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -94,9 +148,13 @@ function Auth() {
                   required
                   value={formData.fullName}
                   onChange={handleChange}
-                  className="input-minimal w-full pl-10 pr-3 py-2.5 text-sm"
+                  className={`input-minimal w-full pl-10 pr-3 py-2.5 text-sm ${fieldErrors.name ? "border-red-500" : ""
+                    }`}
                 />
               </div>
+              {fieldErrors.name && (
+                <p className="text-red-500 text-xs mt-1">{fieldErrors.name}</p>
+              )}
             </div>
           )}
 
@@ -114,10 +172,15 @@ function Auth() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="input-minimal w-full pl-10 pr-3 py-2.5 text-sm"
+                className={`input-minimal w-full pl-10 pr-3 py-2.5 text-sm ${fieldErrors.email ? "border-red-500" : ""
+                  }`}
               />
             </div>
-             <p className="text-xs text-gray-400 mt-1">Tip: Use 'admin@findit.com' for Admin role</p>
+            {fieldErrors.email ? (
+              <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>
+            ) : (
+              <p className="text-xs text-gray-400 mt-1">Tip: Use 'admin@findit.com' for Admin role</p>
+            )}
           </div>
 
           {/* Password */}
@@ -139,7 +202,8 @@ function Auth() {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className="input-minimal w-full pl-10 pr-10 py-2.5 text-sm"
+                className={`input-minimal w-full pl-10 pr-10 py-2.5 text-sm ${fieldErrors.password ? "border-red-500" : ""
+                  }`}
               />
               <i
                 className={`fa-solid absolute right-3 cursor-pointer text-gray-400 hover:text-navy ${showPassword ? "fa-eye-slash" : "fa-eye"
@@ -147,6 +211,9 @@ function Auth() {
                 onClick={togglePassword}
               />
             </div>
+            {fieldErrors.password && (
+              <p className="text-red-500 text-xs mt-1">{fieldErrors.password}</p>
+            )}
           </div>
 
           {/* Sign Up Only: Confirm Password */}
@@ -197,12 +264,27 @@ function Auth() {
             </label>
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
           {/* Submit Button */}
           <button
             type="submit"
-            className="btn-primary w-full py-3 text-sm"
+            disabled={loading}
+            className="btn-primary w-full py-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSignIn ? "Sign In" : "Create Account"}
+            {loading ? (
+              <span className="flex items-center justify-center">
+                <i className="fa-solid fa-spinner fa-spin mr-2"></i>
+                {isSignIn ? "Signing in..." : "Creating account..."}
+              </span>
+            ) : (
+              isSignIn ? "Sign In" : "Create Account"
+            )}
           </button>
 
           {/* Divider */}

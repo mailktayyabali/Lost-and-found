@@ -7,7 +7,8 @@ import { useAdvancedFilters } from "../hooks/useAdvancedFilters";
 import FilterPanel from "../components/FilterPanel";
 import FilterChip from "../components/FilterChip";
 import CreateAlertModal from "../components/CreateAlertModal";
-import { posts } from "../data/posts";
+import { itemsApi } from "../services/itemsApi";
+import { getErrorMessage } from "../utils/errorHandler";
 
 function Feed({ type }) {
   const { favorites, isFavorite } = useFavorites();
@@ -16,6 +17,9 @@ function Feed({ type }) {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [filters, setFilters] = useState({
     category: null,
     dateFrom: null,
@@ -24,90 +28,82 @@ function Feed({ type }) {
     sortBy: "newest",
     keywords: null,
   });
-
-  // Convert posts to items format and merge with mock items
-  const mockItems = [
-    {
-      id: 1,
-      title: "Lost iPhone 13 Pro",
-      description: "Left it on a bench in Central Park near the fountain...",
-      location: "Central Park, NY",
-      date: "2023-10-25",
-      type: "lost",
-      category: "Electronics",
-      image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    },
-    {
-      id: 2,
-      title: "Found Golden Retriever",
-      description: "Found wandering near 5th Ave. Very friendly, has a red collar...",
-      location: "5th Ave, NY",
-      date: "2023-10-26",
-      type: "found",
-      category: "Pets",
-      image: "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    },
-    {
-      id: 3,
-      title: "Lost Leather Wallet",
-      description: "Brown leather wallet lost in the subway. Contains ID and cards...",
-      location: "Subway Station, Brooklyn",
-      date: "2023-10-24",
-      type: "lost",
-      category: "Accessories",
-      image: "https://images.unsplash.com/photo-1627123424574-181ce5171c98?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    },
-    {
-      id: 4,
-      title: "Found Blue Backpack",
-      description: "Found a blue Nike backpack at the library entrance...",
-      location: "Public Library",
-      date: "2023-10-27",
-      type: "found",
-      category: "Bags",
-      image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    },
-  ];
-
-  // Merge posts with mock items, converting posts format
-  const items = useMemo(() => {
-    const postsAsItems = posts.map((post) => ({
-      id: post.id,
-      title: post.title,
-      description: post.description,
-      location: post.location,
-      date: post.date,
-      type: post.status.toLowerCase(),
-      category: post.category || "Other",
-      image: post.imageUrl,
-      imageUrl: post.imageUrl,
-      status: post.status,
-    }));
-    return [...postsAsItems, ...mockItems];
-  }, []);
-
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
-  // Merge search term into filters
+  // Fetch items from API
   useEffect(() => {
-    if (searchTerm) {
-      setFilters((prev) => ({ ...prev, keywords: searchTerm }));
-    } else {
-      setFilters((prev) => ({ ...prev, keywords: null }));
-    }
-  }, [searchTerm]);
+    const fetchItems = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        let response;
+        const params = {
+          page,
+          limit: 20,
+        };
+
+        // Add status filter if type is specified
+        if (type === "lost" || type === "found") {
+          params.status = type.toUpperCase();
+        }
+
+        // Add category filter
+        if (filters.category) {
+          params.category = filters.category;
+        }
+
+        // Use search API if search term exists
+        if (searchTerm.trim()) {
+          response = await itemsApi.searchItems(searchTerm.trim(), params);
+        } else {
+          response = await itemsApi.getAllItems(params);
+        }
+
+        if (response.success) {
+          const fetchedItems = response.data?.items || response.data || [];
+          
+          // Transform items to match frontend format
+          const transformedItems = fetchedItems.map((item) => ({
+            ...item,
+            id: item.id || item._id,
+            type: item.status?.toLowerCase() || "lost",
+            imageUrl: item.imageUrl || (item.images && item.images[0]) || "",
+            image: item.imageUrl || (item.images && item.images[0]) || "",
+          }));
+
+          if (page === 1) {
+            setItems(transformedItems);
+          } else {
+            setItems((prev) => [...prev, ...transformedItems]);
+          }
+          
+          setHasMore(fetchedItems.length === 20);
+        } else {
+          setError(response.message || "Failed to load items");
+        }
+      } catch (err) {
+        setError(getErrorMessage(err));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchItems();
+  }, [type, filters.category, searchTerm, page]);
 
   // Normalize items format
   const itemsWithType = useMemo(() => {
     return items.map((item) => ({
       ...item,
       status: item.status || (item.type ? item.type.toUpperCase() : "LOST"),
-      imageUrl: item.imageUrl || item.image,
+      imageUrl: item.imageUrl || item.image || "",
       category: item.category || "Other",
     }));
   }, [items]);
 
-  // Apply advanced filters
+  // Apply advanced filters (client-side for date/location)
   const filteredByAdvanced = useAdvancedFilters(itemsWithType, {
     ...filters,
     type: type || "all",
@@ -132,7 +128,13 @@ function Feed({ type }) {
       keywords: null,
     });
     setSearchTerm("");
+    setPage(1);
   };
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [type, filters.category, searchTerm]);
 
   const getActiveFilters = () => {
     const active = [];
@@ -269,19 +271,48 @@ function Feed({ type }) {
               </div>
             )}
 
-            {/* Grid */}
-            {filteredItems.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {filteredItems.map((item) => {
-                  // Transform item to match FeedPostCard expected structure
-                  const post = {
-                    ...item,
-                    status: item.type ? item.type.toUpperCase() : 'LOST',
-                    imageUrl: item.image || item.imageUrl,
-                  };
-                  return <FeedPostCard key={item.id} post={post} />;
-                })}
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+                {error}
               </div>
+            )}
+
+            {/* Loading State */}
+            {loading && page === 1 ? (
+              <div className="text-center py-20">
+                <i className="fa-solid fa-spinner fa-spin text-4xl text-teal mb-4"></i>
+                <p className="text-slate">Loading items...</p>
+              </div>
+            ) : filteredItems.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {filteredItems.map((item) => {
+                    // Transform item to match FeedPostCard expected structure
+                    const post = {
+                      ...item,
+                      status: item.type ? item.type.toUpperCase() : 'LOST',
+                      imageUrl: item.image || item.imageUrl,
+                    };
+                    return <FeedPostCard key={item.id} post={post} />;
+                  })}
+                </div>
+                {hasMore && !loading && (
+                  <div className="text-center mt-8">
+                    <button
+                      onClick={() => setPage((p) => p + 1)}
+                      className="btn-secondary px-6 py-2"
+                    >
+                      Load More
+                    </button>
+                  </div>
+                )}
+                {loading && page > 1 && (
+                  <div className="text-center mt-8">
+                    <i className="fa-solid fa-spinner fa-spin text-teal"></i>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">

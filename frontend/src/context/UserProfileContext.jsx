@@ -1,4 +1,6 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
+import { usersApi } from "../services/usersApi";
+import { reviewsApi } from "../services/reviewsApi";
 
 const UserProfileContext = createContext();
 
@@ -6,95 +8,109 @@ export const useUserProfiles = () => useContext(UserProfileContext);
 
 export const UserProfileProvider = ({ children }) => {
   const [profiles, setProfiles] = useState({});
-  const [reviews, setReviews] = useState([]);
+  const [reviews, setReviews] = useState({});
+  const [loading, setLoading] = useState({});
 
-  useEffect(() => {
-    loadProfiles();
-    loadReviews();
-  }, []);
+  const getProfile = async (userId) => {
+    // Return cached profile if available
+    if (profiles[userId]) {
+      return profiles[userId];
+    }
 
-  const loadProfiles = () => {
-    const stored = localStorage.getItem("findit_user_profiles");
-    if (stored) {
-      setProfiles(JSON.parse(stored));
+    // Fetch from API
+    if (loading[userId]) {
+      return null; // Already loading
+    }
+
+    setLoading((prev) => ({ ...prev, [userId]: true }));
+    try {
+      const response = await usersApi.getUserProfile(userId);
+      if (response.success) {
+        const profile = response.data?.user || response.data;
+        setProfiles((prev) => ({
+          ...prev,
+          [userId]: { ...profile, id: profile.id || profile._id },
+        }));
+        return profile;
+      }
+      return null;
+    } catch (error) {
+      console.error("Failed to load profile:", error);
+      return null;
+    } finally {
+      setLoading((prev => {
+        const updated = { ...prev };
+        delete updated[userId];
+        return updated;
+      }));
     }
   };
 
-  const loadReviews = () => {
-    const stored = localStorage.getItem("findit_reviews");
-    if (stored) {
-      setReviews(JSON.parse(stored));
+  const getUserStats = async (userId) => {
+    try {
+      const response = await usersApi.getUserStats(userId);
+      if (response.success) {
+        return response.data?.stats || response.data;
+      }
+      return null;
+    } catch (error) {
+      console.error("Failed to load user stats:", error);
+      return null;
     }
   };
 
-  const saveProfiles = (newProfiles) => {
-    localStorage.setItem("findit_user_profiles", JSON.stringify(newProfiles));
-    setProfiles(newProfiles);
+  const getUserItems = async (userId) => {
+    try {
+      const response = await usersApi.getUserItems(userId);
+      if (response.success) {
+        return response.data?.items || response.data || [];
+      }
+      return [];
+    } catch (error) {
+      console.error("Failed to load user items:", error);
+      return [];
+    }
   };
 
-  const saveReviews = (newReviews) => {
-    localStorage.setItem("findit_reviews", JSON.stringify(newReviews));
-    setReviews(newReviews);
-  };
-
-  const getProfile = (userId) => {
-    return profiles[userId] || null;
-  };
-
-  const createOrUpdateProfile = (userId, profileData) => {
-    const updated = {
-      ...profiles,
-      [userId]: {
-        ...profiles[userId],
-        ...profileData,
-        userId,
-        memberSince: profiles[userId]?.memberSince || new Date().toISOString(),
-      },
-    };
-    saveProfiles(updated);
-    return updated[userId];
-  };
-
-  const addReview = (review) => {
-    const newReview = {
-      id: Date.now().toString(),
-      ...review,
-      createdAt: new Date().toISOString(),
-    };
-    const updated = [...reviews, newReview];
-    saveReviews(updated);
-
-    // Update profile rating
-    const profile = getProfile(review.revieweeId);
-    if (profile) {
-      const userReviews = updated.filter((r) => r.revieweeId === review.revieweeId);
-      const avgRating =
-        userReviews.reduce((sum, r) => sum + r.rating, 0) / userReviews.length;
-      createOrUpdateProfile(review.revieweeId, {
-        rating: avgRating,
-        reviewCount: userReviews.length,
-      });
+  const getReviewsForUser = async (userId) => {
+    // Return cached reviews if available
+    if (reviews[userId]) {
+      return reviews[userId];
     }
 
-    return newReview;
-  };
+    // Fetch from API
+    if (loading[`reviews-${userId}`]) {
+      return []; // Already loading
+    }
 
-  const getReviewsForUser = (userId) => {
-    return reviews.filter((r) => r.revieweeId === userId);
-  };
-
-  const getUserStats = (userId) => {
-    const profile = getProfile(userId);
-    const userReviews = getReviewsForUser(userId);
-    
-    return {
-      rating: profile?.rating || 0,
-      reviewCount: userReviews.length,
-      itemsPosted: profile?.itemsPosted || 0,
-      itemsFound: profile?.itemsFound || 0,
-      verified: profile?.verified || false,
-      memberSince: profile?.memberSince || new Date().toISOString(),
-    };
+    setLoading((prev) => ({ ...prev, [`reviews-${userId}`]: true }));
+    try {
+      const response = await reviewsApi.getUserReviews(userId);
+      if (response.success) {
+        const fetchedReviews = response.data?.reviews || response.data || [];
+        const transformedReviews = fetchedReviews.map((review) => ({
+          ...review,
+          id: review.id || review._id,
+          revieweeId: review.reviewee?.id || review.reviewee?._id || review.reviewee,
+          reviewerId: review.reviewer?.id || review.reviewer?._id || review.reviewer,
+        }));
+        setReviews((prev) => ({
+          ...prev,
+          [userId]: transformedReviews,
+        }));
+        return transformedReviews;
+      }
+      return [];
+    } catch (error) {
+      console.error("Failed to load reviews:", error);
+      return [];
+    } finally {
+      setLoading((prev => {
+        const updated = { ...prev };
+        delete updated[`reviews-${userId}`];
+        return updated;
+      }));
+    }
   };
 
   return (
@@ -103,10 +119,10 @@ export const UserProfileProvider = ({ children }) => {
         profiles,
         reviews,
         getProfile,
-        createOrUpdateProfile,
-        addReview,
-        getReviewsForUser,
         getUserStats,
+        getUserItems,
+        getReviewsForUser,
+        loading,
       }}
     >
       {children}

@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { authApi } from "../services/authApi";
+import { getErrorMessage } from "../utils/errorHandler";
 
 const AuthContext = createContext();
 
@@ -8,40 +10,116 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Check for existing token and fetch user on mount
   useEffect(() => {
-    // Check local storage for existing session
-    const storedUser = localStorage.getItem("findit_user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
-  }, []);
-
-  const login = (email, password) => {
-    // Mock login logic
-    let role = "user";
-    if (email.includes("admin")) {
-      role = "admin";
-    }
-
-    const userData = {
-      name: email.split("@")[0], // Mock name from email
-      email,
-      role,
+    const initAuth = async () => {
+      const token = localStorage.getItem("findit_token");
+      if (token) {
+        try {
+          const response = await authApi.getCurrentUser();
+          if (response.success && response.data?.user) {
+            setUser(response.data.user);
+          } else {
+            // Invalid token, clear it
+            localStorage.removeItem("findit_token");
+            localStorage.removeItem("findit_user");
+          }
+        } catch (error) {
+          // Token expired or invalid, clear it
+          localStorage.removeItem("findit_token");
+          localStorage.removeItem("findit_user");
+        }
+      }
+      setLoading(false);
     };
 
-    setUser(userData);
-    localStorage.setItem("findit_user", JSON.stringify(userData));
-    return userData;
+    initAuth();
+  }, []);
+
+  const register = async (name, email, password) => {
+    console.log("AuthContext: register called", { name, email });
+    try {
+      const response = await authApi.register({ name, email, password });
+      console.log("AuthContext: register API response", response);
+
+      if (response.success && response.data) {
+        const { user: userData, token } = response.data;
+        // Store token and user
+        localStorage.setItem("findit_token", token);
+        localStorage.setItem("findit_user", JSON.stringify(userData));
+        setUser(userData);
+        return { success: true, user: userData };
+      }
+      throw new Error(response.message || "Registration failed");
+    } catch (error) {
+      console.error("AuthContext: register error", error);
+      return {
+        success: false,
+        error: getErrorMessage(error) || error.message || "Registration failed",
+        errors: error.errors || [],
+      };
+    }
+  };
+
+  const login = async (email, password) => {
+    console.log("AuthContext: login called", { email });
+    try {
+      const response = await authApi.login(email, password);
+      console.log("AuthContext: login API response", response);
+
+      if (response.success && response.data) {
+        const { user: userData, token } = response.data;
+        // Store token and user
+        localStorage.setItem("findit_token", token);
+        localStorage.setItem("findit_user", JSON.stringify(userData));
+        setUser(userData);
+        return { success: true, user: userData };
+      }
+      throw new Error(response.message || "Login failed");
+    } catch (error) {
+      console.error("AuthContext: login error", error);
+      const errorMessage = getErrorMessage(error);
+      console.log("AuthContext: extracted error message", errorMessage);
+      return {
+        success: false,
+        error: errorMessage || error.message || "Login failed",
+        errors: error.errors || [],
+      };
+    }
   };
 
   const logout = () => {
+    console.log("AuthContext: logout called");
     setUser(null);
+    localStorage.removeItem("findit_token");
     localStorage.removeItem("findit_user");
   };
 
+  const updateProfile = async (profileData) => {
+    console.log("AuthContext: updateProfile called", profileData);
+    try {
+      const response = await authApi.updateProfile(profileData);
+      console.log("AuthContext: updateProfile API response", response);
+
+      if (response.success && response.data?.user) {
+        const updatedUser = response.data.user;
+        setUser(updatedUser);
+        localStorage.setItem("findit_user", JSON.stringify(updatedUser));
+        return { success: true, user: updatedUser };
+      }
+      throw new Error(response.message || "Profile update failed");
+    } catch (error) {
+      console.error("AuthContext: updateProfile error", error);
+      return {
+        success: false,
+        error: getErrorMessage(error),
+        errors: error.errors || [],
+      };
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, updateProfile, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );

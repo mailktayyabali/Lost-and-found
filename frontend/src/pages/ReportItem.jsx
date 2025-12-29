@@ -1,12 +1,20 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { itemsApi } from "../services/itemsApi";
+import { getErrorMessage } from "../utils/errorHandler";
 
 export default function ReportItem() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const params = new URLSearchParams(location.search);
   const typeFromURL = params.get("type");
   const [type, setType] = useState(typeFromURL || "lost");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const fileInputRef = useRef(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
   const [formData, setFormData] = useState({
     itemName: "",
@@ -26,25 +34,76 @@ export default function ReportItem() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+    if (error) setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    setSelectedFiles(files);
+  };
+
+  const handleFileDrop = (e) => {
     e.preventDefault();
-    alert(`${type === "lost" ? "Lost" : "Found"} item report submitted! (Demo only)`);
-    console.log("Report Data:", { type, ...formData });
-    // Reset form
-    setFormData({
-      itemName: "",
-      category: "Electronics",
-      color: "",
-      description: "",
-      location: "",
-      date: "",
-      time: "",
-      contactName: "",
-      contactEmail: "",
-      contactPhone: "",
-    });
+    const files = Array.from(e.dataTransfer.files);
+    setSelectedFiles(files);
+  };
+
+  const handleFileClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Check authentication
+    if (!user) {
+      setError("Please sign in to report an item");
+      navigate("/auth");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      // Combine date and time into ISO string
+      let dateTime = formData.date;
+      if (formData.time) {
+        dateTime = `${formData.date}T${formData.time}:00`;
+      } else {
+        dateTime = `${formData.date}T00:00:00`;
+      }
+
+      // Create FormData for multipart/form-data
+      const formDataToSend = new FormData();
+      formDataToSend.append("status", type.toUpperCase());
+      formDataToSend.append("title", formData.itemName);
+      formDataToSend.append("description", formData.description);
+      formDataToSend.append("category", formData.category);
+      formDataToSend.append("location", formData.location);
+      formDataToSend.append("date", new Date(dateTime).toISOString());
+      formDataToSend.append("contactName", formData.contactName);
+      formDataToSend.append("contactEmail", formData.contactEmail);
+      
+      // Add images
+      selectedFiles.forEach((file) => {
+        formDataToSend.append("images", file);
+      });
+
+      const response = await itemsApi.createItem(formDataToSend);
+
+      if (response.success) {
+        // Redirect to item detail page
+        const itemId = response.data?.item?.id || response.data?.id;
+        navigate(`/item/${itemId}`);
+      } else {
+        setError(response.message || "Failed to submit report");
+      }
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -151,9 +210,22 @@ export default function ReportItem() {
           {/* Upload Photos */}
           <div>
             <label className="block mb-2 font-medium text-navy text-sm">
-              Upload Photos
+              Upload Photos (Optional)
             </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50 hover:bg-gray-100 hover:border-teal transition-all cursor-pointer">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              multiple
+              accept="image/*"
+              className="hidden"
+            />
+            <div
+              onClick={handleFileClick}
+              onDrop={handleFileDrop}
+              onDragOver={(e) => e.preventDefault()}
+              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50 hover:bg-gray-100 hover:border-teal transition-all cursor-pointer"
+            >
               <i className="fa-solid fa-cloud-arrow-up text-4xl text-gray-400 mb-3"></i>
               <p className="text-gray-600 text-sm">
                 Drag & drop files here or{" "}
@@ -162,6 +234,11 @@ export default function ReportItem() {
               <p className="text-xs text-gray-400 mt-2">
                 PNG, JPG, GIF up to 10MB
               </p>
+              {selectedFiles.length > 0 && (
+                <p className="text-sm text-teal mt-2">
+                  {selectedFiles.length} file(s) selected
+                </p>
+              )}
             </div>
           </div>
         </section>
@@ -281,21 +358,37 @@ export default function ReportItem() {
           </div>
         </section>
 
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            {error}
+          </div>
+        )}
+
         {/* SUBMIT BUTTONS */}
         <div className="flex flex-col sm:flex-row justify-end gap-4 pt-4">
           <button
             type="button"
             onClick={handleCancel}
-            className="btn-secondary px-6 py-2.5"
+            disabled={loading}
+            className="btn-secondary px-6 py-2.5 disabled:opacity-50"
           >
             Cancel
           </button>
 
           <button
             type="submit"
-            className="btn-primary px-6 py-2.5"
+            disabled={loading}
+            className="btn-primary px-6 py-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Submit Report
+            {loading ? (
+              <span className="flex items-center">
+                <i className="fa-solid fa-spinner fa-spin mr-2"></i>
+                Submitting...
+              </span>
+            ) : (
+              "Submit Report"
+            )}
           </button>
         </div>
       </form>

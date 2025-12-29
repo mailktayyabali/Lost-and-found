@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
+import { favoritesApi } from "../services/favoritesApi";
 
 const FavoritesContext = createContext();
 
@@ -8,6 +9,7 @@ export const useFavorites = () => useContext(FavoritesContext);
 export const FavoritesProvider = ({ children }) => {
   const { user } = useAuth();
   const [favorites, setFavorites] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -17,53 +19,67 @@ export const FavoritesProvider = ({ children }) => {
     }
   }, [user]);
 
-  const loadFavorites = () => {
+  const loadFavorites = async () => {
     if (!user) return;
     
-    const stored = localStorage.getItem("findit_favorites");
-    if (stored) {
-      const allFavorites = JSON.parse(stored);
-      const userFavorites = allFavorites[user.email] || [];
-      setFavorites(userFavorites);
+    setLoading(true);
+    try {
+      const response = await favoritesApi.getFavorites();
+      if (response.success) {
+        // Transform backend response (array of favorite objects) to array of item IDs
+        const favoriteItems = response.data?.favorites || response.data || [];
+        const itemIds = favoriteItems.map((fav) => fav.item?.id || fav.item?._id || fav.itemId);
+        setFavorites(itemIds);
+      }
+    } catch (error) {
+      console.error("Failed to load favorites:", error);
+      setFavorites([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const saveFavorites = (itemIds) => {
-    if (!user) return;
-    
-    const stored = localStorage.getItem("findit_favorites");
-    const allFavorites = stored ? JSON.parse(stored) : {};
-    allFavorites[user.email] = itemIds;
-    localStorage.setItem("findit_favorites", JSON.stringify(allFavorites));
-    setFavorites(itemIds);
-  };
-
-  const addFavorite = (itemId) => {
+  const addFavorite = async (itemId) => {
     if (!user) return false;
     
-    if (!favorites.includes(itemId)) {
-      const updated = [...favorites, itemId];
-      saveFavorites(updated);
-      return true;
+    try {
+      const response = await favoritesApi.addFavorite(itemId);
+      if (response.success) {
+        if (!favorites.includes(itemId)) {
+          setFavorites([...favorites, itemId]);
+        }
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Failed to add favorite:", error);
+      return false;
     }
-    return false;
   };
 
-  const removeFavorite = (itemId) => {
+  const removeFavorite = async (itemId) => {
     if (!user) return false;
     
-    const updated = favorites.filter((id) => id !== itemId);
-    saveFavorites(updated);
-    return true;
+    try {
+      const response = await favoritesApi.removeFavorite(itemId);
+      if (response.success) {
+        setFavorites(favorites.filter((id) => id !== itemId));
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Failed to remove favorite:", error);
+      return false;
+    }
   };
 
-  const toggleFavorite = (itemId) => {
+  const toggleFavorite = async (itemId) => {
     if (!user) return false;
     
     if (isFavorite(itemId)) {
-      return removeFavorite(itemId);
+      return await removeFavorite(itemId);
     } else {
-      return addFavorite(itemId);
+      return await addFavorite(itemId);
     }
   };
 
@@ -84,6 +100,7 @@ export const FavoritesProvider = ({ children }) => {
         toggleFavorite,
         isFavorite,
         getFavoriteCount,
+        loading,
       }}
     >
       {children}

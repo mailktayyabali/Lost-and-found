@@ -6,21 +6,27 @@ const { transformUser } = require('../utils/transformers');
 
 // Register new user
 const register = async (req, res, next) => {
+  console.log("AuthController: register request received", { 
+    body: { ...req.body, password: '***' } // Log safe body
+  });
   try {
     const { name, email, password } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
+      console.log("AuthController: register failed - user already exists", email);
       throw new ValidationError('User with this email already exists');
     }
 
     // Create user
+    console.log("AuthController: creating new user...");
     const user = await User.create({
       name,
       email: email.toLowerCase(),
       password,
     });
+    console.log("AuthController: user created", user._id);
 
     // Generate token
     const token = user.generateAuthToken();
@@ -33,12 +39,14 @@ const register = async (req, res, next) => {
       token,
     }, 201);
   } catch (error) {
+    console.error("AuthController: register error", error);
     next(error);
   }
 };
 
 // Login user
 const login = async (req, res, next) => {
+  console.log("AuthController: login request received", { email: req.body.email });
   try {
     const { email, password } = req.body;
 
@@ -46,23 +54,27 @@ const login = async (req, res, next) => {
     const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
 
     if (!user) {
+      console.log("AuthController: login failed - user not found", email);
       throw new UnauthorizedError('Invalid credentials');
     }
 
     // Check password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
+      console.log("AuthController: login failed - password mismatch", email);
       throw new UnauthorizedError('Invalid credentials');
     }
 
     // Generate token
     const token = user.generateAuthToken();
+    console.log("AuthController: login success", user._id);
 
     sendSuccess(res, 'Login successful', {
       user: transformUser(user),
       token,
     });
   } catch (error) {
+    console.error("AuthController: login error", error);
     next(error);
   }
 };

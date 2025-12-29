@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
+import { alertsApi } from "../services/alertsApi";
 
 const SearchAlertsContext = createContext();
 
@@ -9,89 +10,129 @@ export const SearchAlertsProvider = ({ children }) => {
   const { user } = useAuth();
   const [alerts, setAlerts] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
       loadAlerts();
-      loadNotifications();
+    } else {
+      setAlerts([]);
+      setNotifications([]);
     }
   }, [user]);
 
-  const loadAlerts = () => {
+  const loadAlerts = async () => {
     if (!user) return;
     
-    const stored = localStorage.getItem("findit_search_alerts");
-    if (stored) {
-      const allAlerts = JSON.parse(stored);
-      const userAlerts = allAlerts[user.email] || [];
-      setAlerts(userAlerts);
+    setLoading(true);
+    try {
+      const response = await alertsApi.getAlerts();
+      if (response.success) {
+        const fetchedAlerts = response.data?.alerts || response.data || [];
+        const transformedAlerts = fetchedAlerts.map((alert) => ({
+          ...alert,
+          id: alert.id || alert._id,
+        }));
+        setAlerts(transformedAlerts);
+      }
+    } catch (error) {
+      console.error("Failed to load alerts:", error);
+      setAlerts([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const loadNotifications = () => {
-    if (!user) return;
-    
-    const stored = localStorage.getItem("findit_alert_notifications");
-    if (stored) {
-      const allNotifications = JSON.parse(stored);
-      const userNotifications = allNotifications[user.email] || [];
-      setNotifications(userNotifications);
-    }
-  };
-
-  const saveAlerts = (newAlerts) => {
-    if (!user) return;
-    
-    const stored = localStorage.getItem("findit_search_alerts");
-    const allAlerts = stored ? JSON.parse(stored) : {};
-    allAlerts[user.email] = newAlerts;
-    localStorage.setItem("findit_search_alerts", JSON.stringify(allAlerts));
-    setAlerts(newAlerts);
-  };
-
-  const saveNotifications = (newNotifications) => {
-    if (!user) return;
-    
-    const stored = localStorage.getItem("findit_alert_notifications");
-    const allNotifications = stored ? JSON.parse(stored) : {};
-    allNotifications[user.email] = newNotifications;
-    localStorage.setItem("findit_alert_notifications", JSON.stringify(allNotifications));
-    setNotifications(newNotifications);
-  };
-
-  const createAlert = (alertData) => {
+  const createAlert = async (alertData) => {
     if (!user) return null;
 
-    const newAlert = {
-      id: Date.now().toString(),
-      userId: user.email,
-      name: alertData.name,
-      filters: alertData.filters,
-      active: true,
-      createdAt: new Date().toISOString(),
-    };
+    try {
+      // Transform frontend format to backend format
+      const backendData = {
+        name: alertData.name,
+        filters: {
+          type: alertData.filters?.type || alertData.type,
+          category: alertData.filters?.category || alertData.category,
+          keywords: alertData.filters?.keywords || alertData.keywords || [],
+        },
+      };
 
-    const updated = [...alerts, newAlert];
-    saveAlerts(updated);
-    return newAlert;
+      const response = await alertsApi.createAlert(backendData);
+      if (response.success) {
+        const newAlert = response.data?.alert || response.data;
+        setAlerts([...alerts, { ...newAlert, id: newAlert.id || newAlert._id }]);
+        return newAlert;
+      }
+      return null;
+    } catch (error) {
+      console.error("Failed to create alert:", error);
+      return null;
+    }
   };
 
-  const updateAlert = (alertId, updates) => {
-    const updated = alerts.map((alert) =>
-      alert.id === alertId ? { ...alert, ...updates } : alert
-    );
-    saveAlerts(updated);
+  const updateAlert = async (alertId, updates) => {
+    try {
+      // Transform frontend format to backend format
+      const backendData = {
+        name: updates.name,
+        filters: {
+          type: updates.filters?.type || updates.type,
+          category: updates.filters?.category || updates.category,
+          keywords: updates.filters?.keywords || updates.keywords || [],
+        },
+      };
+
+      const response = await alertsApi.updateAlert(alertId, backendData);
+      if (response.success) {
+        const updatedAlert = response.data?.alert || response.data;
+        setAlerts(alerts.map((alert) =>
+          alert.id === alertId ? { ...updatedAlert, id: updatedAlert.id || updatedAlert._id } : alert
+        ));
+        return updatedAlert;
+      }
+      return null;
+    } catch (error) {
+      console.error("Failed to update alert:", error);
+      return null;
+    }
   };
 
-  const deleteAlert = (alertId) => {
-    const updated = alerts.filter((alert) => alert.id !== alertId);
-    saveAlerts(updated);
+  const deleteAlert = async (alertId) => {
+    try {
+      const response = await alertsApi.deleteAlert(alertId);
+      if (response.success) {
+        setAlerts(alerts.filter((alert) => alert.id !== alertId));
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Failed to delete alert:", error);
+      return false;
+    }
   };
 
-  const toggleAlert = (alertId) => {
+  const toggleAlert = async (alertId) => {
     const alert = alerts.find((a) => a.id === alertId);
     if (alert) {
-      updateAlert(alertId, { active: !alert.active });
+      await updateAlert(alertId, { ...alert, active: !alert.active });
+    }
+  };
+
+  const checkMatches = async (alertId) => {
+    try {
+      const response = await alertsApi.checkMatches(alertId);
+      if (response.success) {
+        const matches = response.data?.matches || response.data || [];
+        // Add notifications for new matches
+        matches.forEach((match) => {
+          addNotification(alertId, match.id || match._id, match.title);
+        });
+        return matches;
+      }
+      return [];
+    } catch (error) {
+      console.error("Failed to check matches:", error);
+      return [];
     }
   };
 
@@ -107,20 +148,17 @@ export const SearchAlertsProvider = ({ children }) => {
       createdAt: new Date().toISOString(),
     };
 
-    const updated = [...notifications, notification];
-    saveNotifications(updated);
+    setNotifications([...notifications, notification]);
   };
 
   const markNotificationAsRead = (notificationId) => {
-    const updated = notifications.map((notif) =>
+    setNotifications(notifications.map((notif) =>
       notif.id === notificationId ? { ...notif, read: true } : notif
-    );
-    saveNotifications(updated);
+    ));
   };
 
   const markAllAsRead = () => {
-    const updated = notifications.map((notif) => ({ ...notif, read: true }));
-    saveNotifications(updated);
+    setNotifications(notifications.map((notif) => ({ ...notif, read: true })));
   };
 
   const getUnreadCount = () => {
@@ -136,10 +174,13 @@ export const SearchAlertsProvider = ({ children }) => {
         updateAlert,
         deleteAlert,
         toggleAlert,
+        checkMatches,
         addNotification,
         markNotificationAsRead,
         markAllAsRead,
         getUnreadCount,
+        loadAlerts,
+        loading,
       }}
     >
       {children}
