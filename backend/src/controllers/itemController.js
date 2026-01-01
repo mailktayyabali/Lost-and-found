@@ -53,6 +53,12 @@ const getItemById = async (req, res, next) => {
 // Create new item
 const createItem = async (req, res, next) => {
   try {
+    console.log('createItem: Request received', {
+      user: req.user ? req.user.id : 'No user',
+      body: req.body,
+      files: req.files ? req.files.map(f => ({ originalname: f.originalname, mimetype: f.mimetype, size: f.size })) : 'No files',
+      headers: req.headers['content-type']
+    });
     const itemData = {
       ...req.body,
       postedBy: req.user.id,
@@ -62,17 +68,22 @@ const createItem = async (req, res, next) => {
 
     // Handle image uploads
     if (req.files && req.files.length > 0) {
+      console.log('createItem: Uploading images to Cloudinary...');
       const imageUrls = await uploadMultipleImageFiles(req.files);
+      console.log('createItem: Images uploaded', imageUrls);
       itemData.images = imageUrls;
     } else if (req.body.images && Array.isArray(req.body.images)) {
       itemData.images = req.body.images;
     }
 
+    console.log('createItem: Saving item to DB', itemData);
     const item = await Item.create(itemData);
     await item.populate('postedBy', 'name username avatar rating verified');
+    console.log('createItem: Item created successfully', item._id);
 
     sendSuccess(res, 'Item created successfully', { item: transformItem(item) }, 201);
   } catch (error) {
+    console.error('createItem error', error);
     next(error);
   }
 };

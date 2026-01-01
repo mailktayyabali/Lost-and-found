@@ -1,0 +1,12 @@
+[2026-01-01T17:42:13.926Z] createItem: Multiple image upload failed: Multiple image upload failed: Image upload failed: Must supply api_key
+Stack: Error: Multiple image upload failed: Multiple image upload failed: Image upload failed: Must supply api_key
+    at uploadMultipleImageFiles (D:\Lost and found\backend\src\services\imageService.js:39:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async createItem (D:\Lost and found\backend\src\controllers\itemController.js:72:25)
+
+[2026-01-01T17:42:13.939Z] errorHandler: Multiple image upload failed: Multiple image upload failed: Image upload failed: Must supply api_key
+Stack: Error: Multiple image upload failed: Multiple image upload failed: Image upload failed: Must supply api_key
+    at uploadMultipleImageFiles (D:\Lost and found\backend\src\services\imageService.js:39:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async createItem (D:\Lost and found\backend\src\controllers\itemController.js:72:25)
+

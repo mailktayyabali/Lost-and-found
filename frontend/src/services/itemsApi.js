@@ -35,6 +35,7 @@ export const itemsApi = {
 
   // Create item (multipart/form-data)
   createItem: async (formData) => {
+    console.log('itemsApi: createItem called', formData);
     const response = await api.post('/items', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',

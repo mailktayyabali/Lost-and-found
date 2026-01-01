@@ -33,7 +33,9 @@ const uploadMultipleImages = async (files) => {
       if (file.path) {
         return uploadImage(file.path);
       } else if (file.buffer) {
-        return uploadImage(file.buffer, { resource_type: 'image' });
+        // Convert buffer to data URI
+        const dataUri = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+        return uploadImage(dataUri, { resource_type: 'image' });
       }
       throw new Error('Invalid file format');
     });

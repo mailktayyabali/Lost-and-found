@@ -16,6 +16,20 @@ const { createLimiter, apiLimiter } = require('../middleware/rateLimiter');
 const { validateItemCreation, validateMongoId } = require('../utils/validation');
 const { uploadMultiple } = require('../middleware/upload');
 
+// Debug logger for create item requests (placed after multer so req.files is available)
+const logCreateItem = (req, res, next) => {
+  try {
+    console.log('POST /items incoming:', {
+      user: req.user ? req.user.id : null,
+      contentType: req.headers['content-type'],
+      bodyKeys: Object.keys(req.body || {}),
+      fileCount: req.files ? req.files.length : 0,
+    });
+  } catch (e) {
+    console.error('logCreateItem error', e);
+  }
+  next();
+};
 // Public routes
 router.get('/', apiLimiter, getAllItems);
 router.get('/search', apiLimiter, searchItems);
@@ -29,6 +43,7 @@ router.post(
   authenticate,
   createLimiter,
   uploadMultiple,
+  logCreateItem,
   validateItemCreation,
   createItem
 );

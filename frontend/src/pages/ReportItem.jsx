@@ -54,7 +54,7 @@ export default function ReportItem() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Check authentication
     if (!user) {
       setError("Please sign in to report an item");
@@ -84,22 +84,29 @@ export default function ReportItem() {
       formDataToSend.append("date", new Date(dateTime).toISOString());
       formDataToSend.append("contactName", formData.contactName);
       formDataToSend.append("contactEmail", formData.contactEmail);
-      
+
       // Add images
       selectedFiles.forEach((file) => {
         formDataToSend.append("images", file);
       });
 
+      console.log('ReportItem: Submitting form data', {
+        entries: Array.from(formDataToSend.entries()).map(([key, value]) => [key, value instanceof File ? value.name : value])
+      });
+
       const response = await itemsApi.createItem(formDataToSend);
+      console.log('ReportItem: API Response', response);
 
       if (response.success) {
         // Redirect to item detail page
         const itemId = response.data?.item?.id || response.data?.id;
         navigate(`/item/${itemId}`);
       } else {
+        console.error('ReportItem: Submission failed', response);
         setError(response.message || "Failed to submit report");
       }
     } catch (err) {
+      console.error('ReportItem: Submission error', err);
       setError(getErrorMessage(err));
     } finally {
       setLoading(false);
