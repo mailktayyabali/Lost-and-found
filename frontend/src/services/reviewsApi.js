@@ -3,7 +3,8 @@ import api from './api';
 export const reviewsApi = {
   // Get reviews for a user
   getUserReviews: async (userId) => {
-    const response = await api.get(`/reviews/user/${userId}`);
+    const encoded = encodeURIComponent(userId);
+    const response = await api.get(`/reviews/user/${encoded}`);
     return response;
   },
 

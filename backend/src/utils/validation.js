@@ -66,11 +66,28 @@ const validateMessage = [
   handleValidationErrors,
 ];
 
-// ID parameter validation
-const validateMongoId = [
-  param('id').isMongoId().withMessage('Invalid ID format'),
-  handleValidationErrors,
-];
+// ID parameter validation - validate any route param that looks like an ID
+const validateMongoId = (req, res, next) => {
+  const isValidObjectId = (val) => typeof val === 'string' && /^[0-9a-fA-F]{24}$/.test(val);
+
+  const params = req.params || {};
+  // If there are no params, continue
+  const keys = Object.keys(params);
+  if (keys.length === 0) return next();
+
+  for (const key of keys) {
+    const val = params[key];
+    if (!isValidObjectId(val)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: [{ msg: `Invalid ID format for param ${key}`, param: key }],
+      });
+    }
+  }
+
+  next();
+};
 
 module.exports = {
   handleValidationErrors,

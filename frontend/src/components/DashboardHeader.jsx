@@ -91,7 +91,7 @@ export default function DashboardHeader() {
               <div className="py-1">
                 <button
                   onClick={() => {
-                    navigate(user ? `/profile/${user.email}` : "/dashboard");
+                    navigate(user ? `/profile/${user.id || user._id}` : "/dashboard");
                     setIsProfileMenuOpen(false);
                   }}
                   className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"

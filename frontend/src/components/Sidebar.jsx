@@ -204,8 +204,8 @@ export default function Sidebar() {
                  {isCollapsed && <div className="h-2"></div>}
                  {!isCollapsed && <p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 animate-fade-in">Account</p>}
 
-                 <SidebarLink 
-                    to={user ? `/profile/${user.email}` : "/dashboard"} 
+                  <SidebarLink 
+                    to={user ? `/profile/${user.id || user._id}` : "/dashboard"} 
                     icon={<UserIcon size={20} />} 
                     label="My Profile" 
                     isActive={location.pathname.startsWith("/profile")}

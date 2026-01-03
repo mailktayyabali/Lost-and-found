@@ -29,7 +29,8 @@ export const itemsApi = {
 
   // Get user items
   getUserItems: async (userId) => {
-    const response = await api.get(`/items/user/${userId}`);
+    const encoded = encodeURIComponent(userId);
+    const response = await api.get(`/items/user/${encoded}`);
     return response;
   },
 
