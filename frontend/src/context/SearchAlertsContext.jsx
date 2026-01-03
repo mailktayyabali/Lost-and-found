@@ -23,7 +23,7 @@ export const SearchAlertsProvider = ({ children }) => {
 
   const loadAlerts = async () => {
     if (!user) return;
-    
+
     setLoading(true);
     try {
       const response = await alertsApi.getAlerts();

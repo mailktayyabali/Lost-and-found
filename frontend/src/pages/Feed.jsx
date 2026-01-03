@@ -335,12 +335,7 @@ function Feed({ type }) {
           onCreate={(alertData) => {
             createAlert(alertData);
             setIsAlertModalOpen(false);
-          }}
-          currentFilters={{
-            ...filters,
-            type: type || null,
-          }}
-        />
+          }} />
       </div>
     </main>
   );

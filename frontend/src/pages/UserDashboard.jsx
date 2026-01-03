@@ -11,6 +11,7 @@ import StatsOverview from "../components/StatsOverview";
 import PerformanceChart from "../components/PerformanceChart";
 import NotificationsSummary from "../components/NotificationsSummary";
 import IncomingClaimsWidget from "../components/IncomingClaimsWidget";
+import MyClaimsWidget from "../components/MyClaimsWidget";
 import RecentItemsWidget from "../components/RecentItemsWidget";
 
 
@@ -109,6 +110,7 @@ export default function UserDashboard() {
         {/* Middle Column - Widgets */}
         <div className="lg:col-span-1 space-y-6">
           <IncomingClaimsWidget />
+          <MyClaimsWidget />
           <RecentMessagesWidget />
           <FavoritesWidget />
           <RecentItemsWidget />

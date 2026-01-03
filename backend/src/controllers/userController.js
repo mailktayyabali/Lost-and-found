@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const Item = require('../models/Item');
+const Claim = require('../models/Claim');
 const Review = require('../models/Review');
 const Favorite = require('../models/Favorite');
 const { sendSuccess } = require('../utils/response');
@@ -36,7 +37,8 @@ const getUserStats = async (req, res, next) => {
       totalItems,
       lostItems,
       foundItems,
-      resolvedItems,
+      resolvedPostedItems,
+      approvedClaims,
       totalFavorites,
       totalReviews,
     ] = await Promise.all([
@@ -44,6 +46,7 @@ const getUserStats = async (req, res, next) => {
       Item.countDocuments({ postedBy: userId, status: 'LOST' }),
       Item.countDocuments({ postedBy: userId, status: 'FOUND' }),
       Item.countDocuments({ postedBy: userId, isResolved: true }),
+      Claim.countDocuments({ claimantId: userId, status: 'approved' }),
       Favorite.countDocuments({ user: userId }),
       Review.countDocuments({ reviewee: userId }),
     ]);
@@ -52,7 +55,7 @@ const getUserStats = async (req, res, next) => {
       totalItems,
       lostItems,
       foundItems,
-      resolvedItems,
+      resolvedItems: resolvedPostedItems + approvedClaims,
       totalFavorites,
       totalReviews,
       rating: user.rating,
