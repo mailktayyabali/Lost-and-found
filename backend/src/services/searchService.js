@@ -11,9 +11,9 @@ const searchItems = async (filters = {}, pagination = {}) => {
       query.status = filters.status.toUpperCase();
     }
 
-    // Category filter
+    // Category filter (case-insensitive)
     if (filters.category) {
-      query.category = filters.category;
+      query.category = { $regex: `^${filters.category}$`, $options: 'i' };
     }
 
     // Location filter (partial match)
@@ -48,6 +48,10 @@ const searchItems = async (filters = {}, pagination = {}) => {
       sort = { createdAt: -1 };
     } else if (filters.sortBy === 'oldest') {
       sort = { createdAt: 1 };
+    } else if (filters.sortBy === 'title-asc') {
+      sort = { title: 1 };
+    } else if (filters.sortBy === 'title-desc') {
+      sort = { title: -1 };
     } else if (filters.keywords) {
       // If text search, sort by relevance
       sort = { score: { $meta: 'textScore' } };

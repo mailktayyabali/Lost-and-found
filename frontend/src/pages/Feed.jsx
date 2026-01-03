@@ -3,7 +3,6 @@ import FeedPostCard from "../components/FeedPostCard";
 import { useFavorites } from "../context/FavoritesContext";
 import { useAuth } from "../context/AuthContext";
 import { useSearchAlerts } from "../context/SearchAlertsContext";
-import { useAdvancedFilters } from "../hooks/useAdvancedFilters";
 import FilterPanel from "../components/FilterPanel";
 import FilterChip from "../components/FilterChip";
 import CreateAlertModal from "../components/CreateAlertModal";
@@ -38,10 +37,10 @@ function Feed({ type }) {
       setLoading(true);
       setError("");
       try {
-        let response;
         const params = {
           page,
           limit: 20,
+          ...filters // Pass all filters to backend
         };
 
         // Add status filter if type is specified
@@ -49,21 +48,20 @@ function Feed({ type }) {
           params.status = type.toUpperCase();
         }
 
-        // Add category filter
-        if (filters.category) {
-          params.category = filters.category;
-        }
-
-        // Use search API if search term exists
+        // Use search API if search term exists or standard get if not
+        let response;
         if (searchTerm.trim()) {
-          response = await itemsApi.searchItems(searchTerm.trim(), params);
+          params.keywords = searchTerm.trim();
+          // We can use getAllItems for everything since the backend controller handles keywords too
+          // But if we want to stick to searchItems logic:
+          response = await itemsApi.getAllItems(params);
         } else {
           response = await itemsApi.getAllItems(params);
         }
 
         if (response.success) {
           const fetchedItems = response.data?.items || response.data || [];
-          
+
           // Transform items to match frontend format
           const transformedItems = fetchedItems.map((item) => ({
             ...item,
@@ -78,7 +76,7 @@ function Feed({ type }) {
           } else {
             setItems((prev) => [...prev, ...transformedItems]);
           }
-          
+
           setHasMore(fetchedItems.length === 20);
         } else {
           setError(response.message || "Failed to load items");
@@ -91,7 +89,7 @@ function Feed({ type }) {
     };
 
     fetchItems();
-  }, [type, filters.category, searchTerm, page]);
+  }, [type, filters, searchTerm, page]);
 
   // Normalize items format
   const itemsWithType = useMemo(() => {
@@ -103,16 +101,10 @@ function Feed({ type }) {
     }));
   }, [items]);
 
-  // Apply advanced filters (client-side for date/location)
-  const filteredByAdvanced = useAdvancedFilters(itemsWithType, {
-    ...filters,
-    type: type || "all",
-  });
-
-  // Apply favorites filter
+  // Apply favorites filter (client-side only for favorites view)
   const filteredItems = showFavoritesOnly && user
-    ? filteredByAdvanced.filter((item) => isFavorite(item.id))
-    : filteredByAdvanced;
+    ? itemsWithType.filter((item) => isFavorite(item.id))
+    : itemsWithType;
 
   const handleFilterChange = (newFilters) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
@@ -214,8 +206,8 @@ function Feed({ type }) {
                   <button
                     onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
                     className={`px-4 py-3 rounded-xl border transition-all text-sm font-medium ${showFavoritesOnly
-                        ? "bg-teal text-white border-teal"
-                        : "bg-white text-navy border-gray-200 hover:border-teal"
+                      ? "bg-teal text-white border-teal"
+                      : "bg-white text-navy border-gray-200 hover:border-teal"
                       }`}
                   >
                     <i className={`fa-solid fa-heart mr-2 ${showFavoritesOnly ? "text-white" : "text-red-500"}`}></i>
