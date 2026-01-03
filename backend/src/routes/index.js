@@ -10,6 +10,7 @@ const searchAlertRoutes = require('./searchAlertRoutes');
 const reviewRoutes = require('./reviewRoutes');
 const userRoutes = require('./userRoutes');
 const adminRoutes = require('./adminRoutes');
+const claimRoutes = require('./claimRoutes');
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -29,6 +30,7 @@ router.use('/alerts', searchAlertRoutes);
 router.use('/reviews', reviewRoutes);
 router.use('/users', userRoutes);
 router.use('/admin', adminRoutes);
+router.use('/claims', claimRoutes);
 
 module.exports = router;
 

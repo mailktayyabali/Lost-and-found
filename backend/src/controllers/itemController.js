@@ -17,9 +17,15 @@ const getAllItems = async (req, res, next) => {
       keywords: req.query.keywords,
       dateFrom: req.query.dateFrom,
       dateTo: req.query.dateTo,
+      // Default to hiding resolved items unless explicitly requested (e.g. 'true' or 'all')
       isResolved: req.query.isResolved,
       sortBy: req.query.sortBy || 'newest',
     };
+
+    // If isResolved is not specified, default to false (show only unresolved items)
+    if (filters.isResolved === undefined) {
+      filters.isResolved = 'false'; // searchService expects string 'false' for boolean false if parsing query params logic applies, checking searchService next
+    }
 
     const result = await searchItems(filters, { page, limit, skip });
 
