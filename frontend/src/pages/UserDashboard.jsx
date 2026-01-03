@@ -10,7 +10,10 @@ import ActivityTimeline from "../components/ActivityTimeline";
 import StatsOverview from "../components/StatsOverview";
 import PerformanceChart from "../components/PerformanceChart";
 import NotificationsSummary from "../components/NotificationsSummary";
+import IncomingClaimsWidget from "../components/IncomingClaimsWidget";
 import RecentItemsWidget from "../components/RecentItemsWidget";
+
+
 import { useFavorites } from "../context/FavoritesContext";
 import { useMessaging } from "../context/MessagingContext";
 import { useSearchAlerts } from "../context/SearchAlertsContext";
@@ -105,6 +108,7 @@ export default function UserDashboard() {
 
         {/* Middle Column - Widgets */}
         <div className="lg:col-span-1 space-y-6">
+          <IncomingClaimsWidget />
           <RecentMessagesWidget />
           <FavoritesWidget />
           <RecentItemsWidget />

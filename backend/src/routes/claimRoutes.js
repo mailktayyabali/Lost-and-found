@@ -4,7 +4,8 @@ const {
   createClaim,
   getClaimsByItem,
   updateClaimStatus,
-  getMyClaims
+  getMyClaims,
+  getClaimsReceived
 } = require('../controllers/claimController');
 
 const router = express.Router();
@@ -14,6 +15,7 @@ router.use(authenticate);
 
 router.post('/', createClaim);
 router.get('/my-claims', getMyClaims);
+router.get('/received', getClaimsReceived);
 router.get('/item/:itemId', getClaimsByItem);
 router.patch('/:id/status', updateClaimStatus);
 

@@ -129,9 +129,24 @@ const getMyClaims = async (req, res, next) => {
     }
 };
 
+// Get claims received (as a poster)
+const getClaimsReceived = async (req, res, next) => {
+    try {
+        const claims = await Claim.find({ posterId: req.user.id, status: 'pending' })
+            .populate('itemId', 'title images status')
+            .populate('claimantId', 'name email avatar username verified')
+            .sort({ createdAt: -1 });
+            
+        sendSuccess(res, 'Received claims retrieved successfully', { claims });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
   createClaim,
   getClaimsByItem,
   updateClaimStatus,
-  getMyClaims
+  getMyClaims,
+  getClaimsReceived
 };

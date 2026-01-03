@@ -90,10 +90,19 @@ function ItemDetail() {
   }
 
   // Check if current user is the owner
-  const isOwner = user && post && post.postedBy && (
-    (typeof post.postedBy === 'string' && post.postedBy === user.id) ||
-    (typeof post.postedBy === 'object' && post.postedBy._id === user.id)
-  );
+  const currentUserId = user?.id || user?._id;
+  const postedBy = post?.postedBy;
+  const posterId = typeof postedBy === 'object' ? postedBy?._id || postedBy?.id : postedBy;
+
+  console.log('ItemDetail Debug:', {
+    user,
+    currentUserId,
+    postedBy,
+    posterId,
+    matchString: String(posterId) === String(currentUserId)
+  });
+
+  const isOwner = user && posterId && String(posterId) === String(currentUserId);
 
   return (
     <main className="flex-1 w-full max-w-[1280px] mx-auto px-4 md:px-8 py-8 bg-[#f8f8f5] min-h-screen">
@@ -136,8 +145,8 @@ function ItemDetail() {
               location={post.location}
             />
 
-            {/* Action Buttons */}
-            <ItemActions status={post.status} itemId={post.id} postedBy={post.postedBy} />
+            {/* Action Buttons (Hide if owner) */}
+            {!isOwner && <ItemActions status={post.status} itemId={post.id} postedBy={post.postedBy} />}
 
             {/* Claim Management (Only for Owner) */}
             {isOwner && <ClaimManagement itemId={post.id} />}

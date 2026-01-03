@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 function PosterProfile({ postedBy }) {
-  if (!postedBy) return null;
+  if (!postedBy || typeof postedBy !== 'object') return null;
 
   const userId = postedBy.id || postedBy._id;
 

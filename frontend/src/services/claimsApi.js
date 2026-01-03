@@ -19,6 +19,12 @@ export const claimsApi = {
     return response;
   },
 
+  // Get received claims (claims on my items)
+  getClaimsReceived: async () => {
+      const response = await api.get('/claims/received');
+      return response;
+  },
+
   // Approve or Reject a claim
   updateClaimStatus: async (claimId, status) => {
     const response = await api.patch(`/claims/${claimId}/status`, { status });
