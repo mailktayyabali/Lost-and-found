@@ -38,13 +38,13 @@ export const authApi = {
       currentPassword,
       newPassword,
     });
-    return response.data;
+    return response;
   },
 
   // Forgot password
   forgotPassword: async (email) => {
     const response = await api.post('/auth/forgot-password', { email });
-    return response.data;
+    return response;
   },
 
   // Reset password
@@ -53,7 +53,7 @@ export const authApi = {
       token,
       password,
     });
-    return response.data;
+    return response;
   },
 };
 

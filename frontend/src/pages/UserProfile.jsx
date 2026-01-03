@@ -1,45 +1,78 @@
 import { useParams } from "react-router-dom";
 import { useUserProfiles } from "../context/UserProfileContext";
 import { useAuth } from "../context/AuthContext";
-import { posts } from "../data/posts";
 import UserStats from "../components/UserStats";
 import ReviewCard from "../components/ReviewCard";
 import ReviewForm from "../components/ReviewForm";
 import RatingDisplay from "../components/RatingDisplay";
 import FeedPostCard from "../components/FeedPostCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function UserProfile() {
   const { userId } = useParams();
-  const { getProfile, getReviewsForUser, getUserStats, addReview } = useUserProfiles();
+  const { getProfile, getReviewsForUser, getUserStats, getUserItems, addReview } = useUserProfiles();
   const { user } = useAuth();
   const [showReviewForm, setShowReviewForm] = useState(false);
 
-  const profile = getProfile(userId);
-  const reviews = getReviewsForUser(userId);
-  const stats = getUserStats(userId);
+  // Local state for profile data
+  const [profile, setProfile] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [userPosts, setUserPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Get user's posted items
-  const userPosts = posts.filter(
-    (post) =>
-      post.postedBy?.username === userId ||
-      post.postedBy?.name?.toLowerCase().replace(/\s+/g, "") === userId
-  );
+  // Fetch all user data
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!userId) return;
+      setLoading(true);
+      try {
+        const [profileData, reviewsData, statsData, itemsData] = await Promise.all([
+          getProfile(userId),
+          getReviewsForUser(userId),
+          getUserStats(userId),
+          getUserItems(userId)
+        ]);
 
-  // Initialize profile if it doesn't exist
-  if (!profile && userPosts.length > 0) {
-    const firstPost = userPosts[0];
-    if (firstPost.postedBy) {
-      // Profile will be created on first access
-    }
-  }
+        setProfile(profileData);
+        setReviews(reviewsData || []);
+        setStats(statsData || { reviewCount: 0, rating: 0 });
+        setUserPosts(itemsData || []);
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleReviewSubmit = (reviewData) => {
-    addReview(reviewData);
+    fetchData();
+  }, [userId]);
+
+  const handleReviewSubmit = async (reviewData) => {
+    await addReview(reviewData);
     setShowReviewForm(false);
+    // Refresh reviews after submission
+    const updatedReviews = await getReviewsForUser(userId);
+    setReviews(updatedReviews || []);
   };
 
-  const canReview = user && user.email !== userId && !reviews.some((r) => r.reviewerId === user.email);
+  const canReview = user && user.email !== profile?.email && user.id !== profile?.id && !reviews.some((r) => r.reviewerId === user.email || r.reviewerId === user.id);
+
+  if (loading) {
+    return (
+      <div className="flex-1 p-10 flex justify-center">
+        <i className="fa-solid fa-spinner fa-spin text-4xl text-teal"></i>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="flex-1 p-10 flex justify-center text-slate">
+        User not found.
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 p-4 md:p-6 lg:p-10 overflow-x-hidden">
@@ -50,14 +83,13 @@ function UserProfile() {
             <div className="relative">
               <img
                 src={
-                  profile?.avatar ||
-                  userPosts[0]?.postedBy?.avatar ||
-                  `https://ui-avatars.com/api/?name=${userId}&background=random`
+                  profile.avatar ||
+                  `https://ui-avatars.com/api/?name=${profile.name}&background=random`
                 }
-                alt={userId}
-                className="w-24 h-24 rounded-full border-4 border-teal/20"
+                alt={profile.name}
+                className="w-24 h-24 rounded-full border-4 border-teal/20 object-cover"
               />
-              {stats.verified && (
+              {profile.verified && (
                 <span
                   className="absolute -bottom-1 -right-1 material-symbols-outlined text-teal bg-white rounded-full p-1"
                   title="Verified User"
@@ -68,40 +100,46 @@ function UserProfile() {
             </div>
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-navy mb-2">
-                {profile?.name || userPosts[0]?.postedBy?.name || userId}
+                {profile.name}
               </h1>
               <div className="flex items-center gap-4 mb-4">
-                <RatingDisplay rating={stats.rating} size="default" />
+                <RatingDisplay rating={stats?.rating || 0} size="default" />
                 <span className="text-slate text-sm">
-                  {stats.reviewCount} review{stats.reviewCount !== 1 ? "s" : ""}
+                  {stats?.reviewCount || 0} review{stats?.reviewCount !== 1 ? "s" : ""}
                 </span>
-                {stats.verified && (
+                {profile.verified && (
                   <span className="text-xs bg-teal/10 text-teal px-2 py-1 rounded-full font-medium">
                     Verified
                   </span>
                 )}
               </div>
               <p className="text-slate text-sm">
-                Member since {new Date(stats.memberSince).toLocaleDateString("en-US", {
+                Member since {profile.memberSince ? new Date(profile.memberSince).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "long",
-                })}
+                }) : 'Unknown'}
               </p>
             </div>
           </div>
         </div>
 
         {/* User Stats */}
-        <UserStats stats={stats} />
+        {stats && <UserStats stats={stats} />}
 
         {/* User's Items */}
         {userPosts.length > 0 && (
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-navy mb-4">Posted Items</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {userPosts.map((post) => (
-                <FeedPostCard key={post.id} post={post} />
-              ))}
+              {userPosts.map((post) => {
+                // Fix post data for FeedPostCard
+                const postData = {
+                  ...post,
+                  imageUrl: post.imageUrl || (post.images && post.images[0]),
+                  status: post.status.toUpperCase(),
+                };
+                return <FeedPostCard key={post.id} post={postData} />;
+              })}
             </div>
           </div>
         )}

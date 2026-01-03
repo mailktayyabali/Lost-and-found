@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 function PosterProfile({ postedBy }) {
   if (!postedBy) return null;
 
-  const userId = postedBy.username || postedBy.email || postedBy.name.toLowerCase().replace(/\s+/g, "");
+  const userId = postedBy.id || postedBy._id || postedBy.username || postedBy.email || postedBy.name.toLowerCase().replace(/\s+/g, "");
 
   return (
     <div className="flex items-center gap-4 p-4 rounded-xl bg-[#F4F6FA] border border-gray-100 mb-6">

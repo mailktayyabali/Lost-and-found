@@ -1,12 +1,11 @@
 import { Link } from "react-router-dom";
 import { useFavorites } from "../context/FavoritesContext";
-import { posts } from "../data/posts";
 import { Heart } from "lucide-react";
 
 function FavoritesWidget() {
-  const { favorites, getFavoriteCount } = useFavorites();
+  const { favoriteItems, getFavoriteCount } = useFavorites();
   const favoriteCount = getFavoriteCount();
-  const favoritePosts = posts.filter((post) => favorites.includes(post.id)).slice(0, 3);
+  const favoritePosts = favoriteItems.slice(0, 3);
 
   if (favoriteCount === 0) {
     return (

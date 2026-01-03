@@ -9,6 +9,7 @@ export const useFavorites = () => useContext(FavoritesContext);
 export const FavoritesProvider = ({ children }) => {
   const { user } = useAuth();
   const [favorites, setFavorites] = useState([]);
+  const [favoriteItems, setFavoriteItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -16,24 +17,36 @@ export const FavoritesProvider = ({ children }) => {
       loadFavorites();
     } else {
       setFavorites([]);
+      setFavoriteItems([]);
     }
   }, [user]);
 
   const loadFavorites = async () => {
     if (!user) return;
-    
+
     setLoading(true);
     try {
       const response = await favoritesApi.getFavorites();
       if (response.success) {
         // Transform backend response (array of favorite objects) to array of item IDs
-        const favoriteItems = response.data?.favorites || response.data || [];
-        const itemIds = favoriteItems.map((fav) => fav.item?.id || fav.item?._id || fav.itemId);
+        const favs = response.data?.favorites || response.data || [];
+        // Extract the actual item objects
+        const items = favs.map(f => f.item).filter(i => i); // Filter out nulls
+        const itemIds = items.map((item) => item.id || item._id);
+
         setFavorites(itemIds);
+
+        // Store full items with consistent ID
+        setFavoriteItems(items.map(item => ({
+          ...item,
+          id: item.id || item._id,
+          imageUrl: item.imageUrl || (item.images && item.images[0]) || null
+        })));
       }
     } catch (error) {
       console.error("Failed to load favorites:", error);
       setFavorites([]);
+      setFavoriteItems([]);
     } finally {
       setLoading(false);
     }
@@ -41,12 +54,15 @@ export const FavoritesProvider = ({ children }) => {
 
   const addFavorite = async (itemId) => {
     if (!user) return false;
-    
+
     try {
       const response = await favoritesApi.addFavorite(itemId);
       if (response.success) {
         if (!favorites.includes(itemId)) {
           setFavorites([...favorites, itemId]);
+          // Note: We don't have the full item here to add to favoriteItems without fetching it
+          // Ideally we should re-fetch favorites or fetch the item, but for now we'll just reload
+          loadFavorites();
         }
         return true;
       }
@@ -59,11 +75,12 @@ export const FavoritesProvider = ({ children }) => {
 
   const removeFavorite = async (itemId) => {
     if (!user) return false;
-    
+
     try {
       const response = await favoritesApi.removeFavorite(itemId);
       if (response.success) {
         setFavorites(favorites.filter((id) => id !== itemId));
+        setFavoriteItems(favoriteItems.filter((item) => item.id !== itemId));
         return true;
       }
       return false;
@@ -75,7 +92,7 @@ export const FavoritesProvider = ({ children }) => {
 
   const toggleFavorite = async (itemId) => {
     if (!user) return false;
-    
+
     if (isFavorite(itemId)) {
       return await removeFavorite(itemId);
     } else {
@@ -95,6 +112,7 @@ export const FavoritesProvider = ({ children }) => {
     <FavoritesContext.Provider
       value={{
         favorites,
+        favoriteItems,
         addFavorite,
         removeFavorite,
         toggleFavorite,

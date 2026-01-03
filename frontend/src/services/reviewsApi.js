@@ -4,7 +4,7 @@ export const reviewsApi = {
   // Get reviews for a user
   getUserReviews: async (userId) => {
     const response = await api.get(`/reviews/user/${userId}`);
-    return response.data;
+    return response;
   },
 
   // Create review
@@ -14,19 +14,19 @@ export const reviewsApi = {
       rating: reviewData.rating,
       comment: reviewData.comment,
     });
-    return response.data;
+    return response;
   },
 
   // Update review
   updateReview: async (id, reviewData) => {
     const response = await api.put(`/reviews/${id}`, reviewData);
-    return response.data;
+    return response;
   },
 
   // Delete review
   deleteReview: async (id) => {
     const response = await api.delete(`/reviews/${id}`);
-    return response.data;
+    return response;
   },
 };
 

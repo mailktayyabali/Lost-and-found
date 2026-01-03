@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { useMessaging } from "../context/MessagingContext";
-import { getPostById } from "../data/posts";
 
 function ConversationList({ conversations }) {
   const formatTime = (timestamp) => {
@@ -26,8 +25,8 @@ function ConversationList({ conversations }) {
   return (
     <div className="space-y-2">
       {conversations.map((conv) => {
-        const post = getPostById(conv.itemId);
-        const otherUserName = conv.otherUserId.split("@")[0];
+        const post = conv.item;
+        const otherUserName = conv.otherUserId.includes("@") ? conv.otherUserId.split("@")[0] : conv.otherUserId;
 
         return (
           <Link

@@ -57,34 +57,40 @@ function RecentMessagesWidget() {
         </Link>
       </div>
       <div className="space-y-3">
-        {recentConversations.map((conv, index) => (
-          <Link
-            key={index}
-            to={`/chat/${conv.itemId}/${conv.otherUserId}`}
-            className="block p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100"
-          >
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-navy text-sm truncate">
-                  Item #{conv.itemId}
-                </p>
-                <p className="text-xs text-slate truncate mt-1">
-                  {conv.lastMessage.content}
-                </p>
-              </div>
-              <div className="flex flex-col items-end gap-1">
-                <span className="text-xs text-slate">
-                  {formatTime(conv.lastMessage.timestamp)}
-                </span>
-                {conv.unreadCount > 0 && (
-                  <span className="bg-teal text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                    {conv.unreadCount}
-                  </span>
-                )}
-              </div>
-            </div>
-          </Link>
-        ))}
+        <div className="space-y-3">
+          {recentConversations.map((conv, index) => {
+            if (!conv || !conv.lastMessage) return null;
+
+            return (
+              <Link
+                key={index}
+                to={`/chat/${conv.itemId}/${conv.otherUserId}`}
+                className="block p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-navy text-sm truncate">
+                      Item #{conv.itemId}
+                    </p>
+                    <p className="text-xs text-slate truncate mt-1">
+                      {conv.lastMessage.content || "No content"}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end gap-1">
+                    <span className="text-xs text-slate">
+                      {formatTime(conv.lastMessage.timestamp)}
+                    </span>
+                    {(conv.unreadCount > 0) && (
+                      <span className="bg-teal text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                        {conv.unreadCount}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

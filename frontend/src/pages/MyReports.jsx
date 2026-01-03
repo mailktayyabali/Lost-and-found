@@ -29,7 +29,7 @@ function MyReports() {
             ...item,
             id: item.id || item._id,
             status: item.status || "LOST",
-            imageUrl: item.imageUrl || (item.images && item.images[0]) || "",
+            imageUrl: item.imageUrl || (item.images && item.images[0]) || null,
           }));
           setItems(transformedItems);
         } else {

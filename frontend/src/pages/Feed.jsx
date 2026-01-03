@@ -69,8 +69,8 @@ function Feed({ type }) {
             ...item,
             id: item.id || item._id,
             type: item.status?.toLowerCase() || "lost",
-            imageUrl: item.imageUrl || (item.images && item.images[0]) || "",
-            image: item.imageUrl || (item.images && item.images[0]) || "",
+            imageUrl: item.imageUrl || (item.images && item.images[0]) || null,
+            image: item.imageUrl || (item.images && item.images[0]) || null,
           }));
 
           if (page === 1) {
@@ -98,7 +98,7 @@ function Feed({ type }) {
     return items.map((item) => ({
       ...item,
       status: item.status || (item.type ? item.type.toUpperCase() : "LOST"),
-      imageUrl: item.imageUrl || item.image || "",
+      imageUrl: item.imageUrl || item.image || null,
       category: item.category || "Other",
     }));
   }, [items]);

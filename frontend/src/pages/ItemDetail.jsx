@@ -32,10 +32,10 @@ function ItemDetail() {
           });
           
           // Transform item to match frontend format
-          const transformedItem = {
+            const transformedItem = {
             ...item,
             id: item.id || item._id,
-            imageUrl: item.imageUrl || (item.images && item.images[0]) || "",
+            imageUrl: item.imageUrl || (item.images && item.images[0]) || null,
             additionalImages: item.additionalImages || (item.images && item.images.slice(1)) || [],
             fullDescription: item.description,
             date: item.date || new Date(item.createdAt).toLocaleDateString(),

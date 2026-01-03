@@ -4,7 +4,7 @@ export const itemsApi = {
   // Get all items with filters and pagination
   getAllItems: async (params = {}) => {
     const response = await api.get('/items', { params });
-    return response.data;
+    return response;
   },
 
   // Search items
@@ -12,25 +12,25 @@ export const itemsApi = {
     const response = await api.get('/items/search', {
       params: { q: query, ...params },
     });
-    return response.data;
+    return response;
   },
 
   // Get item by ID
   getItemById: async (id) => {
     const response = await api.get(`/items/${id}`);
-    return response.data;
+    return response;
   },
 
   // Increment item views
   incrementViews: async (id) => {
     const response = await api.post(`/items/${id}/view`);
-    return response.data;
+    return response;
   },
 
   // Get user items
   getUserItems: async (userId) => {
     const response = await api.get(`/items/user/${userId}`);
-    return response.data;
+    return response;
   },
 
   // Create item (multipart/form-data)
@@ -41,7 +41,7 @@ export const itemsApi = {
         'Content-Type': 'multipart/form-data',
       },
     });
-    return response.data;
+    return response;
   },
 
   // Update item (multipart/form-data)
@@ -51,19 +51,19 @@ export const itemsApi = {
         'Content-Type': 'multipart/form-data',
       },
     });
-    return response.data;
+    return response;
   },
 
   // Delete item
   deleteItem: async (id) => {
     const response = await api.delete(`/items/${id}`);
-    return response.data;
+    return response;
   },
 
   // Mark item as resolved
   markAsResolved: async (id) => {
     const response = await api.patch(`/items/${id}/resolve`);
-    return response.data;
+    return response;
   },
 };
 

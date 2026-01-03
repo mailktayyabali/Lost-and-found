@@ -11,17 +11,17 @@ function UserStats({ stats }) {
     },
     {
       label: "Reviews",
-      value: stats.reviewCount,
+      value: stats.totalReviews || stats.reviewCount || 0,
       icon: "fa-comment",
     },
     {
       label: "Items Posted",
-      value: stats.itemsPosted,
+      value: stats.totalItems || stats.itemsPosted || 0,
       icon: "fa-file",
     },
     {
       label: "Items Found",
-      value: stats.itemsFound,
+      value: stats.foundItems || stats.itemsFound || 0,
       icon: "fa-check-circle",
     },
   ];

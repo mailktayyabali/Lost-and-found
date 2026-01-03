@@ -4,8 +4,8 @@ import { useMessaging } from "../context/MessagingContext";
 import { useSearchAlerts } from "../context/SearchAlertsContext";
 import { useUserProfiles } from "../context/UserProfileContext";
 import { useAuth } from "../context/AuthContext";
-import { posts } from "../data/posts";
 import { Heart, MessageSquare, Bell, Star } from "lucide-react";
+import { useState, useEffect } from "react";
 
 function StatsOverview() {
   const { user } = useAuth();
@@ -13,20 +13,24 @@ function StatsOverview() {
   const { getUnreadCount: getMessageUnreadCount } = useMessaging();
   const { getUnreadCount: getAlertUnreadCount } = useSearchAlerts();
   const { getUserStats } = useUserProfiles();
+  const [userRating, setUserRating] = useState(null);
 
   const favoriteCount = getFavoriteCount();
   const messageUnreadCount = getMessageUnreadCount();
   const alertUnreadCount = getAlertUnreadCount();
-  const userStats = user ? getUserStats(user.email) : null;
 
-  // Calculate user's posted items
-  const userPosts = user
-    ? posts.filter(
-        (post) =>
-          post.postedBy?.email === user.email ||
-          post.postedBy?.username === user.email?.split("@")[0]
-      )
-    : [];
+  // Fetch user stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (user?.id) {
+        const stats = await getUserStats(user.id);
+        if (stats) {
+          setUserRating(stats.rating);
+        }
+      }
+    };
+    fetchStats();
+  }, [user, getUserStats]);
 
   const stats = [
     {
@@ -55,9 +59,9 @@ function StatsOverview() {
     {
       icon: <Star size={20} />,
       label: "My Rating",
-      value: userStats?.rating ? `${userStats.rating.toFixed(1)}/5` : "N/A",
+      value: userRating ? `${userRating.toFixed(1)}/5` : "N/A",
       color: "text-yellow-500 bg-yellow-50",
-      link: user ? `/profile/${user.email}` : "#",
+      link: user ? `/profile/${user.id}` : "#",
     },
   ];
 

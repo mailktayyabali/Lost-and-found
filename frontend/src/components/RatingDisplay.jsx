@@ -1,5 +1,6 @@
 function RatingDisplay({ rating, showNumber = true, size = "default" }) {
-  const fullStars = Math.floor(rating);
+  const safeRating = (typeof rating === 'number' && !isNaN(rating)) ? rating : 0;
+  const fullStars = Math.floor(safeRating);
   const hasHalfStar = rating % 1 >= 0.5;
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 

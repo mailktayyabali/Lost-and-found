@@ -2,11 +2,10 @@ import { useFavorites } from "../context/FavoritesContext";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import FeedPostCard from "../components/FeedPostCard";
-import { posts } from "../data/posts";
 import { Heart } from "lucide-react";
 
 function Favorites() {
-  const { favorites } = useFavorites();
+  const { favorites, favoriteItems } = useFavorites();
   const { user } = useAuth();
 
   if (!user) {
@@ -27,7 +26,7 @@ function Favorites() {
     );
   }
 
-  const favoritePosts = posts.filter((post) => favorites.includes(post.id));
+  const favoritePosts = favoriteItems;
 
   return (
     <div className="flex-1 p-4 md:p-6 lg:p-10 overflow-x-hidden">

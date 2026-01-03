@@ -1,51 +1,60 @@
 import { Pencil, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { posts } from "../data/posts";
-import { useMemo } from "react";
+import { itemsApi } from "../services/itemsApi";
+import { useState, useEffect } from "react";
 
 export default function ActivityTable() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const userPosts = useMemo(() => {
-    if (!user) return [];
-    return posts
-      .filter(
-        (post) =>
-          post.postedBy?.email === user.email ||
-          post.postedBy?.username === user.email?.split("@")[0]
-      )
-      .slice(0, 5)
-      .map((post) => ({
-        id: post.id,
-        item: post.title,
-        desc: post.description,
-        category: post.category || "Other",
-        posted: post.date,
-        status: post.status,
-        badge:
-          post.status === "LOST"
-            ? "bg-red-100 text-red-600"
-            : post.status === "FOUND"
-            ? "bg-green-100 text-green-600"
-            : "bg-blue-100 text-blue-600",
-      }));
+  useEffect(() => {
+    const fetchItems = async () => {
+      if (!user) return;
+      try {
+        const response = await itemsApi.getUserItems(user.id);
+        if (response.success) {
+          const userItems = response.data.items || response.data || [];
+          setItems(userItems.slice(0, 5)); // Limit to 5 recent items
+        }
+      } catch (err) {
+        console.error("Failed to fetch user items:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchItems();
   }, [user]);
 
-  const data = userPosts.length > 0 
-    ? userPosts 
+  const data = items.length > 0
+    ? items.filter(post => post && (post.id || post._id)).map((post) => ({
+      id: post.id || post._id,
+      item: post.title || "Untitled Item",
+      desc: post.description || "No description",
+      category: post.category || "Other",
+      posted: post.createdAt ? new Date(post.createdAt).toLocaleDateString() : "Unknown date",
+      status: post.status || "UNKNOWN",
+      badge:
+        (post.status === "LOST")
+          ? "bg-red-100 text-red-600"
+          : (post.status === "FOUND")
+            ? "bg-green-100 text-green-600"
+            : "bg-blue-100 text-blue-600",
+    }))
     : [
-        {
-          id: 1,
-          item: "No items reported yet",
-          desc: "Start by reporting a lost or found item",
-          category: "-",
-          posted: "-",
-          status: "Empty",
-          badge: "bg-gray-100 text-gray-600",
-        },
-      ];
+      {
+        id: null, // Ensure ID is null for empty state
+        item: loading ? "Loading..." : "No items reported yet",
+        desc: loading ? "Fetching your activities" : "Start by reporting a lost or found item",
+        category: "-",
+        posted: "-",
+        status: "Empty",
+        badge: "bg-gray-100 text-gray-600",
+      },
+    ];
 
   return (
     <div className="bg-white p-4 md:p-6 rounded-xl shadow-md border border-gray-100 mt-6">

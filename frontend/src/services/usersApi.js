@@ -4,19 +4,19 @@ export const usersApi = {
   // Get user profile
   getUserProfile: async (userId) => {
     const response = await api.get(`/users/${userId}`);
-    return response.data;
+    return response;
   },
 
   // Get user stats
   getUserStats: async (userId) => {
     const response = await api.get(`/users/${userId}/stats`);
-    return response.data;
+    return response;
   },
 
   // Get user items
   getUserItems: async (userId) => {
     const response = await api.get(`/users/${userId}/items`);
-    return response.data;
+    return response;
   },
 };
 

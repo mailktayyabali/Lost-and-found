@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useState, useEffect } from "react";
 import DashboardHeader from "../components/DashboardHeader";
 import StatCard from "../components/StatCard";
 import ActivityTable from "../components/ActivityTable";
@@ -14,29 +14,47 @@ import RecentItemsWidget from "../components/RecentItemsWidget";
 import { useFavorites } from "../context/FavoritesContext";
 import { useMessaging } from "../context/MessagingContext";
 import { useSearchAlerts } from "../context/SearchAlertsContext";
-import { posts } from "../data/posts";
 import { useAuth } from "../context/AuthContext";
+import { usersApi } from "../services/usersApi";
 
 export default function UserDashboard() {
   const { user } = useAuth();
   const { favorites } = useFavorites();
-  const { conversations } = useMessaging();
   const { alerts } = useSearchAlerts();
 
-  // Calculate user's actual stats
-  const userPosts = useMemo(() => {
-    if (!user) return [];
-    return posts.filter(
-      (post) =>
-        post.postedBy?.email === user.email ||
-        post.postedBy?.username === user.email?.split("@")[0]
-    );
+  const [stats, setStats] = useState({
+    lostItems: 0,
+    foundItems: 0,
+    resolvedItems: 0,
+    totalItems: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (!user) return;
+      try {
+        const response = await usersApi.getUserStats(user.id);
+        if (response.success) {
+          const fetchedStats = response.data.stats || response.data || {};
+          setStats({
+            lostItems: fetchedStats.lostItems || 0,
+            foundItems: fetchedStats.foundItems || 0,
+            resolvedItems: fetchedStats.resolvedItems || 0,
+            totalItems: fetchedStats.totalItems || 0,
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch user stats:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
   }, [user]);
 
-  const lostItems = userPosts.filter((p) => p.status === "LOST").length;
-  const foundItems = userPosts.filter((p) => p.status === "FOUND").length;
-  const resolvedItems = userPosts.filter((p) => p.status === "RESOLVED").length;
-  const activeAlerts = alerts.filter((a) => a.active).length;
+  const activeAlerts = alerts?.filter((a) => a.active)?.length || 0;
 
   return (
     <div className="p-4 md:p-6 lg:p-8">
@@ -47,30 +65,30 @@ export default function UserDashboard() {
 
       {/* Main Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 mt-6">
-        <StatCard 
-          title="Total Lost Items" 
-          value={lostItems} 
-          subtitle={lostItems > 0 ? `${lostItems} active report${lostItems !== 1 ? 's' : ''}` : "No lost items reported"}
+        <StatCard
+          title="Total Lost Items"
+          value={stats.lostItems}
+          subtitle={stats.lostItems > 0 ? `${stats.lostItems} active report${stats.lostItems !== 1 ? 's' : ''}` : "No lost items reported"}
           icon={<i className="fa-solid fa-magnifying-glass text-2xl"></i>}
           type="lost"
         />
-        <StatCard 
-          title="Total Found Items" 
-          value={foundItems} 
-          subtitle={foundItems > 0 ? `${foundItems} active report${foundItems !== 1 ? 's' : ''}` : "No found items reported"}
+        <StatCard
+          title="Total Found Items"
+          value={stats.foundItems}
+          subtitle={stats.foundItems > 0 ? `${stats.foundItems} active report${stats.foundItems !== 1 ? 's' : ''}` : "No found items reported"}
           icon={<i className="fa-solid fa-check-circle text-2xl"></i>}
           type="found"
         />
-        <StatCard 
-          title="Claimed Items" 
-          value={resolvedItems} 
-          subtitle={resolvedItems > 0 ? "Successfully resolved" : "No resolved items yet"}
+        <StatCard
+          title="Claimed Items"
+          value={stats.resolvedItems}
+          subtitle={stats.resolvedItems > 0 ? "Successfully resolved" : "No resolved items yet"}
           icon={<i className="fa-solid fa-box text-2xl"></i>}
           type="claim"
         />
-        <StatCard 
-          title="Active Alerts" 
-          value={activeAlerts} 
+        <StatCard
+          title="Active Alerts"
+          value={activeAlerts}
           subtitle={activeAlerts > 0 ? "Monitoring for matches" : "No active alerts"}
           icon={<i className="fa-solid fa-bell text-2xl"></i>}
           type="info"
@@ -107,22 +125,22 @@ export default function UserDashboard() {
             data={[
               {
                 label: "Lost Items",
-                value: lostItems,
+                value: stats.lostItems,
                 color: "bg-red-500",
               },
               {
                 label: "Found Items",
-                value: foundItems,
+                value: stats.foundItems,
                 color: "bg-green-500",
               },
               {
                 label: "Resolved",
-                value: resolvedItems,
+                value: stats.resolvedItems,
                 color: "bg-blue-500",
               },
               {
                 label: "Favorites",
-                value: favorites.length,
+                value: favorites?.length || 0,
                 color: "bg-pink-500",
               },
             ]}
