@@ -70,6 +70,11 @@ const userSchema = new mongoose.Schema(
       maxlength: [500, 'Bio cannot exceed 500 characters'],
       trim: true,
     },
+    resetPasswordToken: {
+      type: String,
+      select: false,
+    },
+    resetPasswordExpires: Date,
   },
   {
     timestamps: true,
@@ -124,4 +129,5 @@ userSchema.methods.toJSON = function () {
 };
 
 module.exports = mongoose.model('User', userSchema);
+
 

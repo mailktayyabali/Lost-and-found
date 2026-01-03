@@ -188,7 +188,7 @@ function Auth() {
             <div className="flex justify-between items-center mb-2">
               <label className="text-navy font-medium text-sm">Password</label>
               {isSignIn && (
-                <Link to="#" className="text-teal text-xs hover:underline">
+                <Link to="/forgot-password" className="text-teal text-xs hover:underline">
                   Forgot password?
                 </Link>
               )}

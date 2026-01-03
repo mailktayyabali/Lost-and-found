@@ -9,6 +9,8 @@ import DashboardLayout from "./layouts/DashboardLayout";
 
 import Home from "./pages/Home";
 import Auth from "./pages/Auth";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import About from "./pages/About";
 import Feed from "./pages/Feed";
 import ReportItem from "./pages/ReportItem";
@@ -40,6 +42,8 @@ function App() {
           <Route path="/found-items" element={<Feed type="found" />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/report" element={<ReportItem />} />
           <Route path="/item/:id" element={<ItemDetail />} />
           <Route path="/profile/:userId" element={<UserProfile />} />

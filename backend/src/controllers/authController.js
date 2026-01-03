@@ -151,19 +151,39 @@ const changePassword = async (req, res, next) => {
 };
 
 // Forgot password (placeholder - would need token generation and storage)
+const crypto = require('crypto');
+const { sendPasswordResetEmail } = require('../services/emailService');
+
 const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const user = await User.findOne({ email: email.toLowerCase() }).select('+resetPasswordToken +resetPasswordExpires');
 
     if (!user) {
       // Don't reveal if user exists for security
       return sendSuccess(res, 'If user exists, password reset email has been sent');
     }
 
-    // TODO: Generate reset token and send email
-    // For now, just return success
-    sendSuccess(res, 'Password reset email sent (if user exists)');
+    // Generate a reset token and store its hash + expiry on the user
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const hashed = crypto.createHash('sha256').update(resetToken).digest('hex');
+    user.resetPasswordToken = hashed;
+    user.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 hour
+    await user.save({ validateBeforeSave: false });
+
+    // Send email with the plain resetToken
+    try {
+      await sendPasswordResetEmail(user, resetToken);
+    } catch (err) {
+      console.error('Failed to send reset email:', err);
+      // don't reveal, but clear token
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+      return sendSuccess(res, 'If user exists, password reset email has been sent');
+    }
+
+    sendSuccess(res, 'If user exists, password reset email has been sent');
   } catch (error) {
     next(error);
   }
@@ -173,10 +193,27 @@ const forgotPassword = async (req, res, next) => {
 const resetPassword = async (req, res, next) => {
   try {
     const { token, newPassword } = req.body;
+    if (!token || !newPassword) {
+      throw new ValidationError('Token and new password are required');
+    }
 
-    // TODO: Verify token and reset password
-    // For now, return error
-    throw new AppError('Password reset not implemented yet', 501);
+    const hashed = crypto.createHash('sha256').update(token).digest('hex');
+    const user = await User.findOne({
+      resetPasswordToken: hashed,
+      resetPasswordExpires: { $gt: Date.now() },
+    }).select('+password +resetPasswordToken +resetPasswordExpires');
+
+    if (!user) {
+      throw new ValidationError('Invalid or expired token');
+    }
+
+    // Update password and clear reset fields
+    user.password = newPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    sendSuccess(res, 'Password has been reset successfully');
   } catch (error) {
     next(error);
   }
