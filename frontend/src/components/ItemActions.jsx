@@ -49,12 +49,17 @@ function ItemActions({ status, itemId, postedBy }) {
       return;
     }
 
-    if (!postedBy || !postedBy.email) {
+    const posterId = postedBy?._id || postedBy?.id || postedBy;
+
+    if (!posterId || (typeof posterId === 'object' && !posterId.email && !posterId._id)) {
+      console.error("ItemActions: Invalid posterId", postedBy);
       alert("Unable to start conversation. User information not available.");
       return;
     }
 
-    navigate(`/chat/${itemId}/${postedBy.email}`);
+    // posterId might be the object if it wasn't just an ID
+    const actualId = postedBy?._id || postedBy?.id || postedBy;
+    navigate(`/chat/${itemId}/${actualId}`);
   };
 
   const onClaimSuccess = () => {

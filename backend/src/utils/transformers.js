@@ -86,9 +86,9 @@ const transformMessage = (message, currentUserEmail = null) => {
   if (!message) return null;
   const msgObj = message.toObject ? message.toObject() : message;
   
-  // Get sender and receiver emails if available
-  const senderEmail = msgObj.sender?.email || msgObj.senderId || '';
-  const receiverEmail = msgObj.receiver?.email || msgObj.receiverId || '';
+  // Get sender and receiver IDs (prefer _id)
+  const senderId = msgObj.sender?._id?.toString() || msgObj.senderId || '';
+  const receiverId = msgObj.receiver?._id?.toString() || msgObj.receiverId || '';
   
   // Get itemId from conversation if populated, or from direct reference
   let itemId = msgObj.itemId;
@@ -107,8 +107,8 @@ const transformMessage = (message, currentUserEmail = null) => {
       ? (msgObj.conversation._id?.toString() || msgObj.conversation.toString())
       : msgObj.conversation?.toString() || msgObj.conversationId,
     itemId: itemId ? parseInt(itemId) || itemId : undefined, // Try to convert to number for frontend compatibility
-    senderId: senderEmail, // Frontend expects email
-    receiverId: receiverEmail, // Frontend expects email
+    senderId: senderId, // Return ID
+    receiverId: receiverId, // Return ID
     sender: msgObj.sender ? transformUser(msgObj.sender) : null,
     receiver: msgObj.receiver ? transformUser(msgObj.receiver) : null,
     content: msgObj.content,
@@ -148,7 +148,7 @@ const transformConversation = (conversation, currentUserId = null) => {
     id: convObj._id?.toString() || convObj.id,
     itemId: itemId ? (parseInt(itemId) || itemId) : undefined, // Try number for frontend compatibility
     item: convObj.item && typeof convObj.item === 'object' ? transformItem(convObj.item) : null,
-    otherUserId: otherUser?.email || otherUser?._id?.toString() || otherUser?.toString(),
+    otherUserId: otherUser?._id?.toString() || otherUser?.toString() || otherUser?.email, // Prefer ID
     otherUser: otherUser ? transformUser(otherUser) : null,
     participants: participants.map((p) => typeof p === 'object' ? transformUser(p) : p),
     lastMessage: convObj.lastMessage && typeof convObj.lastMessage === 'object' 

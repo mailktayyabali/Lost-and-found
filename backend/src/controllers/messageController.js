@@ -7,6 +7,7 @@ const { getPaginationParams, getPaginationMeta } = require('../utils/pagination'
 const { sendMessageNotification } = require('../services/emailService');
 const User = require('../models/User');
 const { transformMessage, transformConversation, transformItem } = require('../utils/transformers');
+const { getIo } = require('../services/socketService');
 
 // Get all user conversations
 const getConversations = async (req, res, next) => {
@@ -139,9 +140,27 @@ const sendMessage = async (req, res, next) => {
         select: '_id',
       },
     });
-    
     // Add itemId directly to message object for transformer
     message.itemId = req.body.itemId || conversation.item?.toString();
+    
+    // Transform message
+    const transformedMessage = transformMessage(message, req.user.email);
+
+    // Send via socket (emit to conversation room and receiver's user room)
+    try {
+      const io = getIo();
+      const convRoom = conversation._id.toString();
+      console.log(`Emitting message ${transformedMessage.id} to conversation room ${convRoom} and user_${receiverId}`);
+      io.to(convRoom).emit('receive_message', transformedMessage);
+      // Also emit directly to receiver's personal room in case they're not joined to convo yet
+      try {
+        io.to(`user_${receiverId.toString()}`).emit('receive_message', transformedMessage);
+      } catch (innerErr) {
+        console.error('Emit to user room failed:', innerErr);
+      }
+    } catch (err) {
+      console.error('Socket emit failed:', err);
+    }
 
     // Send notification email (non-blocking)
     const receiver = await User.findById(receiverId);
@@ -153,7 +172,7 @@ const sendMessage = async (req, res, next) => {
     }
 
     sendSuccess(res, 'Message sent successfully', { 
-      message: transformMessage(message, req.user.email) 
+      message: transformedMessage 
     }, 201);
   } catch (error) {
     next(error);

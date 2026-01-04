@@ -2,7 +2,11 @@ import { useAuth } from "../context/AuthContext";
 
 function MessageBubble({ message }) {
   const { user } = useAuth();
-  const isOwn = message.senderId === user?.email;
+  // Convert all to strings for consistent comparison
+  const messageSenderId = String(message.senderId || '');
+  const userId = String(user?.id || user?._id || user?.email || '');
+  const isOwn = messageSenderId === userId;
+  
 
   const formatTime = (timestamp) => {
     const date = new Date(timestamp);
@@ -20,17 +24,15 @@ function MessageBubble({ message }) {
       className={`flex ${isOwn ? "justify-end" : "justify-start"} mb-4`}
     >
       <div
-        className={`max-w-[70%] rounded-2xl px-4 py-2 ${
-          isOwn
+        className={`max-w-[70%] rounded-2xl px-4 py-2 ${isOwn
             ? "bg-teal text-white rounded-br-sm"
             : "bg-white text-navy border border-gray-200 rounded-bl-sm"
-        }`}
+          }`}
       >
         <p className="text-sm leading-relaxed">{message.content}</p>
         <p
-          className={`text-xs mt-1 ${
-            isOwn ? "text-white/70" : "text-slate"
-          }`}
+          className={`text-xs mt-1 ${isOwn ? "text-white/70" : "text-slate"
+            }`}
         >
           {formatTime(message.timestamp)}
         </p>

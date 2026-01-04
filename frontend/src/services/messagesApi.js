@@ -4,13 +4,13 @@ export const messagesApi = {
   // Get all conversations
   getConversations: async () => {
     const response = await api.get('/messages/conversations');
-    return response.data;
+    return response;
   },
 
   // Get conversation by ID
-  getConversation: async (conversationId) => {
-    const response = await api.get(`/messages/conversations/${conversationId}`);
-    return response.data;
+  getConversation: async (conversationId, limit = 100) => {
+    const response = await api.get(`/messages/conversations/${conversationId}?limit=${limit}`);
+    return response;
   },
 
   // Send message
@@ -21,19 +21,19 @@ export const messagesApi = {
       conversationId: messageData.conversationId,
       content: messageData.content,
     });
-    return response.data;
+    return response;
   },
 
   // Mark message as read
   markAsRead: async (messageId) => {
     const response = await api.put(`/messages/${messageId}/read`);
-    return response.data;
+    return response;
   },
 
   // Get unread count
   getUnreadCount: async () => {
     const response = await api.get('/messages/unread-count');
-    return response.data;
+    return response;
   },
 };
 
