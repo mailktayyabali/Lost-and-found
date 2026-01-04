@@ -6,14 +6,12 @@ import QuickActions from "../components/QuickActions";
 import RecentMessagesWidget from "../components/RecentMessagesWidget";
 import FavoritesWidget from "../components/FavoritesWidget";
 import SearchAlertsWidget from "../components/SearchAlertsWidget";
-import ActivityTimeline from "../components/ActivityTimeline";
 import StatsOverview from "../components/StatsOverview";
 import PerformanceChart from "../components/PerformanceChart";
 import NotificationsSummary from "../components/NotificationsSummary";
 import IncomingClaimsWidget from "../components/IncomingClaimsWidget";
 import MyClaimsWidget from "../components/MyClaimsWidget";
 import RecentItemsWidget from "../components/RecentItemsWidget";
-
 
 import { useFavorites } from "../context/FavoritesContext";
 import { useMessaging } from "../context/MessagingContext";
@@ -22,6 +20,7 @@ import { useAuth } from "../context/AuthContext";
 import { usersApi } from "../services/usersApi";
 
 export default function UserDashboard() {
+  // ... (previous state code)
   const { user } = useAuth();
   const { favorites } = useFavorites();
   const { alerts } = useSearchAlerts();
@@ -113,13 +112,14 @@ export default function UserDashboard() {
           <MyClaimsWidget />
           <RecentMessagesWidget />
           <FavoritesWidget />
-          <RecentItemsWidget />
+
         </div>
 
-        {/* Right Column - Alerts & Timeline */}
+        {/* Right Column - Alerts & Timeline (Now just Alerts) */}
         <div className="lg:col-span-1 space-y-6">
           <SearchAlertsWidget />
-          <ActivityTimeline />
+          {/* ActivityTimeline removed */}
+          <RecentItemsWidget />
         </div>
       </div>
 

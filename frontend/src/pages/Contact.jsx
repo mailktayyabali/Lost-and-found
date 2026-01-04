@@ -57,8 +57,8 @@ function Contact() {
               icon="alternate_email"
               title="Email Support"
               description="For general inquiries and support."
-              contact="support@findit.com"
-              link="mailto:support@findit.com"
+              contact="finditwebproj@gmail.com"
+              link="mailto:finditwebproj@gmail.com"
               iconBg="bg-teal/10"
               iconColor="text-teal"
             />
@@ -67,8 +67,8 @@ function Contact() {
               icon="call"
               title="Phone Support"
               description="Available Mon-Fri, 9am-5pm EST."
-              contact="+1 (555) 123-4567"
-              link="tel:+15551234567"
+              contact="+923254269162"
+              link="tel:+923254269162"
               iconBg="bg-amber/10"
               iconColor="text-amber"
             />
