@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { X } from "lucide-react";
+import { CATEGORIES, CATEGORIES_WITH_ALL } from "../utils/constants";
 
 function CreateAlertModal({ isOpen, onClose, onCreate, currentFilters }) {
   const [name, setName] = useState("");
@@ -88,14 +89,9 @@ function CreateAlertModal({ isOpen, onClose, onCreate, currentFilters }) {
               className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal text-sm"
             >
               <option value="">All Categories</option>
-              <option value="electronics">Electronics</option>
-              <option value="accessories">Accessories</option>
-              <option value="clothing">Clothing</option>
-              <option value="documents">Documents</option>
-              <option value="pets">Pets</option>
-              <option value="keys">Keys</option>
-              <option value="bags">Bags</option>
-              <option value="other">Other</option>
+              {CATEGORIES.map(category => (
+                <option key={category} value={category}>{category}</option>
+              ))}
             </select>
           </div>
 
@@ -151,4 +147,3 @@ function CreateAlertModal({ isOpen, onClose, onCreate, currentFilters }) {
 }
 
 export default CreateAlertModal;
-

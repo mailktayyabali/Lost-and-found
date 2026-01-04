@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 import { alertsApi } from "../services/alertsApi";
+import { notificationsApi } from "../services/notificationsApi";
 
 const SearchAlertsContext = createContext();
 
@@ -11,13 +12,16 @@ export const SearchAlertsProvider = ({ children }) => {
   const [alerts, setAlerts] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     if (user) {
       loadAlerts();
+      loadNotifications();
     } else {
       setAlerts([]);
       setNotifications([]);
+      setUnreadCount(0);
     }
   }, [user]);
 
@@ -43,10 +47,32 @@ export const SearchAlertsProvider = ({ children }) => {
     }
   };
 
+  const loadNotifications = async () => {
+    if (!user) return;
+    try {
+      const response = await notificationsApi.getNotifications({ limit: 20 });
+      if (response.success) {
+        const rawNotifications = response.data.notifications || [];
+        const formattedNotifications = rawNotifications.map(n => ({
+          ...n,
+          id: n._id,
+          itemId: n.data?.itemId?._id || n.data?.itemId,
+          itemTitle: n.data?.itemId?.title || n.data?.item?.title || 'Item',
+          alertName: n.data?.alertId?.name || 'Search Alert',
+        }));
+        setNotifications(formattedNotifications);
+        setUnreadCount(response.data.unreadCount || 0);
+      }
+    } catch (error) {
+      console.error("Failed to load notifications:", error);
+    }
+  };
+
   const createAlert = async (alertData) => {
     if (!user) return null;
 
     try {
+      console.log("[SearchAlertsContext] Creating alert with data:", alertData);
       // Transform frontend format to backend format
       const backendData = {
         name: alertData.name,
@@ -58,10 +84,18 @@ export const SearchAlertsProvider = ({ children }) => {
       };
 
       const response = await alertsApi.createAlert(backendData);
+      console.log("[SearchAlertsContext] Create alert response:", response);
+
       if (response.success) {
         const newAlert = response.data?.alert || response.data;
-        setAlerts([...alerts, { ...newAlert, id: newAlert.id || newAlert._id }]);
+        console.log("[SearchAlertsContext] New alert object:", newAlert);
+
+        const alertWithId = { ...newAlert, id: newAlert.id || newAlert._id };
+        setAlerts(prevAlerts => [...prevAlerts, alertWithId]);
+
         return newAlert;
+      } else {
+        console.error("[SearchAlertsContext] API returned success: false", response);
       }
       return null;
     } catch (error) {
@@ -72,7 +106,6 @@ export const SearchAlertsProvider = ({ children }) => {
 
   const updateAlert = async (alertId, updates) => {
     try {
-      // Transform frontend format to backend format
       const backendData = {
         name: updates.name,
         filters: {
@@ -123,10 +156,7 @@ export const SearchAlertsProvider = ({ children }) => {
       const response = await alertsApi.checkMatches(alertId);
       if (response.success) {
         const matches = response.data?.matches || response.data || [];
-        // Add notifications for new matches
-        matches.forEach((match) => {
-          addNotification(alertId, match.id || match._id, match.title);
-        });
+        await loadNotifications();
         return matches;
       }
       return [];
@@ -136,33 +166,32 @@ export const SearchAlertsProvider = ({ children }) => {
     }
   };
 
-  const addNotification = (alertId, itemId, itemTitle) => {
-    if (!user) return;
+  const markNotificationAsRead = async (notificationId) => {
+    try {
+      setNotifications(notifications.map((notif) =>
+        notif._id === notificationId ? { ...notif, read: true } : notif
+      ));
+      setUnreadCount(prev => Math.max(0, prev - 1));
 
-    const notification = {
-      id: Date.now().toString(),
-      alertId,
-      itemId,
-      itemTitle,
-      read: false,
-      createdAt: new Date().toISOString(),
-    };
-
-    setNotifications([...notifications, notification]);
+      await notificationsApi.markAsRead(notificationId);
+    } catch (error) {
+      console.error("Failed to mark notification as read:", error);
+    }
   };
 
-  const markNotificationAsRead = (notificationId) => {
-    setNotifications(notifications.map((notif) =>
-      notif.id === notificationId ? { ...notif, read: true } : notif
-    ));
-  };
+  const markAllAsRead = async () => {
+    try {
+      setNotifications(notifications.map((notif) => ({ ...notif, read: true })));
+      setUnreadCount(0);
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map((notif) => ({ ...notif, read: true })));
+      await notificationsApi.markAllAsRead();
+    } catch (error) {
+      console.error("Failed to mark all as read:", error);
+    }
   };
 
   const getUnreadCount = () => {
-    return notifications.filter((n) => !n.read).length;
+    return unreadCount;
   };
 
   return (
@@ -175,11 +204,11 @@ export const SearchAlertsProvider = ({ children }) => {
         deleteAlert,
         toggleAlert,
         checkMatches,
-        addNotification,
         markNotificationAsRead,
         markAllAsRead,
         getUnreadCount,
         loadAlerts,
+        loadNotifications,
         loading,
       }}
     >

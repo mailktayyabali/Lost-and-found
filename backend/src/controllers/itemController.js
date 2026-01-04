@@ -82,6 +82,32 @@ const createItem = async (req, res, next) => {
     const item = await Item.create(itemData);
     await item.populate('postedBy', 'name username avatar rating verified');
 
+    // Trigger Search Alerts (Async - don't block response)
+    const { findMatchingAlerts } = require('../services/searchService');
+    const { createNotification, sendEmailNotification } = require('../services/notificationService');
+
+    findMatchingAlerts(item).then(async (matches) => {
+      console.log(`[Alerts] Found ${matches.length} matching alerts for item ${item._id}`);
+      
+      for (const alert of matches) {
+        // Create in-app notification
+        await createNotification(
+          alert.user._id,
+          'match',
+          'New Search Alert Match',
+          `A new item matching your alert "${alert.name}" has been posted: ${item.title}`,
+          {
+            itemId: item._id,
+            alertId: alert._id,
+            item: item, // Passing item data for potential use
+          }
+        );
+
+        // Send email notification
+        await sendEmailNotification(alert.user, 'match', { item });
+      }
+    }).catch(err => console.error('[Alerts] Error processing alerts:', err));
+
     sendSuccess(res, 'Item created successfully', { item: transformItem(item) }, 201);
   } catch (error) {
     console.error('createItem error', error);

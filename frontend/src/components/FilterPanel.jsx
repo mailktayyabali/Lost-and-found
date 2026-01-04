@@ -1,17 +1,6 @@
 import { useState } from "react";
 import { X, Filter } from "lucide-react";
-
-const CATEGORIES = [
-  "All",
-  "Electronics",
-  "Accessories",
-  "Clothing",
-  "Documents",
-  "Pets",
-  "Keys",
-  "Bags",
-  "Other",
-];
+import { CATEGORIES_WITH_ALL } from "../utils/constants";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
@@ -86,7 +75,7 @@ function FilterPanel({ filters, onFilterChange, onClearFilters, isOpen, onToggle
               </button>
               {isExpanded.category && (
                 <div className="space-y-2">
-                  {CATEGORIES.map((category) => (
+                  {CATEGORIES_WITH_ALL.map((category) => (
                     <label
                       key={category}
                       className="flex items-center gap-2 cursor-pointer hover:bg-white/10 lg:hover:bg-gray-100 p-2 rounded-lg transition-colors"
@@ -94,15 +83,14 @@ function FilterPanel({ filters, onFilterChange, onClearFilters, isOpen, onToggle
                       <input
                         type="radio"
                         name="category"
-                        value={category.toLowerCase()}
+                        value={category}
                         checked={
-                          (filters.category || "all").toLowerCase() ===
-                          category.toLowerCase()
+                          (filters.category || "All") === category
                         }
                         onChange={(e) =>
                           onFilterChange({
                             category:
-                              e.target.value === "all" ? null : e.target.value,
+                              e.target.value === "All" ? null : e.target.value,
                           })
                         }
                         className="accent-teal"

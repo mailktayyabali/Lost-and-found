@@ -1,17 +1,27 @@
+const Notification = require('../models/Notification');
 const { sendMatchNotification, sendMessageNotification } = require('./emailService');
 
-// Create in-app notification (stored in database - future implementation)
-const createNotification = async (userId, type, message, data = {}) => {
-  // TODO: Implement notification model and storage
-  // For now, just log the notification
-  console.log(`Notification for user ${userId}: ${type} - ${message}`);
-  return { userId, type, message, data, createdAt: new Date() };
+// Create in-app notification
+const createNotification = async (userId, type, title, message, data = {}) => {
+  try {
+    const notification = await Notification.create({
+      recipient: userId,
+      type,
+      title,
+      message,
+      data,
+    });
+    return notification;
+  } catch (error) {
+    console.error(`Failed to create notification for user ${userId}:`, error.message);
+    return null;
+  }
 };
 
 // Send push notification (future implementation)
 const sendPushNotification = async (userId, title, body, data = {}) => {
   // TODO: Implement push notification service (FCM, OneSignal, etc.)
-  console.log(`Push notification for user ${userId}: ${title} - ${body}`);
+  // console.log(`Push notification for user ${userId}: ${title} - ${body}`);
   return true;
 };
 

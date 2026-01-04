@@ -103,8 +103,104 @@ const matchAlerts = async (alert) => {
   }
 };
 
+// Find alerts that match a newly posted item
+const findMatchingAlerts = async (item) => {
+  try {
+    const SearchAlert = require('../models/SearchAlert');
+    
+    console.log('[Alerts] Finding matches for item:', {
+      id: item._id,
+      title: item.title,
+      status: item.status,
+      category: item.category,
+      location: item.location
+    });
+
+    // Build query to find alerts that match this item
+    // Logic: Look for alerts where filters match the item's properties
+    const query = {
+      active: true,
+      user: { $ne: item.postedBy },
+    };
+
+    const andConditions = [];
+
+    // 1. Type Match
+    // If item.status="FOUND", we look for Alerts.type="found" (or "all"/null)
+    if (item.status) {
+      andConditions.push({
+        $or: [
+          { 'filters.type': item.status.toLowerCase() },
+          { 'filters.type': null },
+          { 'filters.type': { $exists: false } },
+          { 'filters.type': '' }
+        ]
+      });
+    }
+
+    // 2. Category Match
+    // If alert has category, it must match item's category (or be null/"all")
+    if (item.category) {
+      andConditions.push({
+        $or: [
+          { 'filters.category': item.category },
+          { 'filters.category': null },
+          { 'filters.category': { $exists: false } },
+          { 'filters.category': '' },
+          { 'filters.category': 'All' } // Handle "All" explicitly if stored
+        ]
+      });
+    }
+
+    if (andConditions.length > 0) {
+      query.$and = andConditions;
+    }
+
+    console.log('[Alerts] Query:', JSON.stringify(query));
+
+    // Optimization: Fetch candidates first
+    const candidates = await SearchAlert.find(query).populate('user', 'email name');
+    console.log(`[Alerts] Found ${candidates.length} candidates before JS filtering`);
+
+    // Filter candidates in memory for Location and Keywords
+    const matches = candidates.filter(alert => {
+      // Location Check
+      if (alert.filters.location && item.location) {
+        const alertLoc = alert.filters.location.toLowerCase();
+        const itemLoc = item.location.toLowerCase();
+        if (!itemLoc.includes(alertLoc)) {
+            // console.log(`[Alerts] filtered out ${alert._id} due to location mismatch`);
+            return false;
+        }
+      }
+
+      // Keyword Check
+      if (alert.filters.keywords) {
+        const keywords = alert.filters.keywords.toLowerCase().split(/\s+/);
+        const itemText = (item.title + ' ' + (item.description || '')).toLowerCase();
+        
+        // All keywords must be present
+        const allKeywordsMatch = keywords.every(k => itemText.includes(k));
+        if (!allKeywordsMatch) {
+            // console.log(`[Alerts] filtered out ${alert._id} due to keyword mismatch`);
+            return false;
+        }
+      }
+
+      return true;
+    });
+
+    console.log(`[Alerts] Final matches: ${matches.length}`);
+    return matches;
+  } catch (error) {
+    console.error('[Alerts] Error finding matching alerts:', error);
+    return [];
+  }
+};
+
 module.exports = {
   searchItems,
   matchAlerts,
+  findMatchingAlerts,
 };
 

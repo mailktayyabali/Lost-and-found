@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { itemsApi } from "../services/itemsApi";
 import { getErrorMessage } from "../utils/errorHandler";
+import { CATEGORIES } from "../utils/constants";
 
 export default function ReportItem() {
   const location = useLocation();
@@ -177,11 +178,11 @@ export default function ReportItem() {
                 required
                 className="input-minimal w-full"
               >
-                <option>Electronics</option>
-                <option>Accessories</option>
-                <option>Clothing</option>
-                <option>Documents</option>
-                <option>Other</option>
+                {CATEGORIES.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
               </select>
             </div>
 
