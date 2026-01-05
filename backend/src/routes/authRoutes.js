@@ -8,6 +8,7 @@ const {
   changePassword,
   forgotPassword,
   resetPassword,
+  googleLogin,
 } = require('../controllers/authController');
 const { authenticate } = require('../middleware/auth');
 const { authLimiter } = require('../middleware/rateLimiter');
@@ -21,6 +22,7 @@ router.post('/register', authLimiter, validateUserRegistration, register);
 router.post('/login', authLimiter, validateUserLogin, login);
 router.post('/forgot-password', authLimiter, forgotPassword);
 router.post('/reset-password', authLimiter, resetPassword);
+router.post('/google', authLimiter, googleLogin);
 
 // Protected routes
 router.get('/me', authenticate, getMe);

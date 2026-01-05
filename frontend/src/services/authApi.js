@@ -55,5 +55,10 @@ export const authApi = {
     });
     return response;
   },
+  // Google Login
+  googleLogin: async (token) => {
+    const response = await api.post('/auth/google', { token });
+    return response;
+  },
 };
 

@@ -3,6 +3,58 @@ const { sendSuccess, sendError } = require('../utils/response');
 const { AppError, UnauthorizedError, ValidationError } = require('../utils/errors');
 const { sendWelcomeEmail } = require('../services/emailService');
 const { transformUser } = require('../utils/transformers');
+const { OAuth2Client } = require('google-auth-library');
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// Google Login
+const googleLogin = async (req, res, next) => {
+  try {
+    const { token } = req.body;
+    
+    // Verify Google Token
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const { name, email, picture, sub: googleId } = ticket.getPayload();
+
+    let user = await User.findOne({ email: email.toLowerCase() });
+
+    if (user) {
+      // User exists - check if googleId is set
+      if (!user.googleId) {
+        user.googleId = googleId;
+        // Update avatar if missing
+        if (!user.avatar) user.avatar = picture;
+        await user.save();
+      }
+    } else {
+      // Create new user with random password
+      const randomPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+      user = await User.create({
+        name,
+        email: email.toLowerCase(),
+        password: randomPassword,
+        googleId,
+        avatar: picture,
+        verified: true, // Google emails are verified
+      });
+      // Send welcome email
+      sendWelcomeEmail(user).catch(console.error);
+    }
+
+    const authToken = user.generateAuthToken();
+    
+    sendSuccess(res, 'Google login successful', {
+      user: transformUser(user),
+      token: authToken,
+    });
+  } catch (error) {
+    console.error('Google login error:', error);
+    next(new UnauthorizedError('Invalid Google Token'));
+  }
+};
 
 // Register new user
 const register = async (req, res, next) => {
@@ -228,5 +280,6 @@ module.exports = {
   changePassword,
   forgotPassword,
   resetPassword,
+  googleLogin,
 };
 

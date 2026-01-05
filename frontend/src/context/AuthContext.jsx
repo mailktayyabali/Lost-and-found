@@ -88,6 +88,29 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const googleLogin = async (token) => {
+    console.log("AuthContext: googleLogin called");
+    try {
+      const response = await authApi.googleLogin(token);
+      console.log("AuthContext: googleLogin API response", response);
+
+      if (response.success && response.data) {
+        const { user: userData, token: authToken } = response.data;
+        localStorage.setItem("findit_token", authToken);
+        localStorage.setItem("findit_user", JSON.stringify(userData));
+        setUser(userData);
+        return { success: true, user: userData };
+      }
+      throw new Error(response.message || "Google Login failed");
+    } catch (error) {
+      console.error("AuthContext: googleLogin error", error);
+      return {
+        success: false,
+        error: getErrorMessage(error) || "Google Login failed",
+      };
+    }
+  };
+
   const logout = () => {
     console.log("AuthContext: logout called");
     setUser(null);
@@ -119,7 +142,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, updateProfile, loading }}>
+    <AuthContext.Provider value={{ user, login, register, googleLogin, logout, updateProfile, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );
