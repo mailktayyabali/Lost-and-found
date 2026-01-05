@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useRef } from "react";
+import { createContext, useContext, useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "./AuthContext";
 import { messagesApi } from "../services/messagesApi";
 import { io } from "socket.io-client";
@@ -16,102 +16,11 @@ export const MessagingProvider = ({ children }) => {
   const socketRef = useRef(null);
   const currentConversationIdRef = useRef(null);
 
-  // Initialize socket connection
-  useEffect(() => {
-    if (user && !socketRef.current) {
-      socketRef.current = io(import.meta.env.VITE_API_URL || "http://localhost:5000");
+  // ----------------------------------------------------------------------
+  // 1. Define Helper Functions (useCallback) BEFORE Effects
+  // ----------------------------------------------------------------------
 
-      socketRef.current.on("connect", () => {
-        console.log("Connected to socket server");
-        // Register this socket to a user-specific room so server can emit directly
-        if (user && socketRef.current) {
-          try {
-            socketRef.current.emit('register', user.id || user._id);
-            console.log('Socket registered for user', user.id || user._id);
-          } catch (err) {
-            console.error('Socket register failed', err);
-          }
-        }
-      });
-
-      socketRef.current.on("receive_message", (newMessage) => {
-        console.log('MessagingContext: socket receive_message', newMessage);
-        handleReceiveMessage(newMessage);
-      });
-
-      socketRef.current.on("disconnect", () => {
-        console.log("Disconnected from socket server");
-      });
-    }
-
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
-      }
-    };
-  }, [user]);
-
-  const handleReceiveMessage = (newMessage) => {
-    // 1. Update messages list if viewing this conversation
-    if (currentConversationIdRef.current === newMessage.conversationId) {
-      setMessages((prev) => {
-        // Avoid duplicates
-        if (prev.some(m => m.id === newMessage.id)) return prev;
-
-        // Transform if needed (backend mostly returns correct format, but ensure compatibility)
-        const transformedMsg = {
-          ...newMessage,
-          senderId: newMessage.senderId || newMessage.sender?._id || newMessage.sender?.id,
-          receiverId: newMessage.receiverId || newMessage.receiver?._id || newMessage.receiver?.id,
-          timestamp: newMessage.createdAt || newMessage.timestamp,
-        };
-        return [...prev, transformedMsg];
-      });
-
-      // Mark as read immediately if window is open (optional, or rely on manual effect)
-      // Here we rely on ChatWindow to mark as read
-    } else {
-      // Increment unread count if not viewing
-      if (newMessage.receiverId === user?.email) { // Verify it's for us
-        setUnreadCount((prev) => prev + 1);
-      }
-    }
-
-    // 2. Update conversations list (last message)
-    setConversations((prev) => {
-      const existingConvIndex = prev.findIndex(c => c.id === newMessage.conversationId);
-      if (existingConvIndex !== -1) {
-        const updatedConv = {
-          ...prev[existingConvIndex],
-          lastMessage: newMessage,
-          updatedAt: newMessage.createdAt
-        };
-        const newConvs = [...prev];
-        newConvs[existingConvIndex] = updatedConv;
-        // Move to top
-        newConvs.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-        return newConvs;
-      } else {
-        // If new conversation, might need to reload or manually construct
-        loadConversations(); // Simplest way to get full conservation object
-        return prev;
-      }
-    });
-  };
-
-  useEffect(() => {
-    if (user) {
-      loadConversations();
-      loadUnreadCount();
-    } else {
-      setConversations([]);
-      setMessages([]);
-      setUnreadCount(0);
-    }
-  }, [user]);
-
-  const loadConversations = async () => {
+  const loadConversations = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
@@ -136,9 +45,9 @@ export const MessagingProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
-  const loadUnreadCount = async () => {
+  const loadUnreadCount = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -149,9 +58,9 @@ export const MessagingProvider = ({ children }) => {
     } catch (error) {
       console.error("Failed to load unread count:", error);
     }
-  };
+  }, [user]);
 
-  const sendMessage = async (itemId, receiverId, content, conversationId = null) => {
+  const sendMessage = useCallback(async (itemId, receiverId, content, conversationId = null) => {
     if (!user) return null;
 
     try {
@@ -178,10 +87,8 @@ export const MessagingProvider = ({ children }) => {
         }
 
         // Manually update messages state to ensure it shows immediately
-        // (Essential for new conversations where we aren't in the socket room yet)
         setMessages((prev) => {
           if (prev.some(m => m.id === newMessage.id)) return prev;
-          // Transform if needed
           const transformedMsg = {
             ...newMessage,
             senderId: newMessage.senderId || newMessage.sender?._id || newMessage.sender?.id || user.id,
@@ -216,14 +123,13 @@ export const MessagingProvider = ({ children }) => {
       console.error("Failed to send message:", error);
       return null;
     }
-  };
+  }, [user, loadConversations]);
 
-  const getConversation = async (conversationId) => {
+  const getConversation = useCallback(async (conversationId) => {
     if (!user) return [];
 
     // Socket: Join Room
     if (socketRef.current) {
-      // Leave previous if any (though usually handled by switching pages)
       if (currentConversationIdRef.current && currentConversationIdRef.current !== conversationId) {
         socketRef.current.emit("leave_conversation", currentConversationIdRef.current);
       }
@@ -234,12 +140,10 @@ export const MessagingProvider = ({ children }) => {
     try {
       const response = await messagesApi.getConversation(conversationId);
       console.log('MessagingContext: getConversation response', response);
-      
+
       if (response.success) {
-        // Backend returns: response.data.conversation.messages
         const fetchedMessages = response.data?.conversation?.messages || response.data?.messages || response.data || [];
-        console.log('MessagingContext: fetched messages count:', fetchedMessages.length);
-        
+
         const transformedMessages = fetchedMessages.map((msg) => ({
           ...msg,
           id: msg.id || msg._id,
@@ -257,19 +161,17 @@ export const MessagingProvider = ({ children }) => {
       console.error("Failed to load conversation:", error);
       return [];
     }
-  };
+  }, [user]);
 
-  // Cleanup when leaving component that uses getConversation? 
-  // We can add a leaveConversation method
-  const leaveConversation = () => {
+  const leaveConversation = useCallback(() => {
     if (socketRef.current && currentConversationIdRef.current) {
       socketRef.current.emit("leave_conversation", currentConversationIdRef.current);
       currentConversationIdRef.current = null;
     }
-    setMessages([]); // Clear messages when leaving
-  };
+    setMessages([]);
+  }, []);
 
-  const markAsRead = async (messageId) => {
+  const markAsRead = useCallback(async (messageId) => {
     if (!user) return;
 
     try {
@@ -285,11 +187,109 @@ export const MessagingProvider = ({ children }) => {
     } catch (error) {
       console.error("Failed to mark as read:", error);
     }
+  }, [user, loadUnreadCount]);
+
+  const getUnreadCount = useCallback(() => {
+    return unreadCount;
+  }, [unreadCount]);
+
+  // ----------------------------------------------------------------------
+  // 2. Define Socket Handler (Non-hook)
+  // ----------------------------------------------------------------------
+
+  const handleReceiveMessage = (newMessage) => {
+    // 1. Update messages list if viewing this conversation
+    if (currentConversationIdRef.current === newMessage.conversationId) {
+      setMessages((prev) => {
+        if (prev.some(m => m.id === newMessage.id)) return prev;
+
+        const transformedMsg = {
+          ...newMessage,
+          senderId: newMessage.senderId || newMessage.sender?._id || newMessage.sender?.id,
+          receiverId: newMessage.receiverId || newMessage.receiver?._id || newMessage.receiver?.id,
+          timestamp: newMessage.createdAt || newMessage.timestamp,
+        };
+        return [...prev, transformedMsg];
+      });
+    } else {
+      // Increment unread count if not viewing
+      if (newMessage.receiverId === user?.email) {
+        setUnreadCount((prev) => prev + 1);
+      }
+    }
+
+    // 2. Update conversations list (last message)
+    setConversations((prev) => {
+      const existingConvIndex = prev.findIndex(c => c.id === newMessage.conversationId);
+      if (existingConvIndex !== -1) {
+        const updatedConv = {
+          ...prev[existingConvIndex],
+          lastMessage: newMessage,
+          updatedAt: newMessage.createdAt
+        };
+        const newConvs = [...prev];
+        newConvs[existingConvIndex] = updatedConv;
+        // Move to top
+        newConvs.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        return newConvs;
+      } else {
+        // If new conversation, we need to reload to get full details
+        loadConversations();
+        return prev;
+      }
+    });
   };
 
-  const getUnreadCount = () => {
-    return unreadCount;
-  };
+  // ----------------------------------------------------------------------
+  // 3. Effects
+  // ----------------------------------------------------------------------
+
+  // Initialize socket connection
+  useEffect(() => {
+    if (user && !socketRef.current) {
+      socketRef.current = io(import.meta.env.VITE_API_URL || "http://localhost:5000");
+
+      socketRef.current.on("connect", () => {
+        console.log("Connected to socket server");
+        if (user && socketRef.current) {
+          try {
+            socketRef.current.emit('register', user.id || user._id);
+            console.log('Socket registered for user', user.id || user._id);
+          } catch (err) {
+            console.error('Socket register failed', err);
+          }
+        }
+      });
+
+      socketRef.current.on("receive_message", (newMessage) => {
+        console.log('MessagingContext: socket receive_message', newMessage);
+        handleReceiveMessage(newMessage);
+      });
+
+      socketRef.current.on("disconnect", () => {
+        console.log("Disconnected from socket server");
+      });
+    }
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+    };
+  }, [user]); // Effectively re-subscribes when user changes
+
+  // Load Initial Data
+  useEffect(() => {
+    if (user) {
+      loadConversations();
+      loadUnreadCount();
+    } else {
+      setConversations([]);
+      setMessages([]);
+      setUnreadCount(0);
+    }
+  }, [user, loadConversations, loadUnreadCount]);
 
   return (
     <MessagingContext.Provider
@@ -303,11 +303,10 @@ export const MessagingProvider = ({ children }) => {
         getUnreadCount,
         loadConversations,
         loading,
-        socket: socketRef.current // Expose socket for Typing indicators
+        socket: socketRef.current
       }}
     >
       {children}
     </MessagingContext.Provider>
   );
 };
-

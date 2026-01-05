@@ -82,8 +82,26 @@ const userSchema = new mongoose.Schema(
 );
 
 // Hash password before saving
+// Hash password and enforce single admin limit before saving
 userSchema.pre('save', async function (next) {
-  // Skip if password hasn't been modified
+  // Enforce Single Admin Policy
+  if (this.role === 'admin') {
+    const adminCount = await mongoose.models.User.countDocuments({ role: 'admin' });
+    // If this is a new admin (no _id) OR an existing user changing role to admin
+    // AND we already have an admin that isn't this user
+    if (adminCount > 0) {
+      // Logic: if we are updating, we need to check if we are THE admin.
+      // If we are new, failure.
+      // If we are updating, we only fail if we aren't the existing admin.
+      const existingAdmin = await mongoose.models.User.findOne({ role: 'admin' });
+      if (existingAdmin && existingAdmin._id.toString() !== this._id.toString()) {
+        const err = new Error('Security Violation: Only one administrator is allowed.');
+        return next(err);
+      }
+    }
+  }
+
+  // Skip password hashing if not modified
   if (!this.isModified('password')) {
     if (typeof next === 'function') {
       return next();

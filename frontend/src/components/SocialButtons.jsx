@@ -5,13 +5,6 @@ function SocialButtons() {
         <i className="fa-brands fa-google text-red-500 text-base"></i>
         Google
       </button>
-      <button
-        onClick={() => alert("hi")}
-        className="flex-1 flex items-center justify-center gap-2 py-2 border rounded-md bg-white text-gray-700 font-semibold hover:bg-gray-100 transition transform hover:-translate-y-1 shadow-sm"
-      >
-        <i className="fa-brands fa-facebook-f text-blue-600 text-base"></i>
-        Facebook
-      </button>
     </div>
   );
 }

@@ -25,6 +25,7 @@ const register = async (req, res, next) => {
       name,
       email: email.toLowerCase(),
       password,
+      role: 'user', // Force role to user, blocking API admin creation
     });
     console.log("AuthController: user created", user._id);
 
