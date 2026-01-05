@@ -10,7 +10,7 @@ import { itemsApi } from "../services/itemsApi";
 import { getErrorMessage } from "../utils/errorHandler";
 
 function Feed({ type }) {
-  const { favorites, isFavorite } = useFavorites();
+  const { favorites, isFavorite, favoriteItems } = useFavorites();
   const { user } = useAuth();
   const { createAlert } = useSearchAlerts();
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
@@ -103,8 +103,12 @@ function Feed({ type }) {
 
   // Apply favorites filter (client-side only for favorites view)
   const filteredItems = showFavoritesOnly && user
-    ? itemsWithType.filter((item) => isFavorite(item.id))
+    ? favoriteItems
     : itemsWithType;
+
+  useEffect(() => {
+    // Debug favorites logic if needed
+  }, [showFavoritesOnly, favoriteItems, filteredItems]);
 
   const handleFilterChange = (newFilters) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));

@@ -4,25 +4,25 @@ export const favoritesApi = {
   // Get all favorites for current user
   getFavorites: async () => {
     const response = await api.get('/favorites');
-    return response.data;
+    return response;
   },
 
   // Add favorite
   addFavorite: async (itemId) => {
     const response = await api.post(`/favorites/${itemId}`);
-    return response.data;
+    return response;
   },
 
   // Remove favorite
   removeFavorite: async (itemId) => {
     const response = await api.delete(`/favorites/${itemId}`);
-    return response.data;
+    return response;
   },
 
   // Check if item is favorited
   checkFavorite: async (itemId) => {
     const response = await api.get(`/favorites/check/${itemId}`);
-    return response.data;
+    return response;
   },
 };
 
