@@ -5,7 +5,7 @@ const Favorite = require('../models/Favorite');
 const Message = require('../models/Message');
 const Conversation = require('../models/Conversation');
 const SearchAlert = require('../models/SearchAlert');
-const { sendSuccess } = require('../utils/response');
+const { sendSuccess, sendError } = require('../utils/response');
 const { NotFoundError } = require('../utils/errors');
 const { getPaginationParams, getPaginationMeta } = require('../utils/pagination');
 const { transformUser, transformItems } = require('../utils/transformers');
@@ -167,10 +167,7 @@ const deleteUser = async (req, res, next) => {
 
     // Prevent deleting yourself
     if (id === req.user.id) {
-      return res.status(400).json({
-        success: false,
-        message: 'Cannot delete your own account',
-      });
+      return sendError(res, 'Cannot delete your own account', 400);
     }
 
     const user = await User.findByIdAndDelete(id);

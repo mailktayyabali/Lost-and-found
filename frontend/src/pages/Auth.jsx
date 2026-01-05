@@ -179,7 +179,7 @@ function Auth() {
             {fieldErrors.email ? (
               <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>
             ) : (
-              <p className="text-xs text-gray-400 mt-1">Tip: Use 'admin@findit.com' for Admin role</p>
+              import.meta.env.DEV && <p className="text-xs text-gray-400 mt-1">Tip: Use 'admin@findit.com' for Admin role</p>
             )}
           </div>
 

@@ -18,12 +18,7 @@ const createNotification = async (userId, type, title, message, data = {}) => {
   }
 };
 
-// Send push notification (future implementation)
-const sendPushNotification = async (userId, title, body, data = {}) => {
-  // TODO: Implement push notification service (FCM, OneSignal, etc.)
-  // console.log(`Push notification for user ${userId}: ${title} - ${body}`);
-  return true;
-};
+
 
 // Send email notification
 const sendEmailNotification = async (user, type, data) => {
@@ -45,7 +40,7 @@ const sendEmailNotification = async (user, type, data) => {
 
 module.exports = {
   createNotification,
-  sendPushNotification,
+
   sendEmailNotification,
 };
 

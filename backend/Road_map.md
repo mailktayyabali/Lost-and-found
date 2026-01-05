@@ -256,7 +256,7 @@ Implement text search, geolocation search (future)
 5.4 Notification Service
 File: backend/src/services/notificationService.js
 createNotification - Create in-app notification
-sendPushNotification - Send push notification (future)
+
 sendEmailNotification - Send email notification
 Phase 6: Routes
 6.1 Auth Routes
