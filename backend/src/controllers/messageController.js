@@ -146,17 +146,27 @@ const sendMessage = async (req, res, next) => {
     // Transform message
     const transformedMessage = transformMessage(message, req.user.email);
 
-    // Send via socket (emit to conversation room and receiver's user room)
+    // Send via socket (emit to conversation room and both users' personal rooms)
     try {
       const io = getIo();
       const convRoom = conversation._id.toString();
-      console.log(`Emitting message ${transformedMessage.id} to conversation room ${convRoom} and user_${receiverId}`);
+      console.log(`Emitting message ${transformedMessage.id} to conversation room ${convRoom}`);
+      
+      // Emit to conversation room (if either user has joined)
       io.to(convRoom).emit('receive_message', transformedMessage);
-      // Also emit directly to receiver's personal room in case they're not joined to convo yet
+      
+      // Emit to sender's personal room (so they see their own message immediately)
+      try {
+        io.to(`user_${senderId.toString()}`).emit('receive_message', transformedMessage);
+      } catch (innerErr) {
+        console.error('Emit to sender user room failed:', innerErr);
+      }
+      
+      // Emit to receiver's personal room (in case they're not joined to convo yet)
       try {
         io.to(`user_${receiverId.toString()}`).emit('receive_message', transformedMessage);
       } catch (innerErr) {
-        console.error('Emit to user room failed:', innerErr);
+        console.error('Emit to receiver user room failed:', innerErr);
       }
     } catch (err) {
       console.error('Socket emit failed:', err);

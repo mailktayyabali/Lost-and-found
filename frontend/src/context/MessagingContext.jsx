@@ -167,7 +167,15 @@ export const MessagingProvider = ({ children }) => {
 
       if (response.success) {
         const newMessage = response.data?.message || response.data;
-          console.log('MessagingContext: sendMessage API response newMessage', newMessage);
+        console.log('MessagingContext: sendMessage API response newMessage', newMessage);
+
+        // Join the conversation room immediately so we receive updates
+        const msgConversationId = newMessage.conversationId || conversationId;
+        if (socketRef.current && msgConversationId && currentConversationIdRef.current !== msgConversationId) {
+          socketRef.current.emit("join_conversation", msgConversationId);
+          currentConversationIdRef.current = msgConversationId;
+          console.log('MessagingContext: joined conversation room after sending', msgConversationId);
+        }
 
         // Manually update messages state to ensure it shows immediately
         // (Essential for new conversations where we aren't in the socket room yet)
@@ -181,6 +189,21 @@ export const MessagingProvider = ({ children }) => {
             timestamp: newMessage.createdAt || newMessage.timestamp || new Date().toISOString(),
           };
           return [...prev, transformedMsg];
+        });
+
+        // Update the conversation as well to include the new message
+        setConversations(prev => {
+          const convIndex = prev.findIndex(c => c.id === msgConversationId);
+          if (convIndex !== -1) {
+            const updated = [...prev];
+            updated[convIndex] = {
+              ...updated[convIndex],
+              lastMessage: newMessage,
+              updatedAt: newMessage.timestamp || new Date().toISOString()
+            };
+            return updated;
+          }
+          return prev;
         });
 
         // Also reload conversations list to update last message
@@ -210,8 +233,13 @@ export const MessagingProvider = ({ children }) => {
 
     try {
       const response = await messagesApi.getConversation(conversationId);
+      console.log('MessagingContext: getConversation response', response);
+      
       if (response.success) {
-        const fetchedMessages = response.data?.messages || response.data || [];
+        // Backend returns: response.data.conversation.messages
+        const fetchedMessages = response.data?.conversation?.messages || response.data?.messages || response.data || [];
+        console.log('MessagingContext: fetched messages count:', fetchedMessages.length);
+        
         const transformedMessages = fetchedMessages.map((msg) => ({
           ...msg,
           id: msg.id || msg._id,

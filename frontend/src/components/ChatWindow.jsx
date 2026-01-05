@@ -28,35 +28,21 @@ function ChatWindow({ itemId, otherUserId, itemTitle }) {
         found: !!existingConv,
         itemId,
         otherUserId,
-        convCount: conversations.length
+        convCount: conversations.length,
+        conversationId: existingConv?.id
       });
 
       if (existingConv) {
-        // Join room and load messages
-        // Don't re-fetch if we already have it active (optimization)
+        // Join room and load messages - Pass conversationId, not itemId/otherUserId
         if (getConversation) {
-          getConversation(existingConv.id);
+          getConversation(existingConv.id); // Use the actual conversation ID
         }
-        if (markAsRead) {
-          markAsRead(existingConv.latestMessage?.id);
+        if (markAsRead && existingConv.lastMessage?.id) {
+          markAsRead(existingConv.lastMessage.id);
         }
       } else {
-        // New conversation - Clear messages
-        // Only clear if we really don't have messages for this context?
-        // But setConversation(messages) handles the view.
-        // We set local conversation to empty only if messages is empty?
-        // No, keep logic - but logging will tell us if this path is taken.
-        console.log("ChatWindow: Conversation not found in list, clearing local view if currently empty.");
-        // setConversation([]); // relying on 'messages' sync effect is safer?
-        // If we setConversation([]) here, we override the 'setConversation(messages)' effect?
-        // Actually this useEffect runs when 'conversations' changes.
-        // The other useEffect runs when 'messages' changes.
-        // If 'conversations' changes -> setConversation([]) -> clears view.
-        // If 'messages' hasn't changed, the other effect won't run.
-        // So yes, this line clears the view.
-
-        // FIX: Don't clear if we have messages in context that seem correct?
-        // But context messages might be from previous nav.
+        // New conversation - Clear messages for now
+        console.log("ChatWindow: No existing conversation found yet");
         setConversation([]);
       }
     }
@@ -64,7 +50,8 @@ function ChatWindow({ itemId, otherUserId, itemTitle }) {
 
   // Sync local conversation with context messages
   useEffect(() => {
-    console.log("ChatWindow: messages updated", messages);
+    console.log("ChatWindow: messages updated from context", messages);
+    // Update local state with context messages (from getConversation)
     setConversation(messages);
   }, [messages]);
 
@@ -75,6 +62,14 @@ function ChatWindow({ itemId, otherUserId, itemTitle }) {
   useEffect(() => {
     scrollToBottom();
   }, [conversation, isTyping]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      // Don't call leaveConversation here - it clears messages which breaks refresh
+      // The context will handle room management via socket
+    };
+  }, []);
 
   // Typing indicators
   useEffect(() => {
@@ -138,24 +133,19 @@ function ChatWindow({ itemId, otherUserId, itemTitle }) {
     e.preventDefault();
     if (!messageText.trim() || !user) return;
 
-    const sentMsg = await sendMessage(itemId, otherUserId, messageText);
+    // Find the conversation ID from conversations list
+    const existingConv = conversations.find(c =>
+      (String(c.itemId) === String(itemId)) &&
+      (String(c.otherUserId) === String(otherUserId))
+    );
+
+    const sentMsg = await sendMessage(itemId, otherUserId, messageText, existingConv?.id);
     setMessageText("");
 
     console.log('ChatWindow: sendMessage returned', sentMsg);
-    if (sentMsg) {
-      console.log("ChatWindow: Message sent.", sentMsg);
-
-      if (sentMsg.conversationId) {
-        // Ensure we are joined to the room
-        if (getConversation) {
-          await getConversation(sentMsg.conversationId);
-        }
-      }
-
+    if (sentMsg && sentMsg.conversationId && socket) {
       // Stop typing
-      if (socket && sentMsg.conversationId) {
-        socket.emit("stop_typing", { conversationId: sentMsg.conversationId, userId: user.id });
-      }
+      socket.emit("stop_typing", { conversationId: sentMsg.conversationId, userId: user.id });
     }
   };
 
