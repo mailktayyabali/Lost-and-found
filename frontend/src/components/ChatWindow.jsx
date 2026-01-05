@@ -12,16 +12,6 @@ function ChatWindow({ itemId, otherUserId, itemTitle }) {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
-  const currentConversationIdRef = useRef(null);
-
-  useEffect(() => {
-    console.log("ChatWindow Mount/Update:", {
-      itemId,
-      otherUserId,
-      currentUserId: user?.id,
-      itemTitle
-    });
-  }, [itemId, otherUserId, user, itemTitle]);
 
   useEffect(() => {
     // Wait for conversations to load
@@ -42,19 +32,15 @@ function ChatWindow({ itemId, otherUserId, itemTitle }) {
       });
 
       if (existingConv) {
-        // Only load conversation if we're not already viewing it (prevent unnecessary reloads)
-        // But always reload if conversation ID changes to ensure we have latest messages
-        const conversationIdToLoad = existingConv.id || existingConv.conversationId;
-        if (getConversation && currentConversationIdRef.current !== conversationIdToLoad) {
-          currentConversationIdRef.current = conversationIdToLoad;
-          getConversation(conversationIdToLoad);
+        // Join room and load messages
+        // Don't re-fetch if we already have it active (optimization)
+        if (getConversation) {
+          getConversation(existingConv.id);
         }
-        if (markAsRead && existingConv.lastMessage?.id && existingConv.lastMessage.senderId !== user.id) {
-          markAsRead(existingConv.lastMessage.id);
+        if (markAsRead) {
+          markAsRead(existingConv.latestMessage?.id);
         }
       } else {
-        // Reset current conversation ID if conversation not found
-        currentConversationIdRef.current = null;
         // New conversation - Clear messages
         // Only clear if we really don't have messages for this context?
         // But setConversation(messages) handles the view.
@@ -160,12 +146,8 @@ function ChatWindow({ itemId, otherUserId, itemTitle }) {
       console.log("ChatWindow: Message sent.", sentMsg);
 
       if (sentMsg.conversationId) {
-        // Update current conversation ID and reload conversation to ensure all messages are displayed
-        currentConversationIdRef.current = sentMsg.conversationId;
+        // Ensure we are joined to the room
         if (getConversation) {
-          // Small delay to ensure message is saved to database before reloading
-          // Increased delay to ensure message is definitely in the database
-          await new Promise(resolve => setTimeout(resolve, 300));
           await getConversation(sentMsg.conversationId);
         }
       }
