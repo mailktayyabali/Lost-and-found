@@ -80,6 +80,7 @@ function Chat() {
             itemId={itemId}
             otherUserId={userId}
             itemTitle={post.title}
+            isItemResolved={post.isResolved}
           />
         </div>
       </div>

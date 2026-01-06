@@ -32,7 +32,11 @@ function ConversationList({ conversations }) {
           <Link
             key={`${conv.itemId}-${conv.otherUserId}`}
             to={`/chat/${conv.itemId}/${conv.otherUserId}`}
-            className="block p-4 bg-white rounded-xl border border-gray-100 hover:border-teal transition-colors"
+            className={`block p-4 rounded-xl border transition-colors ${
+              post?.isResolved
+                ? "bg-gray-50 border-gray-200"
+                : "bg-white border-gray-100 hover:border-teal"
+            }`}
           >
             <div className="flex items-start gap-3">
               <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
@@ -46,9 +50,16 @@ function ConversationList({ conversations }) {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
-                  <h4 className="font-semibold text-navy truncate">
-                    {post?.title || `Item #${conv.itemId}`}
-                  </h4>
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <h4 className="font-semibold text-navy truncate">
+                      {post?.title || `Item #${conv.itemId}`}
+                    </h4>
+                    {post?.isResolved && (
+                      <span className="bg-amber-100 text-amber-800 text-xs font-semibold px-2 py-0.5 rounded whitespace-nowrap">
+                        Claimed
+                      </span>
+                    )}
+                  </div>
                   {conv.unreadCount > 0 && (
                     <span className="bg-teal text-white text-xs font-bold px-2 py-0.5 rounded-full">
                       {conv.unreadCount}
@@ -56,14 +67,14 @@ function ConversationList({ conversations }) {
                   )}
                 </div>
                 <p className="text-sm text-slate truncate mb-1">
-                  {conv.lastMessage.content}
+                  {conv.lastMessage?.content || "No messages"}
                 </p>
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-slate">
                     {otherUserName}
                   </span>
                   <span className="text-xs text-slate">
-                    {formatTime(conv.lastMessage.timestamp)}
+                    {conv.lastMessage?.timestamp ? formatTime(conv.lastMessage.timestamp) : "N/A"}
                   </span>
                 </div>
               </div>

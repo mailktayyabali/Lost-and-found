@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import MessageBubble from "./MessageBubble";
 import { Send } from "lucide-react";
 
-function ChatWindow({ itemId, otherUserId, itemTitle }) {
+function ChatWindow({ itemId, otherUserId, itemTitle, isItemResolved }) {
   const { messages, conversations, loading, getConversation, sendMessage, markAsRead, leaveConversation, socket } = useMessaging();
   const { user } = useAuth();
   const [messageText, setMessageText] = useState("");
@@ -196,24 +196,33 @@ function ChatWindow({ itemId, otherUserId, itemTitle }) {
       </div>
 
       {/* Message Input */}
-      <form onSubmit={handleSend} className="bg-white border-t border-gray-200 p-4 rounded-b-xl">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={messageText}
-            onChange={onMessageChange}
-            placeholder="Type a message..."
-            className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal text-sm"
-          />
-          <button
-            type="submit"
-            disabled={!messageText.trim()}
-            className="px-4 py-2 bg-teal text-white rounded-lg hover:bg-teal-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Send size={18} />
-          </button>
+      {isItemResolved ? (
+        <div className="bg-amber-50 border-t border-amber-200 p-4 rounded-b-xl">
+          <div className="flex items-center gap-2 text-amber-800 text-sm">
+            <i className="fa-solid fa-circle-info"></i>
+            <span>This item has been claimed. Chat is no longer available.</span>
+          </div>
         </div>
-      </form>
+      ) : (
+        <form onSubmit={handleSend} className="bg-white border-t border-gray-200 p-4 rounded-b-xl">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={messageText}
+              onChange={onMessageChange}
+              placeholder="Type a message..."
+              className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal text-sm"
+            />
+            <button
+              type="submit"
+              disabled={!messageText.trim()}
+              className="px-4 py-2 bg-teal text-white rounded-lg hover:bg-teal-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Send size={18} />
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }
