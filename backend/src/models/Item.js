@@ -89,6 +89,10 @@ const itemSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    isBanned: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

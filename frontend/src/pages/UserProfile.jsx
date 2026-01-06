@@ -7,6 +7,9 @@ import ReviewForm from "../components/ReviewForm";
 import RatingDisplay from "../components/RatingDisplay";
 import FeedPostCard from "../components/FeedPostCard";
 import { useState, useEffect } from "react";
+import { Flag } from "lucide-react"; // Import Flag icon
+import { itemsApi } from "../services/itemsApi"; // Reuse itemsApi for reporting
+import { getErrorMessage } from "../utils/errorHandler";
 
 function UserProfile() {
   const { userId } = useParams();
@@ -20,6 +23,11 @@ function UserProfile() {
   const [stats, setStats] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Reporting State
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [reporting, setReporting] = useState(false);
 
   // Fetch all user data
   useEffect(() => {
@@ -56,7 +64,29 @@ function UserProfile() {
     setReviews(updatedReviews || []);
   };
 
+  const handleReportUser = async () => {
+    if (!reportReason.trim()) return;
+    setReporting(true);
+    try {
+      await itemsApi.reportItem({
+        targetUserId: userId,
+        reason: reportReason,
+        reporter: user.id
+      });
+      setIsReportModalOpen(false);
+      setReportReason("");
+      alert("Report submitted successfully.");
+    } catch (error) {
+      alert(getErrorMessage(error));
+    } finally {
+      setReporting(false);
+    }
+  };
+
+
   const canReview = user && user.email !== profile?.email && user.id !== profile?.id && !reviews.some((r) => r.reviewerId === user.email || r.reviewerId === user.id);
+  // Check if current user is viewing their own profile
+  const isOwnProfile = user && (user.id === userId || user._id === userId);
 
   if (loading) {
     return (
@@ -78,7 +108,18 @@ function UserProfile() {
     <div className="flex-1 p-4 md:p-6 lg:p-10 overflow-x-hidden">
       <div className="max-w-6xl mx-auto">
         {/* Profile Header */}
-        <div className="bg-white rounded-2xl p-8 mb-6 border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-2xl p-8 mb-6 border border-gray-100 shadow-sm relative">
+          {/* Report User Button */}
+          {!isOwnProfile && user && (
+            <button
+              onClick={() => setIsReportModalOpen(true)}
+              className="absolute top-8 right-8 text-slate-400 hover:text-red-500 transition-colors flex items-center gap-1 text-sm font-medium"
+              title="Report User"
+            >
+              <Flag size={16} /> Report
+            </button>
+          )}
+
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
             <div className="relative">
               <img
@@ -184,6 +225,40 @@ function UserProfile() {
           )}
         </div>
       </div>
+
+      {/* Report User Modal */}
+      {isReportModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-2xl animate-scale-in">
+            <h3 className="text-lg font-bold text-slate-800 mb-2">Report User</h3>
+            <p className="text-slate-500 text-sm mb-4">Why is this user being reported?</p>
+
+            <textarea
+              value={reportReason}
+              onChange={(e) => setReportReason(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg p-3 h-32 focus:ring-2 focus:ring-red-200 focus:outline-none mb-4 resize-none"
+              placeholder="Spam, harassment, inappropriate behavior..."
+            ></textarea>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setIsReportModalOpen(false)}
+                disabled={reporting}
+                className="px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReportUser}
+                disabled={reporting || !reportReason.trim()}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 shadow-md shadow-red-200 font-bold disabled:opacity-50"
+              >
+                {reporting ? "Submitting..." : "Submit Report"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

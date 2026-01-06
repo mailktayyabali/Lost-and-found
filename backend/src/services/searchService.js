@@ -11,6 +11,9 @@ const searchItems = async (filters = {}, pagination = {}) => {
       query.status = filters.status.toUpperCase();
     }
 
+    // Exclude banned items
+    query.isBanned = { $ne: true };
+
     // Category filter (case-insensitive)
     if (filters.category) {
       query.category = { $regex: `^${filters.category}$`, $options: 'i' };

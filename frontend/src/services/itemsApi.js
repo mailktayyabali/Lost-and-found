@@ -21,6 +21,12 @@ export const itemsApi = {
     return response;
   },
 
+  // Report an item
+  reportItem: async (data) => {
+    const response = await api.post('/flags', data);
+    return response;
+  },
+
   // Increment item views
   incrementViews: async (id) => {
     const response = await api.post(`/items/${id}/view`);

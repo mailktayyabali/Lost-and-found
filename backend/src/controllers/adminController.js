@@ -5,6 +5,7 @@ const Favorite = require('../models/Favorite');
 const Message = require('../models/Message');
 const Conversation = require('../models/Conversation');
 const SearchAlert = require('../models/SearchAlert');
+const Flag = require('../models/Flag');
 const { sendSuccess, sendError } = require('../utils/response');
 const { NotFoundError } = require('../utils/errors');
 const { getPaginationParams, getPaginationMeta } = require('../utils/pagination');
@@ -25,6 +26,7 @@ const getDashboardStats = async (req, res, next) => {
       totalConversations,
       totalMessages,
       activeAlerts,
+      pendingFlags,
     ] = await Promise.all([
       User.countDocuments(),
       Item.countDocuments(),
@@ -37,21 +39,44 @@ const getDashboardStats = async (req, res, next) => {
       Conversation.countDocuments(),
       Message.countDocuments(),
       SearchAlert.countDocuments({ active: true }),
+      Flag.countDocuments({ status: 'PENDING' }),
     ]);
 
-    // Get recent activity (last 7 days)
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    // Get recent activity (last 30 days) for charts
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const [
       newUsers,
       newItems,
-      newMessages,
     ] = await Promise.all([
-      User.countDocuments({ createdAt: { $gte: sevenDaysAgo } }),
-      Item.countDocuments({ createdAt: { $gte: sevenDaysAgo } }),
-      Message.countDocuments({ createdAt: { $gte: sevenDaysAgo } }),
+      User.countDocuments({ createdAt: { $gte: thirtyDaysAgo } }),
+      Item.countDocuments({ createdAt: { $gte: thirtyDaysAgo } }),
     ]);
+
+     // Aggregate daily signups for last 7 days
+     const dailySignups = await User.aggregate([
+      { $match: { createdAt: { $gte: thirtyDaysAgo } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+      const dailyItems = await Item.aggregate([
+      { $match: { createdAt: { $gte: thirtyDaysAgo } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
 
     const stats = {
       users: {
@@ -77,11 +102,17 @@ const getDashboardStats = async (req, res, next) => {
       },
       messages: {
         total: totalMessages,
-        new: newMessages,
       },
       alerts: {
         active: activeAlerts,
       },
+      flags: {
+        pending: pendingFlags,
+      },
+      chartData: {
+          dailySignups,
+          dailyItems
+      }
     };
 
     sendSuccess(res, 'Dashboard statistics retrieved successfully', { stats });
@@ -94,12 +125,18 @@ const getDashboardStats = async (req, res, next) => {
 const getAllUsers = async (req, res, next) => {
   try {
     const { page, limit, skip } = getPaginationParams(req.query);
-    const { role, search } = req.query;
+    const { role, search, status } = req.query;
 
     const query = {};
     if (role) {
       query.role = role;
     }
+    if (status === 'banned') {
+      query.isBanned = true;
+    } else if (status === 'active') {
+        query.isBanned = { $ne: true };
+    }
+
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },
@@ -123,6 +160,53 @@ const getAllUsers = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+// Ban user
+const banUser = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { reason } = req.body;
+  
+      if (id === req.user.id) {
+        return sendError(res, 'Cannot ban yourself', 400);
+      }
+  
+      const user = await User.findByIdAndUpdate(
+        id,
+        { isBanned: true, banReason: reason },
+        { new: true }
+      );
+  
+      if (!user) {
+        throw new NotFoundError('User');
+      }
+  
+      sendSuccess(res, 'User banned successfully', { user: transformUser(user) });
+    } catch (error) {
+      next(error);
+    }
+  };
+  
+// Unban user
+const unbanUser = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+
+        const user = await User.findByIdAndUpdate(
+        id,
+        { isBanned: false, banReason: null },
+        { new: true }
+        );
+
+        if (!user) {
+        throw new NotFoundError('User');
+        }
+
+        sendSuccess(res, 'User unbanned successfully', { user: transformUser(user) });
+    } catch (error) {
+        next(error);
+    }
 };
 
 // Get all items with filters
@@ -204,10 +288,12 @@ const deleteItem = async (req, res, next) => {
 const getActivityLog = async (req, res, next) => {
   try {
     const { page, limit, skip } = getPaginationParams(req.query);
-    const { type, days = 7 } = req.query;
+    const { type, days = 30 } = req.query; // Increase default to 30 days
 
     const dateFilter = new Date();
     dateFilter.setDate(dateFilter.getDate() - parseInt(days));
+    
+    console.log('ActivityLog: Fetching since', dateFilter.toISOString());
 
     let activities = [];
 
@@ -216,6 +302,7 @@ const getActivityLog = async (req, res, next) => {
         .populate('postedBy', 'name username')
         .sort({ createdAt: -1 })
         .limit(50);
+
       activities.push(
         ...items.map((item) => ({
           type: 'item_created',
@@ -228,9 +315,10 @@ const getActivityLog = async (req, res, next) => {
 
     if (!type || type === 'users') {
       const users = await User.find({ createdAt: { $gte: dateFilter } })
-        .select('name username email')
+        .select('name username email createdAt') // Added createdAt
         .sort({ createdAt: -1 })
         .limit(50);
+      
       activities.push(
         ...users.map((user) => ({
           type: 'user_registered',
@@ -255,6 +343,59 @@ const getActivityLog = async (req, res, next) => {
   }
 };
 
+// Get flags
+const getFlags = async (req, res, next) => {
+    try {
+        const { page, limit, skip } = getPaginationParams(req.query);
+        const { status } = req.query;
+
+        const query = {};
+        if (status) query.status = status.toUpperCase();
+
+        const flags = await Flag.find(query)
+            .populate('reporter', 'name email avatar')
+            .populate('targetItem', 'title description images')
+            .populate('targetUser', 'name email avatar')
+            .populate('resolvedBy', 'name')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const total = await Flag.countDocuments(query);
+
+        sendSuccess(res, 'Flags retrieved successfully', {
+            flags,
+            pagination: getPaginationMeta(page, limit, total),
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Resolve flag
+const updateFlagStatus = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { status, resolutionNote } = req.body;
+
+        const flag = await Flag.findByIdAndUpdate(
+            id,
+            { 
+                status: status, 
+                resolutionNote,
+                resolvedBy: req.user.id
+            },
+            { new: true }
+        );
+
+        if (!flag) throw new NotFoundError('Flag');
+
+        sendSuccess(res, 'Flag status updated', { flag });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
   getDashboardStats,
   getAllUsers,
@@ -262,5 +403,8 @@ module.exports = {
   deleteUser,
   deleteItem,
   getActivityLog,
+  banUser,
+  unbanUser,
+  getFlags,
+  updateFlagStatus
 };
-

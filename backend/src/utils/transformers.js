@@ -29,6 +29,7 @@ const transformUser = (user) => {
     phone: userObj.phone,
     location: userObj.location,
     bio: userObj.bio,
+    createdAt: userObj.createdAt, // Added createdAt
   };
 };
 

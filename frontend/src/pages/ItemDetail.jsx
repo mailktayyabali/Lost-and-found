@@ -13,6 +13,8 @@ import { itemsApi } from "../services/itemsApi";
 import { getErrorMessage } from "../utils/errorHandler";
 import { useAuth } from "../context/AuthContext";
 
+import { Flag } from "lucide-react";
+
 function ItemDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -20,6 +22,9 @@ function ItemDetail() {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [reporting, setReporting] = useState(false);
 
   useEffect(() => {
     const fetchItem = async () => {
@@ -94,15 +99,34 @@ function ItemDetail() {
   const postedBy = post?.postedBy;
   const posterId = typeof postedBy === 'object' ? postedBy?._id || postedBy?.id : postedBy;
 
-  console.log('ItemDetail Debug:', {
-    user,
-    currentUserId,
-    postedBy,
-    posterId,
-    matchString: String(posterId) === String(currentUserId)
-  });
+  //   console.log('ItemDetail Debug:', {
+  //     user,
+  //     currentUserId,
+  //     postedBy,
+  //     posterId,
+  //     matchString: String(posterId) === String(currentUserId)
+  //   });
 
   const isOwner = user && posterId && String(posterId) === String(currentUserId);
+
+  const handleReport = async () => {
+    if (!reportReason.trim()) return;
+    setReporting(true);
+    try {
+      await itemsApi.reportItem({
+        targetItemId: id,
+        reason: reportReason,
+        reporter: user.id
+      });
+      setIsReportModalOpen(false);
+      setReportReason("");
+      alert("Report submitted successfully. Thank you for helping keep our community safe.");
+    } catch (error) {
+      alert(getErrorMessage(error));
+    } finally {
+      setReporting(false);
+    }
+  };
 
   return (
     <main className="flex-1 w-full max-w-[1280px] mx-auto px-4 md:px-8 py-8 bg-[#f8f8f5] min-h-screen">
@@ -124,7 +148,18 @@ function ItemDetail() {
         {/* Right Column: Info & Actions */}
         <div className="lg:col-span-5 flex flex-col gap-6">
           {/* Header Card */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 relative">
+            {/* Report Button */}
+            {!isOwner && user && (
+              <button
+                onClick={() => setIsReportModalOpen(true)}
+                className="absolute top-6 right-6 text-slate-400 hover:text-red-500 transition-colors"
+                title="Report this item"
+              >
+                <Flag size={20} />
+              </button>
+            )}
+
             <ItemHeader
               status={post.status}
               title={post.title}
@@ -148,8 +183,38 @@ function ItemDetail() {
             {/* Action Buttons (Hide if owner) */}
             {!isOwner && <ItemActions status={post.status} itemId={post.id} postedBy={post.postedBy} />}
 
-            {/* Claim Management (Only for Owner) */}
-            {isOwner && <ClaimManagement itemId={post.id} />}
+            {/* Owner Actions */}
+            {isOwner && (
+              <div className="flex flex-col gap-3">
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => navigate(`/edit-item/${post.id}`)}
+                    className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-[#212121] font-semibold transition-colors hover:bg-gray-50 hover:border-gray-300"
+                  >
+                    <i className="fa-solid fa-pen-to-square text-gray-500"></i>
+                    Edit Item
+                  </button>
+                  <button
+                    onClick={async () => {
+                      if (window.confirm("Are you sure you want to delete this item? This action cannot be undone.")) {
+                        try {
+                          await itemsApi.deleteItem(post.id);
+                          alert("Item deleted successfully");
+                          navigate("/my-reports");
+                        } catch (e) {
+                          alert(getErrorMessage(e));
+                        }
+                      }
+                    }}
+                    className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-red-600 font-semibold transition-colors hover:bg-red-100 hover:border-red-200"
+                  >
+                    <i className="fa-solid fa-trash-can"></i>
+                    Delete
+                  </button>
+                </div>
+                <ClaimManagement itemId={post.id} />
+              </div>
+            )}
           </div>
 
           {/* Safety Notice */}
@@ -167,6 +232,40 @@ function ItemDetail() {
           />
         </div>
       </div>
+
+      {/* Report Modal */}
+      {isReportModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-2xl animate-scale-in">
+            <h3 className="text-lg font-bold text-slate-800 mb-2">Report Item</h3>
+            <p className="text-slate-500 text-sm mb-4">Why is this item inappropriate?</p>
+
+            <textarea
+              value={reportReason}
+              onChange={(e) => setReportReason(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg p-3 h-32 focus:ring-2 focus:ring-red-200 focus:outline-none mb-4 resize-none"
+              placeholder="Please describe the issue (spam, scam, offensive content, etc)..."
+            ></textarea>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setIsReportModalOpen(false)}
+                disabled={reporting}
+                className="px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReport}
+                disabled={reporting || !reportReason.trim()}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 shadow-md shadow-red-200 font-bold disabled:opacity-50"
+              >
+                {reporting ? "Submitting..." : "Submit Report"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

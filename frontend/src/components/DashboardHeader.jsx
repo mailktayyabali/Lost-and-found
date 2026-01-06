@@ -20,7 +20,7 @@ export default function DashboardHeader() {
   const alertUnreadCount = getAlertUnreadCount();
 
   const handleReportClick = () => {
-    navigate("/report?type=lost"); 
+    navigate("/report?type=lost");
   };
 
   const handleLogout = () => {
@@ -54,8 +54,8 @@ export default function DashboardHeader() {
       {/* Top Bar with User Menu */}
       <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-200">
         <div className="flex items-center gap-3">
-          <img 
-            src="/assets/images/icon.jpg" 
+          <img
+            src="/assets/images/icon.jpg"
             className="w-10 h-10 rounded-lg shadow-md"
             alt="Logo"
           />
@@ -87,7 +87,7 @@ export default function DashboardHeader() {
                 <p className="text-sm font-semibold text-gray-800">{user?.name || 'User'}</p>
                 <p className="text-xs text-gray-500">{user?.email || ''}</p>
               </div>
-              
+
               <div className="py-1">
                 <button
                   onClick={() => {
@@ -142,14 +142,16 @@ export default function DashboardHeader() {
             <Search size={18} />
             Browse Items
           </button>
-          <button
-            onClick={handleReportClick}
-            className="px-6 py-2 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl
-                       bg-teal hover:bg-teal-dark transition-all duration-200 flex items-center justify-center gap-2"
-          >
-            <Plus size={18} />
-            Report Item
-          </button>
+          {user?.role !== 'admin' && (
+            <button
+              onClick={handleReportClick}
+              className="px-6 py-2 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl
+                        bg-teal hover:bg-teal-dark transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              <Plus size={18} />
+              Report Item
+            </button>
+          )}
         </div>
       </div>
 

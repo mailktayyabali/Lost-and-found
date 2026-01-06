@@ -7,6 +7,10 @@ const {
   deleteUser,
   deleteItem,
   getActivityLog,
+  banUser,
+  unbanUser,
+  getFlags,
+  updateFlagStatus
 } = require('../controllers/adminController');
 const { authenticate, authorize } = require('../middleware/auth');
 const { apiLimiter } = require('../middleware/rateLimiter');
@@ -20,8 +24,13 @@ router.get('/stats', apiLimiter, getDashboardStats);
 router.get('/users', apiLimiter, getAllUsers);
 router.get('/items', apiLimiter, getAllItems);
 router.delete('/users/:id', apiLimiter, validateMongoId, deleteUser);
+router.patch('/users/:id/ban', apiLimiter, validateMongoId, banUser);
+router.patch('/users/:id/unban', apiLimiter, validateMongoId, unbanUser);
 router.delete('/items/:id', apiLimiter, validateMongoId, deleteItem);
 router.get('/activity', apiLimiter, getActivityLog);
 
-module.exports = router;
+// Flag routes
+router.get('/flags', apiLimiter, getFlags);
+router.patch('/flags/:id', apiLimiter, validateMongoId, updateFlagStatus);
 
+module.exports = router;
