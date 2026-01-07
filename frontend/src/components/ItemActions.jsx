@@ -97,12 +97,7 @@ function ItemActions({ status, itemId, postedBy }) {
           <span className="material-symbols-outlined text-gray-500">chat</span>
           Message
         </button>
-        <button
-          className="flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-3 text-[#212121] transition-colors hover:bg-gray-50 hover:border-gray-300"
-          title="More Options"
-        >
-          <span className="material-symbols-outlined text-gray-500">more_horiz</span>
-        </button>
+
       </div>
 
       {showClaimModal && (

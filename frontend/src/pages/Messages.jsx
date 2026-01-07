@@ -2,6 +2,7 @@ import { useMessaging } from "../context/MessagingContext";
 import { useAuth } from "../context/AuthContext";
 import ConversationList from "../components/ConversationList";
 import { Link } from "react-router-dom";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 function Messages() {
   const { conversations, getUnreadCount } = useMessaging();
@@ -49,7 +50,9 @@ function Messages() {
 
         {/* Conversations List */}
         <div className="bg-gray-50 rounded-2xl p-6">
-          <ConversationList conversations={conversations} />
+          <ErrorBoundary>
+            <ConversationList conversations={conversations} />
+          </ErrorBoundary>
         </div>
       </div>
     </div>

@@ -161,7 +161,7 @@ function Auth() {
                   required
                   value={formData.fullName}
                   onChange={handleChange}
-                  className={`input-minimal w-full pl-10 pr-3 py-2.5 text-sm ${fieldErrors.name ? "border-red-500" : ""
+                  className={`input-minimal w-full !pl-11 pr-3 py-2.5 text-sm ${fieldErrors.name ? "border-red-500" : ""
                     }`}
                 />
               </div>
@@ -185,14 +185,12 @@ function Auth() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className={`input-minimal w-full pl-10 pr-3 py-2.5 text-sm ${fieldErrors.email ? "border-red-500" : ""
+                className={`input-minimal w-full !pl-11 pr-3 py-2.5 text-sm ${fieldErrors.email ? "border-red-500" : ""
                   }`}
               />
             </div>
-            {fieldErrors.email ? (
+            {fieldErrors.email && (
               <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>
-            ) : (
-              import.meta.env.DEV && <p className="text-xs text-gray-400 mt-1">Tip: Use 'admin@findit.com' for Admin role</p>
             )}
           </div>
 
@@ -215,7 +213,7 @@ function Auth() {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className={`input-minimal w-full pl-10 pr-10 py-2.5 text-sm ${fieldErrors.password ? "border-red-500" : ""
+                className={`input-minimal w-full !pl-11 pr-10 py-2.5 text-sm ${fieldErrors.password ? "border-red-500" : ""
                   }`}
               />
               <i
@@ -244,7 +242,7 @@ function Auth() {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="input-minimal w-full pl-10 pr-10 py-2.5 text-sm"
+                  className="input-minimal w-full !pl-11 pr-10 py-2.5 text-sm"
                 />
                 <i
                   className={`fa-solid absolute right-3 cursor-pointer text-gray-400 hover:text-navy ${showConfirmPassword ? "fa-eye-slash" : "fa-eye"

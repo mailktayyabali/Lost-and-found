@@ -149,22 +149,22 @@ function ItemDetail() {
         <div className="lg:col-span-5 flex flex-col gap-6">
           {/* Header Card */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 relative">
-            {/* Report Button */}
-            {!isOwner && user && (
-              <button
-                onClick={() => setIsReportModalOpen(true)}
-                className="absolute top-6 right-6 text-slate-400 hover:text-red-500 transition-colors"
-                title="Report this item"
-              >
-                <Flag size={20} />
-              </button>
-            )}
-
             <ItemHeader
               status={post.status}
               title={post.title}
               itemId={post.id}
               postedTime="2 hours ago"
+              actionButtons={
+                !isOwner && user && (
+                  <button
+                    onClick={() => setIsReportModalOpen(true)}
+                    className="text-slate-400 hover:text-red-500 transition-colors p-2"
+                    title="Report this item"
+                  >
+                    <Flag size={20} />
+                  </button>
+                )
+              }
             />
             <p className="text-gray-500 text-sm mb-6">
               Item ID: #{post.id} • Posted {post.date}

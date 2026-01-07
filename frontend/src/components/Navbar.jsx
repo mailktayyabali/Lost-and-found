@@ -9,7 +9,7 @@ function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { user, logout } = useAuth();
-  const { getUnreadCount: getMessageUnreadCount } = useMessaging();
+  const { getUnreadCount: getMessageUnreadCount, isConnected } = useMessaging();
   const { getUnreadCount: getAlertUnreadCount } = useSearchAlerts();
   const navigate = useNavigate();
   const profileRef = useRef(null);
@@ -52,9 +52,9 @@ function Navbar() {
                 alt="FindIt logo"
                 className="w-12 h-12 rounded-xl object-cover shadow-lg ring-2 ring-teal/20 transition-transform group-hover:scale-105 group-hover:ring-teal/50"
               />
-              <span className="absolute -bottom-1 -right-1 flex h-4 w-4">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-4 w-4 bg-teal"></span>
+              <span className="absolute -bottom-1 -right-1 flex h-4 w-4" title={isConnected ? "Connected to Chat" : "Disconnected"}>
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isConnected ? "bg-teal" : "bg-red-500"} opacity-75`}></span>
+                <span className={`relative inline-flex rounded-full h-4 w-4 ${isConnected ? "bg-teal" : "bg-red-500"}`}></span>
               </span>
             </div>
             <div className="flex flex-col">

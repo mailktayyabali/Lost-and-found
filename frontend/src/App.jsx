@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { FavoritesProvider } from "./context/FavoritesContext";
 import { UserProfileProvider } from "./context/UserProfileContext";
@@ -30,7 +30,8 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminItems from "./pages/admin/AdminItems";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
-import { Navigate } from "react-router-dom";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 
 function App() {
   return (
@@ -44,6 +45,8 @@ function App() {
                 <Route element={<MainLayout />}>
                   <Route path="/" element={<Home />} />
                   <Route path="/about" element={<About />} />
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/privacy" element={<Privacy />} />
                   <Route path="/feed" element={<Feed />} />
                   <Route path="/lost-items" element={<Feed type="lost" />} />
                   <Route path="/found-items" element={<Feed type="found" />} />
@@ -62,7 +65,7 @@ function App() {
                   <Route path="/my-reports" element={<MyReports />} />
                   <Route path="/search-alerts" element={<SearchAlerts />} />
                   <Route path="/favorites" element={<Favorites />} />
-                  <Route path="/chat" element={<Messages />} />
+                  <Route path="/messages" element={<Messages />} />
                   <Route path="/chat/:itemId/:userId" element={<Chat />} />
                   <Route path="/edit-item/:id" element={<ReportItem isEditMode={true} />} />
                 </Route>

@@ -13,6 +13,7 @@ export const MessagingProvider = ({ children }) => {
   const [conversations, setConversations] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
   const socketRef = useRef(null);
   const currentConversationIdRef = useRef(null);
 
@@ -45,10 +46,10 @@ export const MessagingProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user?.id]);
 
   const loadUnreadCount = useCallback(async () => {
-    if (!user) return;
+    if (!user?.id) return;
 
     try {
       const response = await messagesApi.getUnreadCount();
@@ -58,7 +59,7 @@ export const MessagingProvider = ({ children }) => {
     } catch (error) {
       console.error("Failed to load unread count:", error);
     }
-  }, [user]);
+  }, [user?.id]);
 
   const sendMessage = useCallback(async (itemId, receiverId, content, conversationId = null) => {
     if (!user) return null;
@@ -126,16 +127,22 @@ export const MessagingProvider = ({ children }) => {
   }, [user, loadConversations]);
 
   const getConversation = useCallback(async (conversationId) => {
-    if (!user) return [];
+    if (!user?.id) return [];
 
-    // Socket: Join Room
+    // Track previous conversation ID to handle room switching
+    const prevConversationId = currentConversationIdRef.current;
+
+    // Always update the ref so that if socket connects LATER, it knows what room to join
+    currentConversationIdRef.current = conversationId;
+
+    // Socket: Join Room (if socket is already connected)
     if (socketRef.current) {
-      if (currentConversationIdRef.current && currentConversationIdRef.current !== conversationId) {
-        socketRef.current.emit("leave_conversation", currentConversationIdRef.current);
+      if (prevConversationId && prevConversationId !== conversationId) {
+        socketRef.current.emit("leave_conversation", prevConversationId);
       }
       socketRef.current.emit("join_conversation", conversationId);
-      currentConversationIdRef.current = conversationId;
     }
+
 
     try {
       const response = await messagesApi.getConversation(conversationId);
@@ -161,7 +168,7 @@ export const MessagingProvider = ({ children }) => {
       console.error("Failed to load conversation:", error);
       return [];
     }
-  }, [user]);
+  }, [user?.id]);
 
   const leaveConversation = useCallback(() => {
     if (socketRef.current && currentConversationIdRef.current) {
@@ -172,7 +179,7 @@ export const MessagingProvider = ({ children }) => {
   }, []);
 
   const markAsRead = useCallback(async (messageId) => {
-    if (!user) return;
+    if (!user?.id) return;
 
     try {
       const response = await messagesApi.markAsRead(messageId);
@@ -187,7 +194,7 @@ export const MessagingProvider = ({ children }) => {
     } catch (error) {
       console.error("Failed to mark as read:", error);
     }
-  }, [user, loadUnreadCount]);
+  }, [user?.id, loadUnreadCount]);
 
   const getUnreadCount = useCallback(() => {
     return unreadCount;
@@ -197,48 +204,7 @@ export const MessagingProvider = ({ children }) => {
   // 2. Define Socket Handler (Non-hook)
   // ----------------------------------------------------------------------
 
-  const handleReceiveMessage = (newMessage) => {
-    // 1. Update messages list if viewing this conversation
-    if (currentConversationIdRef.current === newMessage.conversationId) {
-      setMessages((prev) => {
-        if (prev.some(m => m.id === newMessage.id)) return prev;
 
-        const transformedMsg = {
-          ...newMessage,
-          senderId: newMessage.senderId || newMessage.sender?._id || newMessage.sender?.id,
-          receiverId: newMessage.receiverId || newMessage.receiver?._id || newMessage.receiver?.id,
-          timestamp: newMessage.createdAt || newMessage.timestamp,
-        };
-        return [...prev, transformedMsg];
-      });
-    } else {
-      // Increment unread count if not viewing
-      if (newMessage.receiverId === user?.email) {
-        setUnreadCount((prev) => prev + 1);
-      }
-    }
-
-    // 2. Update conversations list (last message)
-    setConversations((prev) => {
-      const existingConvIndex = prev.findIndex(c => c.id === newMessage.conversationId);
-      if (existingConvIndex !== -1) {
-        const updatedConv = {
-          ...prev[existingConvIndex],
-          lastMessage: newMessage,
-          updatedAt: newMessage.createdAt
-        };
-        const newConvs = [...prev];
-        newConvs[existingConvIndex] = updatedConv;
-        // Move to top
-        newConvs.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-        return newConvs;
-      } else {
-        // If new conversation, we need to reload to get full details
-        loadConversations();
-        return prev;
-      }
-    });
-  };
 
   // ----------------------------------------------------------------------
   // 3. Effects
@@ -246,28 +212,95 @@ export const MessagingProvider = ({ children }) => {
 
   // Initialize socket connection
   useEffect(() => {
-    if (user && !socketRef.current) {
-      socketRef.current = io(import.meta.env.VITE_API_URL || "http://localhost:5000");
+    if (user?.id && !socketRef.current) {
+      // Clean up the URL to ensure we connect to the root, not /api namespace
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const socketUrl = apiUrl.replace(/\/api\/?$/, "");
+
+      console.log("DEBUG: Connecting to socket at:", socketUrl);
+      socketRef.current = io(socketUrl);
 
       socketRef.current.on("connect", () => {
-        console.log("Connected to socket server");
+        console.log("DEBUG: Socket Connected!", socketRef.current.id);
+        setIsConnected(true);
         if (user && socketRef.current) {
           try {
             socketRef.current.emit('register', user.id || user._id);
-            console.log('Socket registered for user', user.id || user._id);
+            console.log('DEBUG: Socket registered for user', user.id || user._id);
+
+            // Fix: Re-join conversation room if we are already viewing one
+            if (currentConversationIdRef.current) {
+              socketRef.current.emit("join_conversation", currentConversationIdRef.current);
+              console.log('DEBUG: Socket re-joined conversation room', currentConversationIdRef.current);
+            }
           } catch (err) {
             console.error('Socket register failed', err);
           }
         }
       });
 
+      socketRef.current.on("connect_error", (err) => {
+        console.error("DEBUG: Socket Connection Error", err);
+      });
+
+      const handleReceiveMessage = (newMessage) => {
+        console.log("DEBUG: handleReceiveMessage called", {
+          msgId: newMessage.id,
+          msgConvId: newMessage.conversationId,
+          currentRefConvId: currentConversationIdRef.current,
+          match: currentConversationIdRef.current === newMessage.conversationId
+        });
+
+        // 1. Update messages list if viewing this conversation
+        if (currentConversationIdRef.current === newMessage.conversationId) {
+          setMessages((prev) => {
+            if (prev.some(m => m.id === newMessage.id)) return prev;
+
+            const transformedMsg = {
+              ...newMessage,
+              senderId: newMessage.senderId || newMessage.sender?._id || newMessage.sender?.id,
+              receiverId: newMessage.receiverId || newMessage.receiver?._id || newMessage.receiver?.id,
+              timestamp: newMessage.createdAt || newMessage.timestamp,
+            };
+            return [...prev, transformedMsg];
+          });
+        } else {
+          // Increment unread count if not viewing
+          if (newMessage.receiverId === user?.email) {
+            setUnreadCount((prev) => prev + 1);
+          }
+        }
+
+        // 2. Update conversations list (last message)
+        setConversations((prev) => {
+          const existingConvIndex = prev.findIndex(c => c.id === newMessage.conversationId);
+          if (existingConvIndex !== -1) {
+            const updatedConv = {
+              ...prev[existingConvIndex],
+              lastMessage: newMessage,
+              updatedAt: newMessage.createdAt
+            };
+            const newConvs = [...prev];
+            newConvs[existingConvIndex] = updatedConv;
+            // Move to top
+            newConvs.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+            return newConvs;
+          } else {
+            // If new conversation, we need to reload to get full details
+            loadConversations();
+            return prev;
+          }
+        });
+      };
+
       socketRef.current.on("receive_message", (newMessage) => {
-        console.log('MessagingContext: socket receive_message', newMessage);
+        console.log('DEBUG: MessagingContext: socket receive_message', newMessage);
         handleReceiveMessage(newMessage);
       });
 
       socketRef.current.on("disconnect", () => {
         console.log("Disconnected from socket server");
+        setIsConnected(false);
       });
     }
 
@@ -277,11 +310,11 @@ export const MessagingProvider = ({ children }) => {
         socketRef.current = null;
       }
     };
-  }, [user]); // Effectively re-subscribes when user changes
+  }, [user?.id]); // Effectively re-subscribes when user changes
 
   // Load Initial Data
   useEffect(() => {
-    if (user) {
+    if (user?.id) {
       loadConversations();
       loadUnreadCount();
     } else {
@@ -289,7 +322,7 @@ export const MessagingProvider = ({ children }) => {
       setMessages([]);
       setUnreadCount(0);
     }
-  }, [user, loadConversations, loadUnreadCount]);
+  }, [user?.id, loadConversations, loadUnreadCount]);
 
   return (
     <MessagingContext.Provider
@@ -301,12 +334,11 @@ export const MessagingProvider = ({ children }) => {
         leaveConversation,
         markAsRead,
         getUnreadCount,
-        loadConversations,
-        loading,
-        socket: socketRef.current
+        socket: socketRef.current,
+        isConnected
       }}
     >
       {children}
-    </MessagingContext.Provider>
+    </MessagingContext.Provider >
   );
 };

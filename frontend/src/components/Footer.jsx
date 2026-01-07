@@ -101,14 +101,6 @@ function Footer() {
                   FAQ
                 </a>
               </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-white/60 hover:text-teal transition-colors text-sm"
-                >
-                  Help Center
-                </a>
-              </li>
             </ul>
           </div>
 
@@ -193,15 +185,12 @@ function Footer() {
             <p>© 2025 FindIt Inc. All rights reserved.</p>
           </div>
           <div className="flex flex-wrap justify-center gap-6 text-sm text-white/50">
-            <a href="#" className="hover:text-teal transition-colors">
+            <Link to="/privacy" className="hover:text-teal transition-colors">
               Privacy Policy
-            </a>
-            <a href="#" className="hover:text-teal transition-colors">
+            </Link>
+            <Link to="/terms" className="hover:text-teal transition-colors">
               Terms of Service
-            </a>
-            <a href="#" className="hover:text-teal transition-colors">
-              Cookie Settings
-            </a>
+            </Link>
           </div>
         </div>
       </div>

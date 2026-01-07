@@ -37,8 +37,10 @@ function ChatWindow({ itemId, otherUserId, itemTitle, isItemResolved }) {
         if (getConversation) {
           getConversation(existingConv.id); // Use the actual conversation ID
         }
-        if (markAsRead && existingConv.lastMessage?.id) {
-          markAsRead(existingConv.lastMessage.id);
+
+        const lastMsg = existingConv.lastMessage;
+        if (markAsRead && lastMsg?.id && !lastMsg.read && lastMsg.receiverId === user?.id) {
+          markAsRead(lastMsg.id);
         }
       } else {
         // New conversation - Clear messages for now

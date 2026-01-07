@@ -26,17 +26,17 @@ function ConversationList({ conversations }) {
     <div className="space-y-2">
       {conversations.map((conv) => {
         const post = conv.item;
-        const otherUserName = conv.otherUserId.includes("@") ? conv.otherUserId.split("@")[0] : conv.otherUserId;
+        const otherUserId = conv.otherUserId || "Unknown User";
+        const otherUserName = otherUserId.toString().includes("@") ? otherUserId.split("@")[0] : otherUserId;
 
         return (
           <Link
             key={`${conv.itemId}-${conv.otherUserId}`}
             to={`/chat/${conv.itemId}/${conv.otherUserId}`}
-            className={`block p-4 rounded-xl border transition-colors ${
-              post?.isResolved
+            className={`block p-4 rounded-xl border transition-colors ${post?.isResolved
                 ? "bg-gray-50 border-gray-200"
                 : "bg-white border-gray-100 hover:border-teal"
-            }`}
+              }`}
           >
             <div className="flex items-start gap-3">
               <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
