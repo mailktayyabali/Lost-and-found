@@ -42,15 +42,7 @@ export default function AdminLayout() {
             >
                 <div className="flex flex-col h-full">
                     {/* Logo Area */}
-                    <div className="p-6 border-b border-white/10 flex items-center gap-3">
-                        <div className="bg-gradient-to-tr from-teal to-blue-500 p-2 rounded-lg">
-                            <Shield size={24} className="text-white" />
-                        </div>
-                        <div>
-                            <h1 className="text-xl font-bold tracking-tight">Admin Portal</h1>
-                            <p className="text-xs text-slate-400 uppercase tracking-widest">Moderation</p>
-                        </div>
-                    </div>
+
 
                     {/* User Info */}
                     <div className="p-6 border-b border-white/5 bg-slate-800/50">
@@ -113,15 +105,7 @@ export default function AdminLayout() {
                             onClick={() => setIsSidebarOpen(false)}
                         />
 
-                        <p className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6">System</p>
 
-                        <NavLink
-                            to="/admin/settings"
-                            icon={<Settings size={20} />}
-                            label="Settings"
-                            active={location.pathname === "/admin/settings"}
-                            onClick={() => setIsSidebarOpen(false)}
-                        />
                     </nav>
 
                     {/* Footer */}
@@ -179,8 +163,8 @@ function NavLink({ to, icon, label, active, onClick }) {
             to={to}
             onClick={onClick}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${active
-                    ? "bg-teal text-white shadow-lg shadow-teal/20 font-medium"
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                ? "bg-teal text-white shadow-lg shadow-teal/20 font-medium"
+                : "text-slate-400 hover:text-white hover:bg-white/5"
                 }`}
         >
             <span className={active ? "" : "opacity-70"}>{icon}</span>

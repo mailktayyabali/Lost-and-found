@@ -30,6 +30,8 @@ const transformUser = (user) => {
     location: userObj.location,
     bio: userObj.bio,
     createdAt: userObj.createdAt, // Added createdAt
+    isBanned: userObj.isBanned || false,
+    banReason: userObj.banReason || '',
   };
 };
 

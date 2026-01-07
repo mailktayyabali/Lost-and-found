@@ -47,6 +47,38 @@ api.interceptors.response.use(
           window.location.href = '/auth';
         }
       }
+
+      // Handle 403 Forbidden - User Banned
+      if (status === 403) {
+        // Check if it's a ban error
+        const isBanned = data?.message?.toLowerCase().includes('banned');
+        
+        if (isBanned) {
+          localStorage.removeItem('findit_token');
+          localStorage.removeItem('findit_user');
+          
+          // Use SweetAlert2 if available
+          import('sweetalert2').then((Swal) => {
+            Swal.default.fire({
+              icon: 'error',
+              title: 'Account Banned',
+              text: data.message || 'Your account has been restricted.',
+              confirmButtonColor: '#d33',
+              confirmButtonText: 'I Understand',
+              allowOutsideClick: false
+            }).then(() => {
+              window.location.href = '/auth';
+            });
+          }).catch(() => {
+             // Fallback
+             alert(data.message || 'Your account has been banned.');
+             window.location.href = '/auth';
+          });
+          
+          // Return pending promise to prevent other catch blocks from firing immediately
+          return new Promise(() => {}); 
+        }
+      }
       
       // Return error in consistent format
       return Promise.reject({

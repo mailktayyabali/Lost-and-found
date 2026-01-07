@@ -81,7 +81,20 @@ function Auth() {
       } else {
         console.error("Auth: Failed", result);
         // Handle errors
-        setError(result.error || "An error occurred");
+        const errorMessage = result.error || "An error occurred";
+        setError(errorMessage);
+
+        // Check for ban error
+        if (errorMessage.toLowerCase().includes('banned')) {
+          import('sweetalert2').then((Swal) => {
+            Swal.default.fire({
+              icon: 'error',
+              title: 'Access Denied',
+              text: errorMessage,
+              confirmButtonColor: '#d33'
+            });
+          });
+        }
 
         // Handle field-specific validation errors
         if (result.errors && Array.isArray(result.errors)) {

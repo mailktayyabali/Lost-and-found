@@ -49,7 +49,7 @@ export default function AdminTable({ columns, data, actions, pagination, onPageC
             {pagination && (
                 <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
                     <p className="text-sm text-slate-500">
-                        Page {pagination.page} of {pagination.pages} ({pagination.total} total)
+                        Page {pagination.page} of {pagination.totalPages || Math.ceil(pagination.total / pagination.limit)} ({pagination.total} items)
                     </p>
                     <div className="flex gap-2">
                         <button
@@ -60,7 +60,7 @@ export default function AdminTable({ columns, data, actions, pagination, onPageC
                             Previous
                         </button>
                         <button
-                            disabled={pagination.page === pagination.pages}
+                            disabled={pagination.page >= (pagination.totalPages || Math.ceil(pagination.total / pagination.limit))}
                             onClick={() => onPageChange(pagination.page + 1)}
                             className="px-3 py-1 text-sm border border-gray-200 rounded hover:bg-slate-50 disabled:opacity-50"
                         >

@@ -1,6 +1,6 @@
 const User = require('../models/User');
 const { sendSuccess, sendError } = require('../utils/response');
-const { AppError, UnauthorizedError, ValidationError } = require('../utils/errors');
+const { AppError, UnauthorizedError, ValidationError, ForbiddenError } = require('../utils/errors');
 const { sendWelcomeEmail } = require('../services/emailService');
 const { transformUser } = require('../utils/transformers');
 const { OAuth2Client } = require('google-auth-library');
@@ -22,6 +22,11 @@ const googleLogin = async (req, res, next) => {
     let user = await User.findOne({ email: email.toLowerCase() });
 
     if (user) {
+      // Check if user is banned
+      if (user.isBanned) {
+        throw new ForbiddenError(`Your account has been banned. Reason: ${user.banReason || 'Violation of terms'}`);
+      }
+
       // User exists - check if googleId is set
       if (!user.googleId) {
         user.googleId = googleId;
@@ -109,6 +114,11 @@ const login = async (req, res, next) => {
     if (!user) {
       console.log("AuthController: login failed - user not found", email);
       throw new UnauthorizedError('Invalid credentials');
+    }
+
+    // Check if user is banned
+    if (user.isBanned) {
+      throw new ForbiddenError(`Your account has been banned. Reason: ${user.banReason || 'Violation of terms'}`);
     }
 
     // Check password

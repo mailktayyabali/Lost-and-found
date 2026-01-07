@@ -27,6 +27,11 @@ const authenticate = async (req, res, next) => {
         throw new UnauthorizedError('User not found');
       }
 
+      // Check if user is banned
+      if (req.user.isBanned) {
+        throw new ForbiddenError(`Your account has been banned. Reason: ${req.user.banReason || 'Violation of terms'}`);
+      }
+
       next();
     } catch (err) {
       throw new UnauthorizedError('Invalid or expired token');

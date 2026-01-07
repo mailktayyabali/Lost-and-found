@@ -73,7 +73,7 @@ function App() {
                   <Route path="/admin/dashboard" element={<AdminOverview />} />
                   <Route path="/admin/users" element={<AdminUsers />} />
                   <Route path="/admin/items" element={<AdminItems />} />
-                  <Route path="/admin/items" element={<AdminItems />} />
+
                   <Route path="/admin/reports" element={<AdminReports />} />
                   <Route path="/admin/analytics" element={<AdminAnalytics />} />
                 </Route>
