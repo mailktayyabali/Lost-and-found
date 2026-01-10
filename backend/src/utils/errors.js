@@ -35,6 +35,12 @@ class ForbiddenError extends AppError {
   }
 }
 
+class BadRequestError extends AppError {
+  constructor(message = 'Bad Request') {
+    super(message, 400);
+  }
+}
+
 // Error response formatter
 const formatErrorResponse = (err, req) => {
   const error = { ...err };
@@ -86,6 +92,7 @@ module.exports = {
   NotFoundError,
   UnauthorizedError,
   ForbiddenError,
+  BadRequestError,
   formatErrorResponse,
 };
 

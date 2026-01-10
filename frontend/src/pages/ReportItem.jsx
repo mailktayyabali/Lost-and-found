@@ -50,6 +50,12 @@ export default function ReportItem({ isEditMode = false }) {
               return;
             }
 
+            // Check if item is resolved
+            if (item.isResolved) {
+              setError("This item has been marked as resolved/claimed and cannot be edited.");
+              return;
+            }
+
             // Populate form
             setType(item.status?.toLowerCase() || 'lost');
 
@@ -93,9 +99,22 @@ export default function ReportItem({ isEditMode = false }) {
   }, [isEditMode, params.id, user]);
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    // Validation logic for strict inputs
+    if (name === "contactPhone") {
+      // Only allow numbers
+      if (!/^\d*$/.test(value)) return;
+    }
+
+    if (["itemName", "color", "contactName"].includes(name)) {
+      // Only allow characters (letters and spaces)
+      if (!/^[a-zA-Z\s]*$/.test(value)) return;
+    }
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
     if (error) setError("");
   };
@@ -122,6 +141,13 @@ export default function ReportItem({ isEditMode = false }) {
     if (!user) {
       setError("Please sign in to report an item");
       navigate("/auth");
+      return;
+    }
+
+    // Validate Images
+    if (selectedFiles.length === 0 && (!isEditMode || existingImages.length === 0)) {
+      setError("Please upload at least one image");
+      setLoading(false); // Make sure to stop loading if it was set (though it's set after this block usually, but good practice if moved)
       return;
     }
 
@@ -285,7 +311,7 @@ export default function ReportItem({ isEditMode = false }) {
           {/* Upload Photos */}
           <div>
             <label className="block mb-2 font-medium text-navy text-sm">
-              Upload Photos (Optional)
+              Upload Photos <span className="text-red-500">*</span>
             </label>
             <input
               type="file"
@@ -411,7 +437,7 @@ export default function ReportItem({ isEditMode = false }) {
           {/* Phone Number */}
           <div className="mb-5">
             <label className="block mb-2 font-medium text-navy text-sm">
-              Phone Number <span className="text-gray-400 text-sm">(optional)</span>
+              Phone Number
             </label>
             <input
               type="text"
@@ -419,6 +445,7 @@ export default function ReportItem({ isEditMode = false }) {
               placeholder="e.g., +1 234 567 890"
               value={formData.contactPhone}
               onChange={handleChange}
+              required
               className="input-minimal w-full"
             />
           </div>

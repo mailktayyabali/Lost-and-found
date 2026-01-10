@@ -52,7 +52,7 @@ function MyReports() {
     activeFilter === "All"
       ? items
       : activeFilter === "Resolved"
-        ? items.filter((item) => item.resolved)
+        ? items.filter((item) => item.isResolved)
         : items.filter(
           (post) => post.status?.toUpperCase() === activeFilter.toUpperCase()
         );
@@ -78,8 +78,8 @@ function MyReports() {
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
                 className={`px-4 md:px-6 py-2 rounded-full text-sm md:text-base font-medium transition-all ${activeFilter === filter
-                    ? "bg-gray-800 text-white shadow-md"
-                    : "text-gray-600 hover:bg-gray-100"
+                  ? "bg-gray-800 text-white shadow-md"
+                  : "text-gray-600 hover:bg-gray-100"
                   }`}
               >
                 {filter}

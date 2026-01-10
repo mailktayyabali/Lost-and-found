@@ -129,6 +129,12 @@ const updateItem = async (req, res, next) => {
       throw new ForbiddenError('Not authorized to update this item');
     }
 
+    // Check if item is already resolved
+    if (item.isResolved) {
+      const { BadRequestError } = require('../utils/errors');
+      throw new BadRequestError('Cannot edit an item that has been claimed/resolved');
+    }
+
     const itemData = { ...req.body };
 
     // Handle image updates

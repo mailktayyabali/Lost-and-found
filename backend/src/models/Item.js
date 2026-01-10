@@ -11,6 +11,7 @@ const itemSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Please provide a title'],
       trim: true,
+      match: [/^[a-zA-Z\s]*$/, 'Title can only contain letters and spaces'],
       maxlength: [100, 'Title cannot exceed 100 characters'],
     },
     description: {
@@ -32,6 +33,7 @@ const itemSchema = new mongoose.Schema(
     color: {
       type: String,
       trim: true,
+      match: [/^[a-zA-Z\s]*$/, 'Color can only contain letters and spaces'],
     },
     location: {
       type: String,
@@ -53,6 +55,12 @@ const itemSchema = new mongoose.Schema(
     images: {
       type: [String],
       default: [],
+      validate: {
+        validator: function (v) {
+          return v && v.length > 0;
+        },
+        message: 'Please upload at least one image',
+      },
     },
     postedBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -63,6 +71,7 @@ const itemSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Please provide contact name'],
       trim: true,
+      match: [/^[a-zA-Z\s]*$/, 'Contact name can only contain letters and spaces'],
     },
     contactEmail: {
       type: String,
@@ -72,7 +81,9 @@ const itemSchema = new mongoose.Schema(
     },
     contactPhone: {
       type: String,
+      required: [true, 'Please provide contact phone number'],
       trim: true,
+      match: [/^\d+$/, 'Phone number must contain only numbers'],
     },
     isResolved: {
       type: Boolean,
