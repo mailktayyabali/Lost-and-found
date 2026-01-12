@@ -18,6 +18,7 @@ export default function ReportItem({ isEditMode = false }) {
   const fileInputRef = useRef(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [existingImages, setExistingImages] = useState([]); // For edit mode
+  const [keptImages, setKeptImages] = useState([]); // Track images user keeps
 
   const [formData, setFormData] = useState({
     itemName: "",
@@ -88,6 +89,7 @@ export default function ReportItem({ isEditMode = false }) {
               contactPhone: item.contactPhone || "",
             });
             setExistingImages(item.images || []);
+            setKeptImages(item.images || []); // Initialize keptImages
           }
         } catch (err) {
           console.error(err);
@@ -132,6 +134,18 @@ export default function ReportItem({ isEditMode = false }) {
     setSelectedFiles(files);
   };
 
+  const removeSelectedFile = (index) => {
+    const newFiles = [...selectedFiles];
+    newFiles.splice(index, 1);
+    setSelectedFiles(newFiles);
+  };
+
+  const removeExistingImage = (index) => {
+    const newKept = [...keptImages];
+    newKept.splice(index, 1);
+    setKeptImages(newKept);
+  };
+
   const handleFileClick = () => {
     fileInputRef.current?.click();
   };
@@ -147,9 +161,10 @@ export default function ReportItem({ isEditMode = false }) {
     }
 
     // Validate Images
-    if (selectedFiles.length === 0 && (!isEditMode || existingImages.length === 0)) {
+    // Must have at least one image (either new or kept)
+    if (selectedFiles.length === 0 && (!isEditMode || keptImages.length === 0)) {
       setError("Please upload at least one image");
-      setLoading(false); // Make sure to stop loading if it was set (though it's set after this block usually, but good practice if moved)
+      setLoading(false);
       return;
     }
 
@@ -181,6 +196,11 @@ export default function ReportItem({ isEditMode = false }) {
       selectedFiles.forEach((file) => {
         formDataToSend.append("images", file);
       });
+
+      // Add kept images for edit mode
+      if (isEditMode) {
+        keptImages.forEach(img => formDataToSend.append("keptImages", img));
+      }
 
       // If updating, you might want to handle existing images logic (e.g. deleting them?)
       // For now, new images are just added.
@@ -343,6 +363,48 @@ export default function ReportItem({ isEditMode = false }) {
                 </p>
               )}
             </div>
+
+            {/* Existing Images Preview (Edit Mode) */}
+            {isEditMode && keptImages.length > 0 && (
+              <div className="mt-4">
+                <p className="text-sm font-medium text-navy mb-2">Existing Photos:</p>
+                <div className="flex flex-wrap gap-3">
+                  {keptImages.map((img, index) => (
+                    <div key={index} className="relative group">
+                      <img src={img} alt={`Existing ${index}`} className="w-20 h-20 object-cover rounded-md border border-gray-200" />
+                      <button
+                        type="button"
+                        onClick={() => removeExistingImage(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-sm hover:bg-red-600 transition-colors"
+                      >
+                        <i className="fa-solid fa-times"></i>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Selected New Files Preview */}
+            {selectedFiles.length > 0 && (
+              <div className="mt-4">
+                <p className="text-sm font-medium text-navy mb-2">New Photos:</p>
+                <div className="flex flex-wrap gap-3">
+                  {selectedFiles.map((file, index) => (
+                    <div key={index} className="relative group">
+                      <img src={URL.createObjectURL(file)} alt={`New ${index}`} className="w-20 h-20 object-cover rounded-md border border-gray-200" />
+                      <button
+                        type="button"
+                        onClick={() => removeSelectedFile(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-sm hover:bg-red-600 transition-colors"
+                      >
+                        <i className="fa-solid fa-times"></i>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </section>
 

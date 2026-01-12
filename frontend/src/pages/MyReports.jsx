@@ -54,7 +54,7 @@ function MyReports() {
       : activeFilter === "Resolved"
         ? items.filter((item) => item.isResolved)
         : items.filter(
-          (post) => post.status?.toUpperCase() === activeFilter.toUpperCase()
+          (post) => post.status?.toUpperCase() === activeFilter.toUpperCase() && !post.isResolved
         );
 
   return (

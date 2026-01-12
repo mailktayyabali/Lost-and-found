@@ -138,13 +138,58 @@ const updateItem = async (req, res, next) => {
     const itemData = { ...req.body };
 
     // Handle image updates
-    if (req.files && req.files.length > 0) {
-      const newImageUrls = await uploadMultipleImageFiles(req.files);
-      const oldImages = item.images || [];
-      itemData.images = [...oldImages, ...newImageUrls];
-    } else if (req.body.images && Array.isArray(req.body.images)) {
-      itemData.images = req.body.images;
+    // Handle image updates
+    // Logic:
+    // 1. Identify kept images (from req.body.keptImages)
+    // 2. Identify new images (from req.files)
+    // 3. Calculate images to delete (item.images - keptImages)
+    // 4. Delete removed images from cloud
+    // 5. Update item.images with [...keptImages, ...newImages]
+
+    let keptImages = [];
+    if (req.body.keptImages) {
+        if (Array.isArray(req.body.keptImages)) {
+            keptImages = req.body.keptImages;
+        } else {
+            keptImages = [req.body.keptImages];
+        }
+    } else {
+        // If keptImages is explicitly not sent (or empty), it might mean delete all? 
+        // But validation requires at least one.
+        // If the frontend sends nothing for 'keptImages', we assume user kept none of the old ones.
+        // HOWEVER, to be safe against older clients, if keptImages is undefined, maybe we shouldn't wipe?
+        // But for this feature, the frontend WILL send keptImages.
+        // If keptImages is undefined, we assume empty array (user removed all old images).
+        keptImages = [];
     }
+
+    // Determine images to delete
+    const oldImages = item.images || [];
+    const imagesToDelete = oldImages.filter(img => !keptImages.includes(img));
+
+    // Handle new uploads
+    let newImageUrls = [];
+    if (req.files && req.files.length > 0) {
+      newImageUrls = await uploadMultipleImageFiles(req.files);
+    } else if (req.body.images && Array.isArray(req.body.images)) {
+        // Fallback or specific testing scenario where images are sent as URLs directly
+        newImageUrls = req.body.images;
+    }
+
+    const finalImages = [...keptImages, ...newImageUrls];
+
+    // Validate: At least one image must exist
+    if (finalImages.length === 0) {
+         const { BadRequestError } = require('../utils/errors');
+         throw new BadRequestError('At least one image is required');
+    }
+
+    // Delete removed images
+    if (imagesToDelete.length > 0) {
+        await deleteMultipleImages(imagesToDelete);
+    }
+
+    itemData.images = finalImages;
 
     const updatedItem = await Item.findByIdAndUpdate(req.params.id, itemData, {
       new: true,
