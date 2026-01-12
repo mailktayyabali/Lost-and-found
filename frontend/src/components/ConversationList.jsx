@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useMessaging } from "../context/MessagingContext";
+
 
 function ConversationList({ conversations }) {
   const formatTime = (timestamp) => {
@@ -34,8 +34,8 @@ function ConversationList({ conversations }) {
             key={`${conv.itemId}-${conv.otherUserId}`}
             to={`/chat/${conv.itemId}/${conv.otherUserId}`}
             className={`block p-4 rounded-xl border transition-colors ${post?.isResolved
-                ? "bg-gray-50 border-gray-200"
-                : "bg-white border-gray-100 hover:border-teal"
+              ? "bg-gray-50 border-gray-200"
+              : "bg-white border-gray-100 hover:border-teal"
               }`}
           >
             <div className="flex items-start gap-3">

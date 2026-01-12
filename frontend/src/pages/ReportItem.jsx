@@ -33,7 +33,8 @@ export default function ReportItem({ isEditMode = false }) {
   });
 
   // Fetch item details if in edit mode
-  useState(() => {
+  // Fetch item details if in edit mode
+  useEffect(() => {
     if (isEditMode && params.id) {
       const fetchItem = async () => {
         setLoading(true);
@@ -63,14 +64,15 @@ export default function ReportItem({ isEditMode = false }) {
             let dateStr = '';
             let timeStr = '';
             if (item.date) {
-              const d = new Date(item.date); // This might be "Month dd, YYYY" or ISO
               // Try to parse ISO from createdAt or use date field if it's standarized.
               // Best to rely on what backend sends. if backend sends ISO string for 'date' field in API:
               try {
                 const dateObj = new Date(item.createdAt || Date.now());
                 dateStr = dateObj.toISOString().split('T')[0];
                 timeStr = dateObj.toTimeString().slice(0, 5);
-              } catch (e) { }
+              } catch {
+                // ignore
+              }
             }
 
             setFormData({

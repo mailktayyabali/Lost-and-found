@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { adminApi } from "../../services/adminApi"; // Ensure this path is correct
 import {
-    LineChart,
-    Line,
     XAxis,
     YAxis,
     CartesianGrid,

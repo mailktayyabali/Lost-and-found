@@ -152,44 +152,7 @@ const getMe = async (req, res, next) => {
   }
 };
 
-// Update user profile
-const updateProfile = async (req, res, next) => {
-  try {
-    const { name, username, phone, location, bio, avatar } = req.body;
-    const userId = req.user.id;
 
-    // Check if username is taken by another user
-    if (username) {
-      const existingUser = await User.findOne({
-        username: username.toLowerCase(),
-        _id: { $ne: userId },
-      });
-      if (existingUser) {
-        throw new ValidationError('Username already taken');
-      }
-    }
-
-    const user = await User.findByIdAndUpdate(
-      userId,
-      {
-        ...(name && { name }),
-        ...(username && { username: username.toLowerCase() }),
-        ...(phone && { phone }),
-        ...(location && { location }),
-        ...(bio !== undefined && { bio }),
-        ...(avatar && { avatar }),
-      },
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-
-    sendSuccess(res, 'Profile updated successfully', { user: transformUser(user) });
-  } catch (error) {
-    next(error);
-  }
-};
 
 // Change password
 const changePassword = async (req, res, next) => {
@@ -286,7 +249,7 @@ module.exports = {
   register,
   login,
   getMe,
-  updateProfile,
+
   changePassword,
   forgotPassword,
   resetPassword,

@@ -34,7 +34,7 @@ export default function ClaimManagement({ itemId }) {
                 fetchClaims();
                 alert(`Claim ${status} successfully`);
             }
-        } catch (error) {
+        } catch {
             alert("Failed to update claim status");
         } finally {
             setActionLoading(null);

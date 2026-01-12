@@ -3,7 +3,7 @@ import { useSearchAlerts } from "../context/SearchAlertsContext";
 import { Bell, Plus } from "lucide-react";
 
 function SearchAlertsWidget() {
-  const { alerts, notifications, getUnreadCount } = useSearchAlerts();
+  const { alerts, getUnreadCount } = useSearchAlerts();
   const unreadCount = getUnreadCount();
   const activeAlerts = alerts.filter((alert) => alert.active).slice(0, 3);
 
@@ -67,9 +67,8 @@ function SearchAlertsWidget() {
                 </p>
               </div>
               <div
-                className={`w-2 h-2 rounded-full flex-shrink-0 mt-1.5 ${
-                  alert.active ? "bg-teal" : "bg-gray-300"
-                }`}
+                className={`w-2 h-2 rounded-full flex-shrink-0 mt-1.5 ${alert.active ? "bg-teal" : "bg-gray-300"
+                  }`}
               ></div>
             </div>
           </div>

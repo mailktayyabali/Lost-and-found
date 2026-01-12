@@ -4,7 +4,7 @@ const {
   register,
   login,
   getMe,
-  updateProfile,
+
   changePassword,
   forgotPassword,
   resetPassword,
@@ -26,7 +26,7 @@ router.post('/google', authLimiter, googleLogin);
 
 // Protected routes
 router.get('/me', authenticate, getMe);
-router.put('/profile', authenticate, updateProfile);
+
 router.put('/password', authenticate, changePassword);
 
 module.exports = router;

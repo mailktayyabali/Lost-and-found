@@ -42,7 +42,7 @@ export default function ResetPassword() {
       } else {
         setError(res.error || 'Failed to reset password');
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);

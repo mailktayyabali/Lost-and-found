@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "./AuthContext";
 import { messagesApi } from "../services/messagesApi";
@@ -12,7 +13,7 @@ export const MessagingProvider = ({ children }) => {
   const [messages, setMessages] = useState([]);
   const [conversations, setConversations] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false); // Removed unused state
   const [isConnected, setIsConnected] = useState(false);
   const socketRef = useRef(null);
   const currentConversationIdRef = useRef(null);
@@ -24,7 +25,7 @@ export const MessagingProvider = ({ children }) => {
   const loadConversations = useCallback(async () => {
     if (!user) return;
 
-    setLoading(true);
+    // setLoading(true); // Removed
     try {
       const response = await messagesApi.getConversations();
       if (response.success) {
@@ -44,7 +45,7 @@ export const MessagingProvider = ({ children }) => {
       console.error("Failed to load conversations:", error);
       setConversations([]);
     } finally {
-      setLoading(false);
+      // setLoading(false); // Removed
     }
   }, [user?.id]);
 

@@ -13,6 +13,10 @@ function Auth() {
   const { login, register } = useAuth();
   const navigate = useNavigate();
 
+  // Initialize checkboxes to true
+  const [rememberMe, setRememberMe] = useState(true);
+  const [acceptedTerms, setAcceptedTerms] = useState(true);
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -260,6 +264,8 @@ function Auth() {
               id={isSignIn ? "remember" : "terms"}
               required={!isSignIn}
               className="accent-teal w-4 h-4 cursor-pointer"
+              checked={isSignIn ? rememberMe : acceptedTerms}
+              onChange={(e) => isSignIn ? setRememberMe(e.target.checked) : setAcceptedTerms(e.target.checked)}
             />
             <label htmlFor={isSignIn ? "remember" : "terms"} className="text-gray-700 cursor-pointer">
               {isSignIn ? (

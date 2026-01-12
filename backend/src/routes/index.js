@@ -33,7 +33,7 @@ router.use('/reviews', reviewRoutes);
 router.use('/users', userRoutes);
 router.use('/admin', adminRoutes);
 router.use('/claims', claimRoutes);
-router.use('/claims', claimRoutes);
+
 router.use('/notifications', notificationRoutes);
 router.use('/flags', flagRoutes);
 

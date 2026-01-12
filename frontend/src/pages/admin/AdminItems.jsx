@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { adminApi } from "../../services/adminApi";
 import AdminTable from "../../components/AdminTable";
-import { Search, Trash2, Eye, CheckCircle } from "lucide-react";
+import { Search, Trash2, Eye } from "lucide-react";
 import { getErrorMessage } from "../../utils/errorHandler";
 import { Link } from "react-router-dom";
 

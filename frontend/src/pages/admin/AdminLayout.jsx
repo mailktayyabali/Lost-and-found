@@ -4,12 +4,9 @@ import {
     Users,
     Package,
     Flag,
-    Settings,
     LogOut,
     Menu,
-    X,
-    Shield,
-    Bell
+    Shield
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";

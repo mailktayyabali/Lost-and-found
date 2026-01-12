@@ -14,7 +14,7 @@ import MyClaimsWidget from "../components/MyClaimsWidget";
 import RecentItemsWidget from "../components/RecentItemsWidget";
 
 import { useFavorites } from "../context/FavoritesContext";
-import { useMessaging } from "../context/MessagingContext";
+// import { useMessaging } from "../context/MessagingContext"; // Removed unused
 import { useSearchAlerts } from "../context/SearchAlertsContext";
 import { useAuth } from "../context/AuthContext";
 import { usersApi } from "../services/usersApi";
@@ -31,7 +31,7 @@ export default function UserDashboard() {
     resolvedItems: 0,
     totalItems: 0,
   });
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true); // Removed unused
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -50,7 +50,7 @@ export default function UserDashboard() {
       } catch (err) {
         console.error("Failed to fetch user stats:", err);
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     };
 

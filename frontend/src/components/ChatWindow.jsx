@@ -5,7 +5,7 @@ import MessageBubble from "./MessageBubble";
 import { Send } from "lucide-react";
 
 function ChatWindow({ itemId, otherUserId, itemTitle, isItemResolved }) {
-  const { messages, conversations, loading, getConversation, sendMessage, markAsRead, leaveConversation, socket } = useMessaging();
+  const { messages, conversations, loading, getConversation, sendMessage, markAsRead, socket } = useMessaging();
   const { user } = useAuth();
   const [messageText, setMessageText] = useState("");
   const [conversation, setConversation] = useState([]);
@@ -102,24 +102,6 @@ function ChatWindow({ itemId, otherUserId, itemTitle, isItemResolved }) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleInputChange = (e) => {
-    setMessageText(e.target.value);
-
-    if (socket && itemId && otherUserId) {
-      // We need conversationId to emit typing. 
-      // Current implementation of MessagingContext tracks currentConversationIdRef.
-      // But here we don't have conversationId easily accessbile unless we find it.
-      // However, getConversation joins the room named by conversationId.
-      // Wait, messagesApi.getConversation uses conversationId?
-      // No, getConversation(itemId, otherUserId) calls helper?
-      // In MessagingContext: getConversation takes conversationId.
-      // But ChatWindow passes (itemId, otherUserId).
-      // Ah, useMessaging.getConversation signature: `const getConversation = async (conversationId) => { ... }`
-      // But in ChatWindow line 16: `const conv = getConversation(itemId, otherUserId);`
-      // This is a mismatch!
-      // Let's check MessagingContext again. 
-    }
-  };
 
   // FIX: Inspect MessagingContext getConversation signature vs Usage
   // MessagingContext: getConversation = async (conversationId)

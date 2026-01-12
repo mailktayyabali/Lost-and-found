@@ -1,6 +1,6 @@
 import FavoriteButton from "./FavoriteButton";
 
-function ItemHeader({ status, title, itemId, postedTime, actionButtons }) {
+function ItemHeader({ status, title, itemId, actionButtons }) {
   const isFound = status === "FOUND";
 
   return (

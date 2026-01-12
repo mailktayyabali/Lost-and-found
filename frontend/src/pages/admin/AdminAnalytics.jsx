@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { adminApi } from "../../services/adminApi";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Activity, UserPlus, Package } from "lucide-react";
 
 export default function AdminAnalytics() {

@@ -5,7 +5,7 @@ import FeedPostCard from "../components/FeedPostCard";
 import { Heart } from "lucide-react";
 
 function Favorites() {
-  const { favorites, favoriteItems } = useFavorites();
+  const { favoriteItems } = useFavorites();
   const { user } = useAuth();
 
   if (!user) {

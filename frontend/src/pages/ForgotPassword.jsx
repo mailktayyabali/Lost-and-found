@@ -19,7 +19,7 @@ export default function ForgotPassword() {
       } else {
         setError(res.error || 'Failed to send reset email');
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);

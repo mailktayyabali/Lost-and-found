@@ -10,7 +10,7 @@ import { itemsApi } from "../services/itemsApi";
 import { getErrorMessage } from "../utils/errorHandler";
 
 function Feed({ type }) {
-  const { favorites, isFavorite, favoriteItems } = useFavorites();
+  const { favoriteItems } = useFavorites();
   const { user } = useAuth();
   const { createAlert } = useSearchAlerts();
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
