@@ -1,8 +1,12 @@
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const User = require('../models/User');
-const Item = require('../models/Item');
-const path = require('path');
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import User from '../models/User.js';
+import Item from '../models/Item.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load env vars
 dotenv.config({ path: path.join(__dirname, '../../.env') });

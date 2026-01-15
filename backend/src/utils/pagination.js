@@ -22,7 +22,7 @@ const getPaginationMeta = (page, limit, total) => {
   };
 };
 
-module.exports = {
+export {
   getPaginationParams,
   getPaginationMeta,
 };

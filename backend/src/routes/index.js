@@ -1,18 +1,18 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
 // Import all route files
-const authRoutes = require('./authRoutes');
-const itemRoutes = require('./itemRoutes');
-const favoriteRoutes = require('./favoriteRoutes');
-const messageRoutes = require('./messageRoutes');
-const searchAlertRoutes = require('./searchAlertRoutes');
-const reviewRoutes = require('./reviewRoutes');
-const userRoutes = require('./userRoutes');
-const adminRoutes = require('./adminRoutes');
-const claimRoutes = require('./claimRoutes');
-const notificationRoutes = require('./notificationRoutes');
-const flagRoutes = require('./flagRoutes');
+import authRoutes from './authRoutes.js';
+import itemRoutes from './itemRoutes.js';
+import favoriteRoutes from './favoriteRoutes.js';
+import messageRoutes from './messageRoutes.js';
+import searchAlertRoutes from './searchAlertRoutes.js';
+import reviewRoutes from './reviewRoutes.js';
+import userRoutes from './userRoutes.js';
+import adminRoutes from './adminRoutes.js';
+import claimRoutes from './claimRoutes.js';
+import notificationRoutes from './notificationRoutes.js';
+import flagRoutes from './flagRoutes.js';
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -37,5 +37,5 @@ router.use('/claims', claimRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/flags', flagRoutes);
 
-module.exports = router;
+export default router;
 

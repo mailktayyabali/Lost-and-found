@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const { UnauthorizedError, ForbiddenError } = require('../utils/errors');
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
+import { UnauthorizedError, ForbiddenError } from '../utils/errors.js';
 
 // Authenticate user via JWT token
 const authenticate = async (req, res, next) => {
@@ -56,7 +56,7 @@ const authorize = (...roles) => {
   };
 };
 
-module.exports = {
+export {
   authenticate,
   authorize,
 };

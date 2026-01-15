@@ -1,8 +1,8 @@
-const Notification = require('../models/Notification');
-const { sendSuccess } = require('../utils/response');
-const { NotFoundError } = require('../utils/errors');
-const { getPaginationParams, getPaginationMeta } = require('../utils/pagination');
-const { transformNotification } = require('../utils/transformers');
+import Notification from '../models/Notification.js';
+import { sendSuccess } from '../utils/response.js';
+import { NotFoundError } from '../utils/errors.js';
+import { getPaginationParams, getPaginationMeta } from '../utils/pagination.js';
+import { transformNotification } from '../utils/transformers.js';
 
 // Get user's notifications
 const getNotifications = async (req, res, next) => {
@@ -76,7 +76,7 @@ const markAllAsRead = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
   getNotifications,
   markAsRead,
   markAllAsRead,

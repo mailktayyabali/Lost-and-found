@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const conversationSchema = new mongoose.Schema(
   {
@@ -39,5 +39,5 @@ conversationSchema.index({ lastMessageAt: -1 });
 // Compound index to find conversation between two users for an item
 conversationSchema.index({ item: 1, participants: 1 });
 
-module.exports = mongoose.model('Conversation', conversationSchema);
+export default mongoose.model('Conversation', conversationSchema);
 

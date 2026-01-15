@@ -1,4 +1,4 @@
-const cloudinary = require('cloudinary').v2;
+import { v2 as cloudinary } from 'cloudinary';
 
 // Configure Cloudinary
 cloudinary.config({
@@ -60,7 +60,7 @@ const deleteImage = async (imageUrl) => {
   }
 };
 
-module.exports = {
+export {
   cloudinary,
   uploadImage,
   uploadMultipleImages,

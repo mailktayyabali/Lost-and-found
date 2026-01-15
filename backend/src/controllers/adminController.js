@@ -1,15 +1,15 @@
-const User = require('../models/User');
-const Item = require('../models/Item');
-const Review = require('../models/Review');
-const Favorite = require('../models/Favorite');
-const Message = require('../models/Message');
-const Conversation = require('../models/Conversation');
-const SearchAlert = require('../models/SearchAlert');
-const Flag = require('../models/Flag');
-const { sendSuccess, sendError } = require('../utils/response');
-const { NotFoundError } = require('../utils/errors');
-const { getPaginationParams, getPaginationMeta } = require('../utils/pagination');
-const { transformUser, transformItems } = require('../utils/transformers');
+import User from '../models/User.js';
+import Item from '../models/Item.js';
+import Review from '../models/Review.js';
+import Favorite from '../models/Favorite.js';
+import Message from '../models/Message.js';
+import Conversation from '../models/Conversation.js';
+import SearchAlert from '../models/SearchAlert.js';
+import Flag from '../models/Flag.js';
+import { sendSuccess, sendError } from '../utils/response.js';
+import { NotFoundError } from '../utils/errors.js';
+import { getPaginationParams, getPaginationMeta } from '../utils/pagination.js';
+import { transformUser, transformItems } from '../utils/transformers.js';
 
 // Get dashboard statistics
 const getDashboardStats = async (req, res, next) => {
@@ -396,7 +396,7 @@ const updateFlagStatus = async (req, res, next) => {
     }
 };
 
-module.exports = {
+export {
   getDashboardStats,
   getAllUsers,
   getAllItems,

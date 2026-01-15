@@ -1,15 +1,15 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const {
+import {
   getConversations,
   getConversation,
   sendMessage,
   markAsRead,
   getUnreadCount,
-} = require('../controllers/messageController');
-const { authenticate } = require('../middleware/auth');
-const { apiLimiter, createLimiter } = require('../middleware/rateLimiter');
-const { validateMessage, validateMongoId } = require('../utils/validation');
+} from '../controllers/messageController.js';
+import { authenticate } from '../middleware/auth.js';
+import { apiLimiter, createLimiter } from '../middleware/rateLimiter.js';
+import { validateMessage, validateMongoId } from '../utils/validation.js';
 
 // All routes are protected
 router.use(authenticate);
@@ -20,5 +20,5 @@ router.post('/', createLimiter, validateMessage, sendMessage);
 router.put('/:messageId/read', apiLimiter, validateMongoId, markAsRead);
 router.get('/unread-count', apiLimiter, getUnreadCount);
 
-module.exports = router;
+export default router;
 

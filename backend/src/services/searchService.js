@@ -1,4 +1,5 @@
-const Item = require('../models/Item');
+import Item from '../models/Item.js';
+import SearchAlert from '../models/SearchAlert.js';
 
 // Advanced item search with filters
 const searchItems = async (filters = {}, pagination = {}) => {
@@ -109,7 +110,7 @@ const matchAlerts = async (alert) => {
 // Find alerts that match a newly posted item
 const findMatchingAlerts = async (item) => {
   try {
-    const SearchAlert = require('../models/SearchAlert');
+
     
     console.log('[Alerts] Finding matches for item:', {
       id: item._id,
@@ -201,7 +202,7 @@ const findMatchingAlerts = async (item) => {
   }
 };
 
-module.exports = {
+export {
   searchItems,
   matchAlerts,
   findMatchingAlerts,

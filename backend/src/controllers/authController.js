@@ -1,9 +1,9 @@
-const User = require('../models/User');
-const { sendSuccess, sendError } = require('../utils/response');
-const { AppError, UnauthorizedError, ValidationError, ForbiddenError } = require('../utils/errors');
-const { sendWelcomeEmail } = require('../services/emailService');
-const { transformUser } = require('../utils/transformers');
-const { OAuth2Client } = require('google-auth-library');
+import User from '../models/User.js';
+import { sendSuccess, sendError } from '../utils/response.js';
+import { AppError, UnauthorizedError, ValidationError, ForbiddenError } from '../utils/errors.js';
+import { sendWelcomeEmail } from '../services/emailService.js';
+import { transformUser } from '../utils/transformers.js';
+import { OAuth2Client } from 'google-auth-library';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -177,8 +177,8 @@ const changePassword = async (req, res, next) => {
 };
 
 // Forgot password (placeholder - would need token generation and storage)
-const crypto = require('crypto');
-const { sendPasswordResetEmail } = require('../services/emailService');
+import crypto from 'crypto';
+import { sendPasswordResetEmail } from '../services/emailService.js';
 
 const forgotPassword = async (req, res, next) => {
   try {
@@ -245,7 +245,7 @@ const resetPassword = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
   register,
   login,
   getMe,

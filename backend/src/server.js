@@ -1,10 +1,10 @@
-require('dotenv').config();
-const http = require('http');
-const app = require('./app');
-const connectDB = require('./config/database');
-const socketService = require('./services/socketService');
+import 'dotenv/config';
+import http from 'http';
+import app from './app.js';
+import connectDB from './config/database.js';
+import { init as initSocket } from './services/socketService.js';
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 // Connect to database
 connectDB();
@@ -13,7 +13,7 @@ connectDB();
 const server = http.createServer(app);
 
 // Initialize Socket.io
-socketService.init(server);
+initSocket(server);
 
 // Start server
 server.listen(PORT, () => {

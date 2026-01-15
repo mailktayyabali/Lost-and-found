@@ -1,9 +1,9 @@
-const Review = require('../models/Review');
-const User = require('../models/User');
-const { sendSuccess } = require('../utils/response');
-const { NotFoundError, ForbiddenError } = require('../utils/errors');
-const { getPaginationParams, getPaginationMeta } = require('../utils/pagination');
-const { transformReview } = require('../utils/transformers');
+import Review from '../models/Review.js';
+import User from '../models/User.js';
+import { sendSuccess } from '../utils/response.js';
+import { NotFoundError, ForbiddenError } from '../utils/errors.js';
+import { getPaginationParams, getPaginationMeta } from '../utils/pagination.js';
+import { transformReview } from '../utils/transformers.js';
 
 // Get reviews for a user
 const getReviews = async (req, res, next) => {
@@ -149,7 +149,7 @@ const updateUserRating = async (userId) => {
   });
 };
 
-module.exports = {
+export {
   getReviews,
   createReview,
   updateReview,

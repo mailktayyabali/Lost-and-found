@@ -1,11 +1,11 @@
-const socketIo = require('socket.io');
+import { Server } from 'socket.io';
 
 let io;
 
 const init = (server) => {
-  io = socketIo(server, {
+  io = new Server(server, {
     cors: {
-      origin: [process.env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:5174'],
+      origin: [process.env.FRONTEND_URL],
       methods: ['GET', 'POST'],
       credentials: true
     }
@@ -58,7 +58,7 @@ const getIo = () => {
   return io;
 };
 
-module.exports = {
+export {
   init,
   getIo
 };

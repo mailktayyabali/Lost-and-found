@@ -1,14 +1,14 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const {
+import {
   getFavorites,
   addFavorite,
   removeFavorite,
   checkFavorite,
-} = require('../controllers/favoriteController');
-const { authenticate } = require('../middleware/auth');
-const { apiLimiter } = require('../middleware/rateLimiter');
-const { validateMongoId } = require('../utils/validation');
+} from '../controllers/favoriteController.js';
+import { authenticate } from '../middleware/auth.js';
+import { apiLimiter } from '../middleware/rateLimiter.js';
+import { validateMongoId } from '../utils/validation.js';
 
 // All routes are protected
 router.use(authenticate);
@@ -18,5 +18,5 @@ router.post('/:itemId', apiLimiter, validateMongoId, addFavorite);
 router.delete('/:itemId', apiLimiter, validateMongoId, removeFavorite);
 router.get('/check/:itemId', apiLimiter, validateMongoId, checkFavorite);
 
-module.exports = router;
+export default router;
 

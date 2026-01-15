@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const flagSchema = new mongoose.Schema(
   {
@@ -47,4 +47,4 @@ flagSchema.index({ targetItem: 1 });
 flagSchema.index({ targetUser: 1 });
 flagSchema.index({ createdAt: -1 });
 
-module.exports = mongoose.model('Flag', flagSchema);
+export default mongoose.model('Flag', flagSchema);

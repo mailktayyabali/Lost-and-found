@@ -1,13 +1,13 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
 
 // Import routes
-const routes = require('./routes');
+import routes from './routes/index.js';
 
 // Import error handlers
-const { errorHandler, notFound } = require('./middleware/errorHandler');
+import { errorHandler, notFound } from './middleware/errorHandler.js';
 
 const app = express();
 
@@ -15,19 +15,10 @@ const app = express();
 app.use(helmet());
 
 // CORS configuration
-// CORS configuration: allow FRONTEND_URL and common dev origins
-const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:5174'].filter(Boolean);
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow non-browser requests like curl (no origin)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(new Error('Not allowed by CORS'));
-    },
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
+}));
 
 // Body parser middleware
 app.use(express.json());
@@ -47,4 +38,4 @@ app.use(notFound);
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
-module.exports = app;
+export default app;

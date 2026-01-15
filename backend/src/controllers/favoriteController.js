@@ -1,9 +1,9 @@
-const Favorite = require('../models/Favorite');
-const Item = require('../models/Item');
-const { sendSuccess } = require('../utils/response');
-const { NotFoundError } = require('../utils/errors');
-const { getPaginationParams, getPaginationMeta } = require('../utils/pagination');
-const { transformFavorite, transformFavoritesToIds } = require('../utils/transformers');
+import Favorite from '../models/Favorite.js';
+import Item from '../models/Item.js';
+import { sendSuccess } from '../utils/response.js';
+import { NotFoundError } from '../utils/errors.js';
+import { getPaginationParams, getPaginationMeta } from '../utils/pagination.js';
+import { transformFavorite, transformFavoritesToIds } from '../utils/transformers.js';
 
 // Get user's favorites
 const getFavorites = async (req, res, next) => {
@@ -118,7 +118,7 @@ const checkFavorite = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
   getFavorites,
   addFavorite,
   removeFavorite,

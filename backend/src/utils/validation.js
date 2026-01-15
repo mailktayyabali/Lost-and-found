@@ -1,5 +1,5 @@
 // Reusable validation schemas and custom validators
-const { body, param, query, validationResult } = require('express-validator');
+import { body, param, query, validationResult } from 'express-validator';
 
 // Validation error handler middleware
 const handleValidationErrors = (req, res, next) => {
@@ -89,7 +89,7 @@ const validateMongoId = (req, res, next) => {
   next();
 };
 
-module.exports = {
+export {
   handleValidationErrors,
   validateUserRegistration,
   validateUserLogin,

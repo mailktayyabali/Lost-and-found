@@ -1,11 +1,11 @@
-const User = require('../models/User');
-const Item = require('../models/Item');
-const Claim = require('../models/Claim');
-const Review = require('../models/Review');
-const Favorite = require('../models/Favorite');
-const { sendSuccess } = require('../utils/response');
-const { NotFoundError } = require('../utils/errors');
-const { transformUser, transformItems } = require('../utils/transformers');
+import User from '../models/User.js';
+import Item from '../models/Item.js';
+import Claim from '../models/Claim.js';
+import Review from '../models/Review.js';
+import Favorite from '../models/Favorite.js';
+import { sendSuccess } from '../utils/response.js';
+import { NotFoundError } from '../utils/errors.js';
+import { transformUser, transformItems } from '../utils/transformers.js';
 
 // Get user profile
 const getUserProfile = async (req, res, next) => {
@@ -103,7 +103,7 @@ const getUserItems = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
   getUserProfile,
   getUserStats,
   getUserItems,

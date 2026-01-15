@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const searchAlertSchema = new mongoose.Schema(
   {
@@ -52,5 +52,5 @@ searchAlertSchema.index({ user: 1 });
 searchAlertSchema.index({ active: 1 });
 searchAlertSchema.index({ user: 1, active: 1 });
 
-module.exports = mongoose.model('SearchAlert', searchAlertSchema);
+export default mongoose.model('SearchAlert', searchAlertSchema);
 

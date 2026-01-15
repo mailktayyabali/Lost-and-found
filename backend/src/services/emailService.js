@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
 // Create transporter for SMTP
 const createTransporter = () => {
@@ -61,7 +61,7 @@ const sendWelcomeEmail = async (user) => {
 };
 
 const sendPasswordResetEmail = async (user, resetToken) => {
-  const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}`;
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
   const subject = 'Password Reset Request';
   const html = `
     <h1>Password Reset Request</h1>
@@ -84,7 +84,7 @@ const sendMatchNotification = async (user, item) => {
     <p><strong>Status:</strong> ${item.status}</p>
     <p><strong>Category:</strong> ${item.category}</p>
     <p><strong>Location:</strong> ${item.location}</p>
-    <p><a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/item/${item._id}">View Item</a></p>
+    <p><a href="${process.env.FRONTEND_URL}/item/${item._id}">View Item</a></p>
   `;
   return await sendEmail(user.email, subject, html);
 };
@@ -96,12 +96,12 @@ const sendMessageNotification = async (user, sender, item) => {
     <p>Hello ${user.name},</p>
     <p>You have received a new message from ${sender.name} regarding:</p>
     <h2>${item.title}</h2>
-    <p><a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/chat/${item._id}/${sender._id}">View Conversation</a></p>
+    <p><a href="${process.env.FRONTEND_URL}/chat/${item._id}/${sender._id}">View Conversation</a></p>
   `;
   return await sendEmail(user.email, subject, html);
 };
 
-module.exports = {
+export {
   sendEmail,
   sendWelcomeEmail,
   sendPasswordResetEmail,

@@ -22,7 +22,7 @@ const sendError = (res, message, statusCode = 400, data = null) => {
   return sendResponse(res, statusCode, false, message, data);
 };
 
-module.exports = {
+export {
   sendResponse,
   sendSuccess,
   sendError,

@@ -210,7 +210,22 @@ const transformFavoritesToIds = (favorites) => {
   });
 };
 
-module.exports = {
+// Transform notification object
+const transformNotification = (notification) => {
+  if (!notification) return null;
+  const notifObj = notification.toObject ? notification.toObject() : notification;
+  return {
+    id: notifObj._id?.toString() || notifObj.id,
+    type: notifObj.type,
+    title: notifObj.title,
+    message: notifObj.message,
+    data: notifObj.data || {},
+    read: notifObj.read || false,
+    createdAt: notifObj.createdAt,
+  };
+};
+
+export {
   formatDate,
   transformUser,
   transformItem,
@@ -221,5 +236,6 @@ module.exports = {
   transformReview,
   transformSearchAlert,
   transformFavoritesToIds,
+  transformNotification,
 };
 

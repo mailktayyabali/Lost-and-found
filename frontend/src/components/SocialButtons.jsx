@@ -32,7 +32,7 @@ function SocialButtons() {
           useOneTap
           theme="outline"
           shape="circle"
-          width="100%"
+          width="250"
         />
       </div>
     </div>

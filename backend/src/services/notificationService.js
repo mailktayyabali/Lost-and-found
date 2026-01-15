@@ -1,5 +1,5 @@
-const Notification = require('../models/Notification');
-const { sendMatchNotification, sendMessageNotification } = require('./emailService');
+import Notification from '../models/Notification.js';
+import { sendMatchNotification, sendMessageNotification } from './emailService.js';
 
 // Create in-app notification
 const createNotification = async (userId, type, title, message, data = {}) => {
@@ -38,9 +38,8 @@ const sendEmailNotification = async (user, type, data) => {
   }
 };
 
-module.exports = {
+export {
   createNotification,
-
   sendEmailNotification,
 };
 

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const claimSchema = new mongoose.Schema(
   {
@@ -36,4 +36,4 @@ const claimSchema = new mongoose.Schema(
 // Prevent duplicate pending claims from sam user for same item
 claimSchema.index({ itemId: 1, claimantId: 1 }, { unique: true });
 
-module.exports = mongoose.model('Claim', claimSchema);
+export default mongoose.model('Claim', claimSchema);

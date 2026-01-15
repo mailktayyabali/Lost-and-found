@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const {
+import {
   getDashboardStats,
   getAllUsers,
   getAllItems,
@@ -11,10 +11,10 @@ const {
   unbanUser,
   getFlags,
   updateFlagStatus
-} = require('../controllers/adminController');
-const { authenticate, authorize } = require('../middleware/auth');
-const { apiLimiter } = require('../middleware/rateLimiter');
-const { validateMongoId } = require('../utils/validation');
+} from '../controllers/adminController.js';
+import { authenticate, authorize } from '../middleware/auth.js';
+import { apiLimiter } from '../middleware/rateLimiter.js';
+import { validateMongoId } from '../utils/validation.js';
 
 // All routes are admin only
 router.use(authenticate);
@@ -33,4 +33,4 @@ router.get('/activity', apiLimiter, getActivityLog);
 router.get('/flags', apiLimiter, getFlags);
 router.patch('/flags/:id', apiLimiter, validateMongoId, updateFlagStatus);
 
-module.exports = router;
+export default router;

@@ -1,12 +1,12 @@
-const express = require('express');
-const { authenticate } = require('../middleware/auth');
-const {
+import express from 'express';
+import { authenticate } from '../middleware/auth.js';
+import {
   createClaim,
   getClaimsByItem,
   updateClaimStatus,
   getMyClaims,
   getClaimsReceived
-} = require('../controllers/claimController');
+} from '../controllers/claimController.js';
 
 const router = express.Router();
 
@@ -19,4 +19,4 @@ router.get('/received', getClaimsReceived);
 router.get('/item/:itemId', getClaimsByItem);
 router.patch('/:id/status', updateClaimStatus);
 
-module.exports = router;
+export default router;

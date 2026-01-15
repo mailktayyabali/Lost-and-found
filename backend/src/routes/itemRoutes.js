@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const {
+import {
   getAllItems,
   getItemById,
   createItem,
@@ -10,11 +10,11 @@ const {
   getUserItems,
   searchItems,
   incrementViews,
-} = require('../controllers/itemController');
-const { authenticate, authorize } = require('../middleware/auth');
-const { createLimiter, apiLimiter } = require('../middleware/rateLimiter');
-const { validateItemCreation, validateMongoId } = require('../utils/validation');
-const { uploadMultiple } = require('../middleware/upload');
+} from '../controllers/itemController.js';
+import { authenticate, authorize } from '../middleware/auth.js';
+import { createLimiter, apiLimiter } from '../middleware/rateLimiter.js';
+import { validateItemCreation, validateMongoId } from '../utils/validation.js';
+import { uploadMultiple } from '../middleware/upload.js';
 
 // Debug logger for create item requests (placed after multer so req.files is available)
 const logCreateItem = (req, res, next) => {
@@ -58,5 +58,5 @@ router.put(
 router.delete('/:id', authenticate, validateMongoId, deleteItem);
 router.patch('/:id/resolve', authenticate, validateMongoId, markAsResolved);
 
-module.exports = router;
+export default router;
 

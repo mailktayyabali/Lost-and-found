@@ -1,9 +1,9 @@
-const SearchAlert = require('../models/SearchAlert');
-const { sendSuccess } = require('../utils/response');
-const { NotFoundError } = require('../utils/errors');
-const { getPaginationParams, getPaginationMeta } = require('../utils/pagination');
-const { matchAlerts } = require('../services/searchService');
-const { transformSearchAlert, transformItems } = require('../utils/transformers');
+import SearchAlert from '../models/SearchAlert.js';
+import { sendSuccess } from '../utils/response.js';
+import { NotFoundError } from '../utils/errors.js';
+import { getPaginationParams, getPaginationMeta } from '../utils/pagination.js';
+import { matchAlerts } from '../services/searchService.js';
+import { transformSearchAlert, transformItems } from '../utils/transformers.js';
 
 // Get user's search alerts
 const getAlerts = async (req, res, next) => {
@@ -121,7 +121,7 @@ const checkMatches = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
   getAlerts,
   createAlert,
   updateAlert,

@@ -1,4 +1,4 @@
-/* eslint-disable react-refresh/only-export-components */
+
 import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 import { alertsApi } from "../services/alertsApi";

@@ -1,5 +1,5 @@
-const { formatErrorResponse } = require('../utils/errors');
-const { sendError } = require('../utils/response');
+import { formatErrorResponse } from '../utils/errors.js';
+import { sendError } from '../utils/response.js';
 
 const errorHandler = (err, req, res, next) => {
   let error = formatErrorResponse(err, req);
@@ -23,7 +23,7 @@ const notFound = (req, res, next) => {
   return sendError(res, `Route ${req.originalUrl} not found`, 404);
 };
 
-module.exports = {
+export {
   errorHandler,
   notFound,
 };

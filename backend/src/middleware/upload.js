@@ -1,5 +1,5 @@
-const multer = require('multer');
-const path = require('path');
+import multer from 'multer';
+import path from 'path';
 
 // Configure storage for temporary file storage before Cloudinary upload
 const storage = multer.memoryStorage();
@@ -32,7 +32,7 @@ const uploadSingle = upload.single('image');
 // Middleware for multiple image uploads
 const uploadMultiple = upload.array('images', 10); // Max 10 images
 
-module.exports = {
+export {
   uploadSingle,
   uploadMultiple,
   upload,

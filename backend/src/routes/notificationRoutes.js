@@ -1,12 +1,12 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const {
+import {
   getNotifications,
   markAsRead,
   markAllAsRead,
-} = require('../controllers/notificationController');
-const { authenticate } = require('../middleware/auth');
-const { validateMongoId } = require('../utils/validation');
+} from '../controllers/notificationController.js';
+import { authenticate } from '../middleware/auth.js';
+import { validateMongoId } from '../utils/validation.js';
 
 // All routes are protected
 router.use(authenticate);
@@ -15,4 +15,4 @@ router.get('/', getNotifications);
 router.put('/:id/read', validateMongoId, markAsRead);
 router.put('/read-all', markAllAsRead);
 
-module.exports = router;
+export default router;

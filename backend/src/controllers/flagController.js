@@ -1,8 +1,8 @@
-const Flag = require('../models/Flag');
-const Item = require('../models/Item');
-const User = require('../models/User');
-const { sendSuccess, sendError } = require('../utils/response');
-const { NotFoundError } = require('../utils/errors');
+import Flag from '../models/Flag.js';
+import Item from '../models/Item.js';
+import User from '../models/User.js';
+import { sendSuccess, sendError } from '../utils/response.js';
+import { NotFoundError } from '../utils/errors.js';
 
 // Create a new flag
 const createFlag = async (req, res, next) => {
@@ -49,6 +49,6 @@ const createFlag = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
   createFlag,
 };

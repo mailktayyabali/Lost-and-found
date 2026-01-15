@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const {
+import {
   register,
   login,
   getMe,
@@ -9,13 +9,13 @@ const {
   forgotPassword,
   resetPassword,
   googleLogin,
-} = require('../controllers/authController');
-const { authenticate } = require('../middleware/auth');
-const { authLimiter } = require('../middleware/rateLimiter');
-const {
+} from '../controllers/authController.js';
+import { authenticate } from '../middleware/auth.js';
+import { authLimiter } from '../middleware/rateLimiter.js';
+import {
   validateUserRegistration,
   validateUserLogin,
-} = require('../utils/validation');
+} from '../utils/validation.js';
 
 // Public routes
 router.post('/register', authLimiter, validateUserRegistration, register);
@@ -29,5 +29,5 @@ router.get('/me', authenticate, getMe);
 
 router.put('/password', authenticate, changePassword);
 
-module.exports = router;
+export default router;
 

@@ -86,7 +86,7 @@ const formatErrorResponse = (err, req) => {
   return error;
 };
 
-module.exports = {
+export {
   AppError,
   ValidationError,
   NotFoundError,

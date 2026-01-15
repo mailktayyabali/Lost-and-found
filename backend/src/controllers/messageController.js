@@ -1,13 +1,13 @@
-const Message = require('../models/Message');
-const Conversation = require('../models/Conversation');
-const Item = require('../models/Item');
-const { sendSuccess } = require('../utils/response');
-const { NotFoundError, ForbiddenError } = require('../utils/errors');
-const { getPaginationParams, getPaginationMeta } = require('../utils/pagination');
-const { sendMessageNotification } = require('../services/emailService');
-const User = require('../models/User');
-const { transformMessage, transformConversation, transformItem } = require('../utils/transformers');
-const { getIo } = require('../services/socketService');
+import Message from '../models/Message.js';
+import Conversation from '../models/Conversation.js';
+import Item from '../models/Item.js';
+import { sendSuccess } from '../utils/response.js';
+import { NotFoundError, ForbiddenError } from '../utils/errors.js';
+import { getPaginationParams, getPaginationMeta } from '../utils/pagination.js';
+import { sendMessageNotification } from '../services/emailService.js';
+import User from '../models/User.js';
+import { transformMessage, transformConversation, transformItem } from '../utils/transformers.js';
+import { getIo } from '../services/socketService.js';
 
 // Get all user conversations
 const getConversations = async (req, res, next) => {
@@ -235,7 +235,7 @@ const getUnreadCount = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
   getConversations,
   getConversation,
   sendMessage,

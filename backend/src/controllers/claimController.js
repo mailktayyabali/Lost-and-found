@@ -1,7 +1,7 @@
-const Claim = require('../models/Claim');
-const Item = require('../models/Item');
-const { sendSuccess } = require('../utils/response');
-const { NotFoundError, BadRequestError, ForbiddenError } = require('../utils/errors');
+import Claim from '../models/Claim.js';
+import Item from '../models/Item.js';
+import { sendSuccess } from '../utils/response.js';
+import { NotFoundError, BadRequestError, ForbiddenError } from '../utils/errors.js';
 
 // Create a new claim request
 const createClaim = async (req, res, next) => {
@@ -143,7 +143,7 @@ const getClaimsReceived = async (req, res, next) => {
     }
 };
 
-module.exports = {
+export {
   createClaim,
   getClaimsByItem,
   updateClaimStatus,

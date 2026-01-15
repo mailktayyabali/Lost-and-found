@@ -1,4 +1,4 @@
-const { uploadImage, uploadMultipleImages, deleteImage } = require('../config/cloudinary');
+import { uploadImage, uploadMultipleImages, deleteImage } from '../config/cloudinary.js';
 
 // Upload single image to Cloudinary
 const uploadSingleImage = async (file) => {
@@ -68,7 +68,7 @@ const deleteMultipleImages = async (imageUrls) => {
   }
 };
 
-module.exports = {
+export {
   uploadSingleImage,
   uploadMultipleImageFiles,
   deleteImageFromCloud,

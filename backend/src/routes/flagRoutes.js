@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { createFlag } = require('../controllers/flagController');
-const { authenticate } = require('../middleware/auth');
+import { createFlag } from '../controllers/flagController.js';
+import { authenticate } from '../middleware/auth.js';
 
 // Protect all routes
 router.use(authenticate);
@@ -9,4 +9,4 @@ router.use(authenticate);
 // Create a new flag
 router.post('/', createFlag);
 
-module.exports = router;
+export default router;

@@ -1,10 +1,11 @@
-const Item = require('../models/Item');
-const { sendSuccess, sendError } = require('../utils/response');
-const { NotFoundError, ForbiddenError } = require('../utils/errors');
-const { getPaginationParams, getPaginationMeta } = require('../utils/pagination');
-const { searchItems } = require('../services/searchService');
-const { uploadMultipleImageFiles, deleteMultipleImages } = require('../services/imageService');
-const { transformItem, transformItems } = require('../utils/transformers');
+import Item from '../models/Item.js';
+import { sendSuccess, sendError } from '../utils/response.js';
+import { NotFoundError, ForbiddenError, BadRequestError } from '../utils/errors.js';
+import { getPaginationParams, getPaginationMeta } from '../utils/pagination.js';
+import { searchItems, findMatchingAlerts } from '../services/searchService.js';
+import { uploadMultipleImageFiles, deleteMultipleImages } from '../services/imageService.js';
+import { transformItem, transformItems } from '../utils/transformers.js';
+import { createNotification, sendEmailNotification } from '../services/notificationService.js';
 
 // Get all items with filters and pagination
 const getAllItems = async (req, res, next) => {
@@ -83,8 +84,7 @@ const createItem = async (req, res, next) => {
     await item.populate('postedBy', 'name username avatar rating verified');
 
     // Trigger Search Alerts (Async - don't block response)
-    const { findMatchingAlerts } = require('../services/searchService');
-    const { createNotification, sendEmailNotification } = require('../services/notificationService');
+
 
     findMatchingAlerts(item).then(async (matches) => {
       console.log(`[Alerts] Found ${matches.length} matching alerts for item ${item._id}`);
@@ -131,7 +131,7 @@ const updateItem = async (req, res, next) => {
 
     // Check if item is already resolved
     if (item.isResolved) {
-      const { BadRequestError } = require('../utils/errors');
+
       throw new BadRequestError('Cannot edit an item that has been claimed/resolved');
     }
 
@@ -180,7 +180,7 @@ const updateItem = async (req, res, next) => {
 
     // Validate: At least one image must exist
     if (finalImages.length === 0) {
-         const { BadRequestError } = require('../utils/errors');
+
          throw new BadRequestError('At least one image is required');
     }
 
@@ -317,7 +317,7 @@ const incrementViews = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
   getAllItems,
   getItemById,
   createItem,
@@ -325,7 +325,7 @@ module.exports = {
   deleteItem,
   markAsResolved,
   getUserItems,
-  searchItems: searchItemsController,
+  searchItemsController as searchItems, // alias export
   incrementViews,
 };
 
