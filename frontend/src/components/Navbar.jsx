@@ -156,7 +156,7 @@ function Navbar() {
 
                       {user.role === 'user' && (
                         <Link
-                          to="/dashboard"
+                          to={`/profile/${user.id || user._id}`}
                           className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-200 hover:bg-white/5 hover:text-white rounded-lg transition-colors group"
                           onClick={() => setIsProfileOpen(false)}
                         >
