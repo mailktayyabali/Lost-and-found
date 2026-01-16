@@ -45,13 +45,17 @@ function ConversationList({ conversations }) {
         const otherUserId = conv.otherUserId || "Unknown User";
         const otherUserName = otherUserId.toString().includes("@") ? otherUserId.split("@")[0] : otherUserId;
 
+        const isUnread = conv.unreadCount > 0;
+
         return (
           <Link
             key={`${conv.itemId}-${conv.otherUserId}`}
             to={`/chat/${conv.itemId}/${conv.otherUserId}`}
             className={`block p-4 rounded-xl border transition-colors ${post?.isResolved
               ? "bg-gray-50 border-gray-200"
-              : "bg-white border-gray-100 hover:border-teal"
+              : isUnread
+                ? "bg-white border-teal shadow-sm"
+                : "bg-white border-gray-100 hover:border-teal"
               }`}
           >
             <div className="flex items-start gap-3">
@@ -67,7 +71,7 @@ function ConversationList({ conversations }) {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <h4 className="font-semibold text-navy truncate">
+                    <h4 className={`font-semibold truncate ${isUnread ? "text-black" : "text-navy"}`}>
                       {post?.title || `Item #${conv.itemId}`}
                     </h4>
                     {post?.isResolved && (
@@ -76,7 +80,7 @@ function ConversationList({ conversations }) {
                       </span>
                     )}
                   </div>
-                  {conv.unreadCount > 0 && (
+                  {isUnread && (
                     <span className="bg-teal text-white text-xs font-bold px-2 py-0.5 rounded-full">
                       {conv.unreadCount}
                     </span>
@@ -89,14 +93,14 @@ function ConversationList({ conversations }) {
                     <i className="fa-regular fa-trash-can"></i>
                   </button>
                 </div>
-                <p className="text-sm text-slate truncate mb-1">
+                <p className={`text-sm truncate mb-1 ${isUnread ? "font-bold text-gray-900" : "text-slate"}`}>
                   {conv.lastMessage?.content || "No messages"}
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate">
+                  <span className={`text-xs ${isUnread ? "font-bold text-gray-800" : "text-slate"}`}>
                     {otherUserName}
                   </span>
-                  <span className="text-xs text-slate">
+                  <span className={`text-xs ${isUnread ? "font-bold text-teal" : "text-slate"}`}>
                     {conv.lastMessage?.timestamp ? formatTime(conv.lastMessage.timestamp) : "N/A"}
                   </span>
                 </div>

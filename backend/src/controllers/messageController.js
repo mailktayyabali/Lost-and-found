@@ -23,8 +23,26 @@ const getConversations = async (req, res, next) => {
       .populate('lastMessage')
       .sort({ lastMessageAt: -1, updatedAt: -1 });
 
+    // Calculate unread counts for each conversation
+    const conversationsWithCounts = await Promise.all(
+      conversations.map(async (conv) => {
+        const unreadCount = await Message.countDocuments({
+          conversation: conv._id,
+          receiver: userId,
+          read: false
+        });
+        
+        // We need to attach unreadCount to the object before transforming
+        // transformConversation expects either a mongoose doc or object
+        // If passing object, ensure it has all populated fields
+        const convObj = conv.toObject();
+        convObj.unreadCount = unreadCount;
+        return transformConversation(convObj, userId);
+      })
+    );
+
     sendSuccess(res, 'Conversations retrieved successfully', {
-      conversations: conversations.map((conv) => transformConversation(conv, userId)),
+      conversations: conversationsWithCounts,
     });
   } catch (error) {
     next(error);

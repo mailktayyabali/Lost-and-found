@@ -42,8 +42,10 @@ export const MessagingProvider = ({ children }) => {
 
     try {
       const response = await messagesApi.getUnreadCount();
+      console.log('MessagingContext: loadUnreadCount response', response);
       if (response.success) {
-        setUnreadCount(response.data?.count || 0);
+        console.log('MessagingContext: setting unreadCount to', response.data?.unreadCount);
+        setUnreadCount(response.data?.unreadCount || 0);
       }
     } catch (error) {
       console.error("Failed to load unread count:", error);
@@ -260,14 +262,19 @@ export const MessagingProvider = ({ children }) => {
           }
         }
 
-        // 2. Update conversations list (last message)
+        // 2. Update conversations list (last message & unread count)
         setConversations((prev) => {
           const existingConvIndex = prev.findIndex(c => c.id === newMessage.conversationId);
           if (existingConvIndex !== -1) {
+            const isCurrentConv = currentConversationIdRef.current === newMessage.conversationId;
             const updatedConv = {
               ...prev[existingConvIndex],
               lastMessage: newMessage,
-              updatedAt: newMessage.createdAt
+              updatedAt: newMessage.createdAt,
+              // Increment unread count if we are not in this conversation
+              unreadCount: isCurrentConv
+                ? prev[existingConvIndex].unreadCount // Keep same (or reset to 0? logic usually resets on view)
+                : (prev[existingConvIndex].unreadCount || 0) + 1
             };
             const newConvs = [...prev];
             newConvs[existingConvIndex] = updatedConv;

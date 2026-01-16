@@ -27,7 +27,7 @@ export const messagesApi = {
   },
   getUnreadCount: async () => {
     const response = await api.get('/messages/unread-count');
-    return response.data;
+    return response;
   },
 
   deleteConversation: async (conversationId) => {
