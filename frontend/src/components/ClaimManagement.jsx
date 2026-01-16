@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { claimsApi } from "../services/claimsApi";
 
-export default function ClaimManagement({ itemId }) {
+export default function ClaimManagement({ itemId, itemStatus }) {
     const [claims, setClaims] = useState([]);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(null);
@@ -32,22 +32,27 @@ export default function ClaimManagement({ itemId }) {
             if (response.success) {
                 // Refresh claims
                 fetchClaims();
-                alert(`Claim ${status} successfully`);
+                alert(`Request ${status} successfully`);
             }
         } catch {
-            alert("Failed to update claim status");
+            alert("Failed to update status");
         } finally {
             setActionLoading(null);
         }
     };
 
-    if (loading) return <div className="p-4 text-center">Loading claims...</div>;
+    if (loading) return <div className="p-4 text-center">Loading requests...</div>;
 
     if (claims.length === 0) return null; // Don't show if no claims
 
+    // Determine header text
+    // If itemStatus is 'LOST', these are 'Found Reports' (people found my lost item)
+    // If itemStatus is 'FOUND', these are 'Ownership Claims' (people claiming my found item)
+    const headerText = itemStatus === 'LOST' ? `Found Reports (${claims.length})` : `Claim Requests (${claims.length})`;
+
     return (
         <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h3 className="mb-4 text-xl font-bold text-gray-900">Claim Requests ({claims.length})</h3>
+            <h3 className="mb-4 text-xl font-bold text-gray-900">{headerText}</h3>
             <div className="flex flex-col gap-4">
                 {claims.map((claim) => (
                     <div key={claim._id} className="flex flex-col gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4 sm:flex-row sm:items-center sm:justify-between">

@@ -213,7 +213,7 @@ function ItemDetail() {
                     Delete
                   </button>
                 </div>
-                <ClaimManagement itemId={post.id} />
+                <ClaimManagement itemId={post.id} itemStatus={post.status} />
               </div>
             )}
           </div>

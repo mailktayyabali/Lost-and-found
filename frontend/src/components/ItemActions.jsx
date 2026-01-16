@@ -70,23 +70,28 @@ function ItemActions({ status, itemId, postedBy }) {
 
   return (
     <div className="flex flex-col gap-3">
-      {hasClaimed ? (
+      {hasClaimed && claimStatus !== 'rejected' ? (
         <div className={`p-4 rounded-xl text-center font-bold border ${claimStatus === 'approved' ? 'bg-green-50 border-green-200 text-green-700' :
-          claimStatus === 'rejected' ? 'bg-red-50 border-red-200 text-red-700' :
-            'bg-yellow-50 border-yellow-200 text-yellow-700'
+          'bg-yellow-50 border-yellow-200 text-yellow-700'
           }`}>
           {claimStatus === 'approved' ? 'Claim Approved!' :
-            claimStatus === 'rejected' ? 'Claim Rejected' :
-              'Claim Pending Review'}
+            'Claim Pending Review'}
         </div>
       ) : (
-        <button
-          onClick={handleClaimHelpers}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#f2b90d] to-[#ffca28] px-6 py-4 text-[#1c180d] font-bold shadow-md shadow-[#f2b90d]/20 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#f2b90d]/30 active:translate-y-0 text-lg"
-        >
-          <span className="material-symbols-outlined">back_hand</span>
-          {isFound ? "Claim This Item" : "I Found This"}
-        </button>
+        <div className="flex flex-col gap-2">
+          {claimStatus === 'rejected' && (
+            <div className="p-2 text-center text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg">
+              Previous request rejected
+            </div>
+          )}
+          <button
+            onClick={handleClaimHelpers}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#f2b90d] to-[#ffca28] px-6 py-4 text-[#1c180d] font-bold shadow-md shadow-[#f2b90d]/20 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#f2b90d]/30 active:translate-y-0 text-lg"
+          >
+            <span className="material-symbols-outlined">back_hand</span>
+            {isFound ? (claimStatus === 'rejected' ? "Submit New Claim" : "Claim This Item") : (claimStatus === 'rejected' ? "Report Found Again" : "I Found This")}
+          </button>
+        </div>
       )}
 
       <div className="flex gap-3">
@@ -103,6 +108,7 @@ function ItemActions({ status, itemId, postedBy }) {
       {showClaimModal && (
         <ClaimModal
           itemId={itemId}
+          isFound={isFound}
           onClose={() => setShowClaimModal(false)}
           onSuccess={onClaimSuccess}
         />

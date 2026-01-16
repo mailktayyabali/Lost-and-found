@@ -26,12 +26,27 @@ const createClaim = async (req, res, next) => {
     }
 
     // Check if already claimed by this user
-    const existingClaim = await Claim.findOne({ itemId, claimantId });
-    if (existingClaim) {
-      throw new BadRequestError('You have already submitted a claim for this item');
+    // Check if already claimed by this user
+    let claim = await Claim.findOne({ itemId, claimantId });
+
+    if (claim) {
+      if (claim.status === 'pending') {
+        throw new BadRequestError('You already have a pending request for this item');
+      }
+      if (claim.status === 'approved') {
+        throw new BadRequestError('You have already successfully claimed this item');
+      }
+      
+      // If status is 'rejected', allow re-submission
+      if (claim.status === 'rejected') {
+        claim.status = 'pending';
+        claim.message = message;
+        await claim.save();
+        return sendSuccess(res, 'Request re-submitted successfully', { claim }, 200);
+      }
     }
 
-    const claim = await Claim.create({
+    claim = await Claim.create({
       itemId,
       claimantId,
       posterId: item.postedBy,
