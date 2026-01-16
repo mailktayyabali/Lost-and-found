@@ -1,7 +1,23 @@
 import { Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { useMessaging } from "../context/MessagingContext";
 
 
 function ConversationList({ conversations }) {
+  const { deleteConversation } = useMessaging();
+
+  const handleDelete = async (e, conversationId) => {
+    e.preventDefault(); // Prevent navigation
+    if (!window.confirm("Are you sure you want to delete this conversation?")) return;
+
+    const success = await deleteConversation(conversationId);
+    if (success) {
+      toast.success("Conversation deleted");
+    } else {
+      toast.error("Failed to delete conversation");
+    }
+  };
+
   const formatTime = (timestamp) => {
     const date = new Date(timestamp);
     const now = new Date();
@@ -65,6 +81,13 @@ function ConversationList({ conversations }) {
                       {conv.unreadCount}
                     </span>
                   )}
+                  <button
+                    onClick={(e) => handleDelete(e, conv.id)}
+                    className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                    title="Delete conversation"
+                  >
+                    <i className="fa-regular fa-trash-can"></i>
+                  </button>
                 </div>
                 <p className="text-sm text-slate truncate mb-1">
                   {conv.lastMessage?.content || "No messages"}

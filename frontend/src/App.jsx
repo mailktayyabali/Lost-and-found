@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
 import { FavoritesProvider } from "./context/FavoritesContext";
 import { UserProfileProvider } from "./context/UserProfileContext";
@@ -36,6 +37,7 @@ import Privacy from "./pages/Privacy";
 function App() {
   return (
     <AuthProvider>
+      <Toaster position="top-center" />
       <FavoritesProvider>
         <UserProfileProvider>
           <MessagingProvider>

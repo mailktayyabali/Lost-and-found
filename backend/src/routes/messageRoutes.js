@@ -6,6 +6,7 @@ import {
   sendMessage,
   markAsRead,
   getUnreadCount,
+  deleteConversation,
 } from '../controllers/messageController.js';
 import { authenticate } from '../middleware/auth.js';
 import { apiLimiter, createLimiter } from '../middleware/rateLimiter.js';
@@ -19,6 +20,7 @@ router.get('/conversations/:conversationId', apiLimiter, validateMongoId, getCon
 router.post('/', createLimiter, validateMessage, sendMessage);
 router.put('/:messageId/read', apiLimiter, validateMongoId, markAsRead);
 router.get('/unread-count', apiLimiter, getUnreadCount);
+router.delete('/conversations/:conversationId', apiLimiter, validateMongoId, deleteConversation);
 
 export default router;
 

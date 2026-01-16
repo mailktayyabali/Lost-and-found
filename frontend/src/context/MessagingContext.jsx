@@ -34,7 +34,7 @@ export const MessagingProvider = ({ children }) => {
     } catch (error) {
       console.error("Failed to load conversations:", error);
       setConversations([]);
-    } 
+    }
   }, [user?.id]);
 
   const loadUnreadCount = useCallback(async () => {
@@ -165,6 +165,17 @@ export const MessagingProvider = ({ children }) => {
       currentConversationIdRef.current = null;
     }
     setMessages([]);
+  }, []);
+
+  const deleteConversation = useCallback(async (conversationId) => {
+    try {
+      await messagesApi.deleteConversation(conversationId);
+      setConversations((prev) => prev.filter((c) => c._id !== conversationId && c.id !== conversationId));
+      return true;
+    } catch (error) {
+      console.error("Failed to delete conversation:", error);
+      return false;
+    }
   }, []);
 
   const markAsRead = useCallback(async (messageId) => {
@@ -313,7 +324,8 @@ export const MessagingProvider = ({ children }) => {
         markAsRead,
         getUnreadCount,
         socket: socketRef.current,
-        isConnected
+        isConnected,
+        deleteConversation
       }}
     >
       {children}

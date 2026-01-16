@@ -16,6 +16,7 @@ const getConversations = async (req, res, next) => {
 
     const conversations = await Conversation.find({
       participants: userId,
+      deletedBy: { $ne: userId },
     })
       .populate('item', 'title status images')
       .populate('participants', 'name username avatar')
@@ -127,6 +128,13 @@ const sendMessage = async (req, res, next) => {
     // Update conversation
     conversation.lastMessage = message._id;
     conversation.lastMessageAt = new Date();
+    // Resurrection: Remove specific deletedBy entries if they exist
+    // If sender deleted it, it comes back. If receiver deleted it, it comes back for them too.
+    if (conversation.deletedBy && conversation.deletedBy.length > 0) {
+       conversation.deletedBy = conversation.deletedBy.filter(id => 
+          id.toString() !== senderId.toString() && id.toString() !== receiverId.toString()
+       );
+    }
     await conversation.save();
 
     // Populate message with itemId for frontend
@@ -235,11 +243,40 @@ const getUnreadCount = async (req, res, next) => {
   }
 };
 
+// Delete (Hide) conversation for user
+const deleteConversation = async (req, res, next) => {
+  try {
+    const { conversationId } = req.params;
+    const userId = req.user.id;
+
+    const conversation = await Conversation.findById(conversationId);
+    if (!conversation) {
+      throw new NotFoundError('Conversation');
+    }
+
+    // Check participation
+    if (!conversation.participants.includes(userId)) {
+      throw new ForbiddenError('Not authorized to delete this conversation');
+    }
+
+    // Add user to deletedBy if not already there
+    if (!conversation.deletedBy.includes(userId)) {
+      conversation.deletedBy.push(userId);
+      await conversation.save();
+    }
+
+    sendSuccess(res, 'Conversation deleted successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
   getConversations,
   getConversation,
   sendMessage,
   markAsRead,
   getUnreadCount,
+  deleteConversation,
 };
 

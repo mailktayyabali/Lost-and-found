@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import SocialButtons from "../components/SocialButtons";
 import { useAuth } from "../context/AuthContext";
+import { toast } from "react-hot-toast";
 
 function Auth() {
   const [isSignIn, setIsSignIn] = useState(true);
@@ -76,6 +77,7 @@ function Auth() {
 
       if (result.success) {
         console.log("Auth: Success, navigating...");
+        toast.success(`Welcome back, ${result.user.name || "User"}!`);
         // Redirect based on role
         if (result.user.role === "admin") {
           navigate("/admin");

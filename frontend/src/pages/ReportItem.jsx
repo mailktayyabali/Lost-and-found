@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { itemsApi } from "../services/itemsApi";
 import { getErrorMessage } from "../utils/errorHandler";
 import { CATEGORIES } from "../utils/constants";
+import { toast } from "react-hot-toast";
 
 export default function ReportItem({ isEditMode = false }) {
   const location = useLocation();
@@ -215,6 +216,7 @@ export default function ReportItem({ isEditMode = false }) {
       if (response.success) {
         // Redirect to item detail page
         const itemId = response.data?.item?.id || response.data?.id || params.id;
+        toast.success(isEditMode ? "Item updated successfully" : "Item reported successfully");
         navigate(`/item/${itemId}`);
       } else {
         console.error('ReportItem: Submission failed', response);

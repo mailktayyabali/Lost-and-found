@@ -12,6 +12,7 @@ import ClaimManagement from "../components/ClaimManagement";
 import { itemsApi } from "../services/itemsApi";
 import { getErrorMessage } from "../utils/errorHandler";
 import { useAuth } from "../context/AuthContext";
+import { toast } from "react-hot-toast";
 
 import { Flag } from "lucide-react";
 
@@ -120,9 +121,9 @@ function ItemDetail() {
       });
       setIsReportModalOpen(false);
       setReportReason("");
-      alert("Report submitted successfully. Thank you for helping keep our community safe.");
+      toast.success("Report submitted successfully. Thank you for helping keep our community safe.");
     } catch (error) {
-      alert(getErrorMessage(error));
+      toast.error(getErrorMessage(error));
     } finally {
       setReporting(false);
     }
@@ -199,10 +200,10 @@ function ItemDetail() {
                       if (window.confirm("Are you sure you want to delete this item? This action cannot be undone.")) {
                         try {
                           await itemsApi.deleteItem(post.id);
-                          alert("Item deleted successfully");
+                          toast.success("Item deleted successfully");
                           navigate("/my-reports");
                         } catch (e) {
-                          alert(getErrorMessage(e));
+                          toast.error(getErrorMessage(e));
                         }
                       }
                     }}
