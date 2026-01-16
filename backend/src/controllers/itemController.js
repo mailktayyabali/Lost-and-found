@@ -81,11 +81,8 @@ const createItem = async (req, res, next) => {
     }
 
     const item = await Item.create(itemData);
-    await item.populate('postedBy', 'name username avatar rating verified');
-
+    await item.populate('postedBy', 'name username avatar rating verified');  
     // Trigger Search Alerts (Async - don't block response)
-
-
     findMatchingAlerts(item).then(async (matches) => {
       console.log(`[Alerts] Found ${matches.length} matching alerts for item ${item._id}`);
       

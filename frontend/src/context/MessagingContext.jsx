@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "./AuthContext";
 import { messagesApi } from "../services/messagesApi";
@@ -13,24 +12,15 @@ export const MessagingProvider = ({ children }) => {
   const [messages, setMessages] = useState([]);
   const [conversations, setConversations] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  // const [loading, setLoading] = useState(false); // Removed unused state
   const [isConnected, setIsConnected] = useState(false);
   const socketRef = useRef(null);
   const currentConversationIdRef = useRef(null);
-
-  // ----------------------------------------------------------------------
-  // 1. Define Helper Functions (useCallback) BEFORE Effects
-  // ----------------------------------------------------------------------
-
   const loadConversations = useCallback(async () => {
     if (!user) return;
-
-    // setLoading(true); // Removed
     try {
       const response = await messagesApi.getConversations();
       if (response.success) {
         const fetchedConversations = response.data?.conversations || response.data || [];
-        // Transform conversation data
         const transformedConversations = fetchedConversations.map((conv) => ({
           ...conv,
           id: conv.id || conv._id,
@@ -44,9 +34,7 @@ export const MessagingProvider = ({ children }) => {
     } catch (error) {
       console.error("Failed to load conversations:", error);
       setConversations([]);
-    } finally {
-      // setLoading(false); // Removed
-    }
+    } 
   }, [user?.id]);
 
   const loadUnreadCount = useCallback(async () => {
@@ -201,17 +189,6 @@ export const MessagingProvider = ({ children }) => {
     return unreadCount;
   }, [unreadCount]);
 
-  // ----------------------------------------------------------------------
-  // 2. Define Socket Handler (Non-hook)
-  // ----------------------------------------------------------------------
-
-
-
-  // ----------------------------------------------------------------------
-  // 3. Effects
-  // ----------------------------------------------------------------------
-
-  // Initialize socket connection
   useEffect(() => {
     if (user?.id && !socketRef.current) {
       // Clean up the URL to ensure we connect to the root, not /api namespace

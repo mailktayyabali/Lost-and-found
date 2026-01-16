@@ -273,7 +273,7 @@ function Auth() {
               ) : (
                 <>
                   I agree to the{" "}
-                  <Link to="#" className="text-teal font-medium hover:underline">
+                  <Link to="/Terms" className="text-teal font-medium hover:underline">
                     Terms & Conditions
                   </Link>
                 </>

@@ -1,12 +1,10 @@
 import { v2 as cloudinary } from 'cloudinary';
-
 // Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
 // Upload single image from buffer or file path
 const uploadImage = async (filePathOrBuffer, options = {}) => {
   try {
@@ -18,14 +16,12 @@ const uploadImage = async (filePathOrBuffer, options = {}) => {
       ],
       ...options,
     };
-
     const result = await cloudinary.uploader.upload(filePathOrBuffer, uploadOptions);
     return result.secure_url;
   } catch (error) {
     throw new Error(`Image upload failed: ${error.message}`);
   }
 };
-
 // Upload multiple images
 const uploadMultipleImages = async (files) => {
   try {

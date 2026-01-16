@@ -19,7 +19,13 @@ const createClaim = async (req, res, next) => {
       throw new BadRequestError('You cannot claim your own item');
     }
 
-    // Check if already claimed
+    // Check if any pending claim exists for this item
+    const existingPendingClaim = await Claim.findOne({ itemId, status: 'pending' });
+    if (existingPendingClaim) {
+      throw new BadRequestError('This item already has a pending claim request');
+    }
+
+    // Check if already claimed by this user
     const existingClaim = await Claim.findOne({ itemId, claimantId });
     if (existingClaim) {
       throw new BadRequestError('You have already submitted a claim for this item');

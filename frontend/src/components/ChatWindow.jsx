@@ -10,7 +10,7 @@ function ChatWindow({ itemId, otherUserId, itemTitle, isItemResolved }) {
   const [messageText, setMessageText] = useState("");
   const [conversation, setConversation] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = useRef(null)
   const typingTimeoutRef = useRef(null);
 
   useEffect(() => {
@@ -33,9 +33,8 @@ function ChatWindow({ itemId, otherUserId, itemTitle, isItemResolved }) {
       });
 
       if (existingConv) {
-        // Join room and load messages - Pass conversationId, not itemId/otherUserId
         if (getConversation) {
-          getConversation(existingConv.id); // Use the actual conversation ID
+          getConversation(existingConv.id); 
         }
 
         const lastMsg = existingConv.lastMessage;
@@ -43,8 +42,6 @@ function ChatWindow({ itemId, otherUserId, itemTitle, isItemResolved }) {
           markAsRead(lastMsg.id);
         }
       } else {
-        // New conversation - Clear messages for now
-        console.log("ChatWindow: No existing conversation found yet");
         setConversation([]);
       }
     }
@@ -65,15 +62,6 @@ function ChatWindow({ itemId, otherUserId, itemTitle, isItemResolved }) {
     scrollToBottom();
   }, [conversation, isTyping]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      // Don't call leaveConversation here - it clears messages which breaks refresh
-      // The context will handle room management via socket
-    };
-  }, []);
-
-  // Typing indicators
   useEffect(() => {
     if (!socket) return;
 
@@ -102,22 +90,10 @@ function ChatWindow({ itemId, otherUserId, itemTitle, isItemResolved }) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-
-  // FIX: Inspect MessagingContext getConversation signature vs Usage
-  // MessagingContext: getConversation = async (conversationId)
-  // ChatWindow calls: getConversation(itemId, otherUserId)
-  // This implies ChatWindow logic was flawed or I missed a helper "getConversationByItem"?
-  // Let's assume I need to fix ChatWindow to first GET connection or conversation ID.
-
-  // Actually, MessagingContext has `getConversation` taking `conversationId`.
-  // But `ChatWindow` is being passed `itemId` and `otherUserId`.
-  // It needs to FIND the conversation ID first.
-
   const handleSend = async (e) => {
     e.preventDefault();
     if (!messageText.trim() || !user) return;
 
-    // Find the conversation ID from conversations list
     const existingConv = conversations.find(c =>
       (String(c.itemId) === String(itemId)) &&
       (String(c.otherUserId) === String(otherUserId))
