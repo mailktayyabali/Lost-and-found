@@ -27,11 +27,7 @@ export const itemsApi = {
     return response;
   },
 
-  // Increment item views
-  incrementViews: async (id) => {
-    const response = await api.post(`/items/${id}/view`);
-    return response;
-  },
+
 
   // Get user items
   getUserItems: async (userId) => {

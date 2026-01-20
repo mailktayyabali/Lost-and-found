@@ -35,10 +35,7 @@ function ItemDetail() {
         const response = await itemsApi.getItemById(id);
         if (response.success && response.data) {
           const item = response.data.item || response.data;
-          // Increment views
-          itemsApi.incrementViews(id).catch(() => {
-            // Silently fail if view increment fails
-          });
+          // View increment logic removed as it's not used in UI or analytics
 
           // Transform item to match frontend format
           const transformedItem = {

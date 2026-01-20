@@ -9,7 +9,7 @@ import {
   markAsResolved,
   getUserItems,
   searchItems,
-  incrementViews,
+
 } from '../controllers/itemController.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { createLimiter, apiLimiter } from '../middleware/rateLimiter.js';
@@ -34,7 +34,7 @@ const logCreateItem = (req, res, next) => {
 router.get('/', apiLimiter, getAllItems);
 router.get('/search', apiLimiter, searchItems);
 router.get('/:id', apiLimiter, validateMongoId, getItemById);
-router.post('/:id/view', apiLimiter, validateMongoId, incrementViews);
+
 router.get('/user/:userId', apiLimiter, getUserItems);
 
 // Protected routes

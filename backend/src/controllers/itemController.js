@@ -295,24 +295,7 @@ const searchItemsController = async (req, res, next) => {
   }
 };
 
-// Increment view count
-const incrementViews = async (req, res, next) => {
-  try {
-    const item = await Item.findByIdAndUpdate(
-      req.params.id,
-      { $inc: { views: 1 } },
-      { new: true }
-    );
 
-    if (!item) {
-      throw new NotFoundError('Item');
-    }
-
-    sendSuccess(res, 'View count updated', { views: item.views });
-  } catch (error) {
-    next(error);
-  }
-};
 
 export {
   getAllItems,
@@ -323,6 +306,6 @@ export {
   markAsResolved,
   getUserItems,
   searchItemsController as searchItems, // alias export
-  incrementViews,
+
 };
 
