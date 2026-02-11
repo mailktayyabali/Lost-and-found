@@ -1,6 +1,6 @@
 # FindIt — Lost & Found
 
-[Live Demo](https://lost-and-found-dusky.vercel.app) • Public repository: mailktayyabali/Lost-and-found
+[Live Demo](https://thelostlink.vercel.app/) • Public repository: mailktayyabali/Lost-and-found
 
 A modern, secure, and user-friendly platform to report, search, and reunite lost items with their owners. Built with a React + Vite frontend, a Node.js + Express backend, MongoDB, Cloudinary for images, and Socket.io for real-time features.
 
@@ -214,11 +214,7 @@ License
 
 Contact
 - Repository owner: https://github.com/mailktayyabali
-- Demo: https://lost-and-found-dusky.vercel.app
-
-Additional resources in this repo
-- GAP_ANALYSIS.md — architecture notes & improvement suggestions (recommended read)
-- Lost_and_Found_API.postman_collection.json — Postman collection to exercise API
+- Demo: https://thelostlink.vercel.app
 
 ---
 
